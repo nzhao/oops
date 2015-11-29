@@ -4,6 +4,7 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
+Spin	include/spin/Spin.h	/^    Spin(std::vector<double> coordinate)$/;"	f	class:Spin
 Spin	include/spin/Spin.h	/^class Spin$/;"	c
 coordinate	include/spin/Spin.h	/^    std::vector<double> coordinate;$/;"	m	class:Spin
-main	app/cce.cpp	/^void main()$/;"	f
+main	app/cce.cpp	/^int  main()$/;"	f
