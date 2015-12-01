@@ -1,14 +1,33 @@
-#include <vector>
+#ifndef SPIN_H
+#define SPIN_H
 
-class Spin
+#include <vector>
+#include <string>
+#include "include/spin/SpinData.h"
+
+using namespace std;
+
+extern cSPINDATA SPIN_DATABASE;
+
+class cSPIN
 {
 public:
-    Spin(std::vector<double> coordinate)
-    {
-    }
-    std::vector<double> get_coordinate();
-    void set_coordinate(std::vector<double>);
+    cSPIN(vector<double> coord, string isotope_str);
+    cSPIN();
+
+    vector<double> get_coordinate() { return coordinate; };
+    string get_isotope() { return isotope; };
+    int get_multiplicity() { return multiplicity; };
+    double get_gamma() { return gamma; };
+
+    void set_coordinate(vector<double> coord) { coordinate = coord; };
+    void set_isotope(string iso_str) { isotope =  iso_str; };
     
 private:
-    std::vector<double> coordinate;
+    vector<double> coordinate;
+    string isotope;
+    int multiplicity;
+    double gamma;
 };
+
+#endif
