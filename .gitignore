@@ -1,4 +1,5 @@
 bin/*
 obj/*
+doc/*
 *.o
 tags
