@@ -1,12 +1,17 @@
 #include "include/spin/SpinCollection.h"
 
-cSpinCollection::cSpinCollection(cSpinSource & source)
+cSpinCollection::cSpinCollection(cSpinSource * source)
 {
-    spin_source = source;
+    _source = source;
 }
 
-cSpinCollection::make()
+cSpinCollection::~cSpinCollection()
 {
-    spin_source.generate();
+    if (!_source) delete _source;
+}
+
+void cSpinCollection::make()
+{
+    _source->generate();
 }
 

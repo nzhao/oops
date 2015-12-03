@@ -8,9 +8,12 @@
 class cSpinCollection
 {
 public:
-    cSpinCollection(cSpinSource & source);
+    cSpinCollection(cSpinSource * source);
+    ~cSpinCollection();
+
+    void make();
+    vector<cSPIN>& getSpinList(){return _source->get_spin_list();};
 private:
-    vector<cSPIN> spin_list;
-    cSpinSource& spin_source;
+    cSpinSource* _source;
 };
 #endif

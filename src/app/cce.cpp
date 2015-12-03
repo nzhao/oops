@@ -3,6 +3,8 @@
 #include <iostream>
 #include "include/spin/Spin.h"
 #include "include/spin/SpinData.h"
+#include "include/spin/SpinCollection.h"
+#include "include/spin/SpinSource.h"
 
 using namespace std;
 
@@ -17,7 +19,21 @@ int  main()
     cSPIN s1=cSPIN(coordinate, isotope);
 
     cout << s1.get_coordinate()[1] << "\t" << s1.get_isotope() << endl;
-
     cout << s1.get_multiplicity() << "\t" << s1.get_gamma() << endl;
+
+    cSpinSourceFromFile spin_file("RoyCoord.xyz");
+    cSpinCollection sc(&spin_file);
+
+    sc.make();
+
+    vector<cSPIN> sl=sc.getSpinList();
+
+    for ( cSPIN s:sl)
+    {
+        cout << s.get_isotope() << "\t" 
+            << "[" <<  s.get_coordinate()[0] 
+            << ","  << s.get_coordinate()[1] 
+            << ","  << s.get_coordinate()[2]  << "]" << endl;
+    }
     return 0;
 }
