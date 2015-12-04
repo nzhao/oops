@@ -5,13 +5,18 @@
 #include "include/spin/SpinData.h"
 #include "include/spin/SpinCollection.h"
 #include "include/spin/SpinSource.h"
+#include "include/easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
-int  main()
+int  main(int argc, char* argv[])
 {
+    START_EASYLOGGINGPP(argc, argv);
+    LOG(INFO) << "My first info log using default logger";
 
     vector<double> coordinate {1.0, 2.0, 3.0};
     string isotope="13C";
