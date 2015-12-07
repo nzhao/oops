@@ -11,11 +11,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // cSpinSource
-class cSpinGathering
+class cSpinGrouping
 {
 public:
-    cSpinGathering();
-    virtual ~cSpinGathering();
+    cSpinGrouping();
+    virtual ~cSpinGrouping();
     virtual void generate()=0;
 
     vector<cSPIN>& get_cluster_index() {return cluster_index;};
@@ -28,18 +28,16 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // cSpinSourceFromFile
-class cSpinSourceFromFile:public cSpinSource
+class cDepthFirstPathTracing:public cSpinGrouping
 {
 public:
-    cSpinSourceFromFile();
-    cSpinSourceFromFile(string filename);
-    virtual ~cSpinSourceFromFile();
+    cDepthFirstPathTracing();
+    cDepthFirstPathTracing(connection_matrix);
+    virtual ~cDepthFirstPathTracing();
 
     void generate();
 
 private:
-    void read_file();
 
-    string _filename;
 };
 #endif
