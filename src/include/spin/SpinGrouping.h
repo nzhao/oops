@@ -4,7 +4,7 @@
 #include <string>
 #include "include/spin/Spin.h"
 
-typedef vector<vector<int>> CLST_IDX;
+typedef vector<vector<int>> VECT2;
 
 using namespace std;
 
@@ -14,13 +14,14 @@ using namespace std;
 class cSpinGrouping
 {
 public:
-    cSpinGrouping();
+    cSpinGrouping(VECT2 connection_matrix);
     virtual ~cSpinGrouping();
     virtual void generate()=0;
 
-    vector<cSPIN>& get_cluster_index() {return cluster_index;};
+    VECT2& get_cluster_index() {return cluster_index;};
 protected:
-    CLST_IDX cluster_index;
+    VECT2 _cluster_index;
+    VECT2 _connection_matrix;
 private:
 };
 
@@ -38,6 +39,7 @@ public:
     void generate();
 
 private:
+    size_t max_size;
 
 };
 #endif
