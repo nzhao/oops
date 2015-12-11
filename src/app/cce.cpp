@@ -6,6 +6,7 @@
 #include "include/spin/SpinCollection.h"
 #include "include/spin/SpinSource.h"
 #include "include/easylogging++.h"
+#include "include/misc/misc.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -35,10 +36,11 @@ int  main(int argc, char* argv[])
 
     for ( cSPIN s:sl)
     {
-        cout << s.get_isotope() << "\t" 
-            << "[" <<  s.get_coordinate()[0] 
-            << ","  << s.get_coordinate()[1] 
-            << ","  << s.get_coordinate()[2]  << "]" << endl;
+        s.get_coordinate().t().print();
     }
+
+    double x;
+    x=distance( sl[1], sl[2] );
+    cout << "dist = " << x  << endl;
     return 0;
 }
