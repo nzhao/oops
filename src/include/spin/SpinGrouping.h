@@ -1,27 +1,49 @@
 #ifndef SPINGROUPING_H
 #define SPINGROUPING_H
+#include <iostream>
 #include <vector>
+#include <set>
 #include <string>
+#include <armadillo>
 #include "include/spin/Spin.h"
-
-typedef vector<vector<int>> VECT2;
 
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-// cSpinSource
+// cClusterIndex
+class cClusterIndex
+{
+public:
+    cClusterIndex();
+    cClusterIndex(const vector<int>& idx);
+    ~cClusterIndex();
+
+    friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
+    friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
+    friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
+private:
+    vector<int> _index;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// cSpinGrouping
+
+typedef set<cClusterIndex> CLST_IDX_LIST;
+
 class cSpinGrouping
 {
 public:
-    cSpinGrouping(VECT2 connection_matrix);
+    cSpinGrouping(arma::umat connection_matrix);
+    cSpinGrouping();
     virtual ~cSpinGrouping();
-    virtual void generate()=0;
+    virtual CLST_IDX_LIST generate()=0;
 
-    VECT2& get_cluster_index() {return cluster_index;};
+    CLST_IDX_LIST get_cluster_index() {return _cluster_index_list;};
 protected:
-    VECT2 _cluster_index;
-    VECT2 _connection_matrix;
+    CLST_IDX_LIST _cluster_index_list;
+    arma::umat _connection_matrix;
 private:
 };
 
@@ -33,10 +55,10 @@ class cDepthFirstPathTracing:public cSpinGrouping
 {
 public:
     cDepthFirstPathTracing();
-    cDepthFirstPathTracing(connection_matrix);
+    cDepthFirstPathTracing(arma::umat connection_matrix);
     virtual ~cDepthFirstPathTracing();
 
-    void generate();
+    CLST_IDX_LIST generate();
 
 private:
     size_t max_size;

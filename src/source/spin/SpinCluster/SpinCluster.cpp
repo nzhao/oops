@@ -1,6 +1,9 @@
 #include "include/spin/SpinCluster.h"
 #include "include/spin/SpinGrouping.h"
 
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+// cSpinCluster
 cSpinCluster::cSpinCluster(cSpinGrouping * grouping)
 {
     _grouping = grouping;
@@ -13,6 +16,6 @@ cSpinCluster::~cSpinCluster()
 
 void cSpinCluster::make()
 {
-    _grouping->generate();
+    _cluster_index_list = _grouping->generate();
 }
 

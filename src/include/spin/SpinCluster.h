@@ -2,20 +2,20 @@
 #define SPINCLUSTER_H
 
 #include <vector>
+#include <set>
 #include "include/spin/Spin.h"
 #include "include/spin/SpinGrouping.h"
-
-typedef vector<vector<int>> CLST_IDX;
 
 class cSpinCluster
 {
 public:
-    cSpinCluster(cSpinGrouping * groupling);
+    cSpinCluster(cSpinGrouping * grouping);
     ~cSpinCluster();
 
     void make();
-    CLST_IDX getClusterIndex(){return _groupling->get_cluster_index();};
+    CLST_IDX_LIST getClusterIndex(){return _cluster_index_list;};
 private:
-    cSpinGrouping * _groupling;
+    cSpinGrouping * _grouping;
+    CLST_IDX_LIST _cluster_index_list;
 };
 #endif

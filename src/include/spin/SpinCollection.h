@@ -2,6 +2,7 @@
 #define SPINCOLLECTION_H
 
 #include <vector>
+#include <armadillo>
 #include "include/spin/Spin.h"
 #include "include/spin/SpinSource.h"
 
@@ -12,8 +13,13 @@ public:
     ~cSpinCollection();
 
     void make();
-    vector<cSPIN>& getSpinList(){return _source->get_spin_list();};
+    vector<cSPIN>& getSpinList(){return spin_list;};
+    arma::mat& getDistanceMatrix(){return dist_mat;};
+    arma::umat getConnectionMatrix(double threshold);
 private:
     cSpinSource* _source;
+    vector<cSPIN> spin_list;
+
+    arma::mat dist_mat;
 };
 #endif

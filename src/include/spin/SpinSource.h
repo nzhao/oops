@@ -14,7 +14,7 @@ class cSpinSource
 public:
     cSpinSource();
     virtual ~cSpinSource();
-    virtual void generate()=0;
+    virtual vector<cSPIN>& generate()=0;
 
     vector<cSPIN>& get_spin_list() {return spin_list;};
 protected:
@@ -33,7 +33,7 @@ public:
     cSpinSourceFromFile(string filename);
     virtual ~cSpinSourceFromFile();
 
-    void generate();
+    vector<cSPIN>& generate();
 
 private:
     void read_file();

@@ -1,4 +1,6 @@
+#include "armadillo"
 #include "include/spin/SpinCollection.h"
+#include "include/misc/misc.h"
 
 cSpinCollection::cSpinCollection(cSpinSource * source)
 {
@@ -12,6 +14,23 @@ cSpinCollection::~cSpinCollection()
 
 void cSpinCollection::make()
 {
-    _source->generate();
+    spin_list= _source->generate();
+
+    int nspin=spin_list.size();
+    arma::mat d(nspin, nspin);
+    for (int i=0; i<spin_list.size(); ++i)
+    {
+        for (int j=i; j<spin_list.size(); ++j)
+        {
+            d(i,j)=distance(spin_list[i],spin_list[j]);
+        }
+    }
+    d =d+d.t();
+    dist_mat=d;
+}
+
+arma::umat cSpinCollection::getConnectionMatrix(double threshold)
+{
+    return (dist_mat<=threshold);
 }
 

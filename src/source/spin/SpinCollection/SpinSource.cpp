@@ -23,9 +23,10 @@ cSpinSource::~cSpinSource()
     cout << "destructor: cSpinSource is called" << endl;
 }
 
-void cSpinSource::generate()
+vector<cSPIN>& cSpinSource::generate()
 {
     cout << "cSpinSource::generate is called" << endl;
+    return spin_list;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +48,7 @@ cSpinSourceFromFile::~cSpinSourceFromFile()
     cout << "destructor: cSpinSourceFromFile is called" << endl;
 }
 
-void cSpinSourceFromFile::generate()
+vector<cSPIN>& cSpinSourceFromFile::generate()
 {
     int nbath;
     string atom_type;
@@ -64,5 +65,6 @@ void cSpinSourceFromFile::generate()
     }
 
     coord.close();
+    return spin_list;
 }
 
