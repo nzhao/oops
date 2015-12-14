@@ -14,6 +14,7 @@
 INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
+using namespace arma;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
@@ -30,7 +31,7 @@ int  main(int argc, char* argv[])
     cout << s1.get_coordinate()[1] << "\t" << s1.get_isotope() << endl;
     cout << s1.get_multiplicity() << "\t" << s1.get_gamma() << endl;
 
-    cSpinSourceFromFile spin_file("RoyCoord.xyz");
+    cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
     cSpinCollection sc(&spin_file);
 
     sc.make();
@@ -55,17 +56,22 @@ int  main(int argc, char* argv[])
     cDepthFirstPathTracing cg(c);
     cg.generate();
 
-    vector<int> vIdx1 {1, 5, 2};
-    vector<int> vIdx2 {1, 4, 3};
+    uvec vIdx1={1, 5, 2};
+    uvec vIdx2={1, 4, 3};
+    uvec vIdx3={1, 2, 5};
 
+    vIdx2 <<100;
     cClusterIndex clst_idx1(vIdx1);
     cClusterIndex clst_idx2(vIdx2);
+    cClusterIndex clst_idx3(vIdx3);
 
     cout << clst_idx1 << endl;
     cout << clst_idx2 << endl;
+    cout << clst_idx3 << endl;
 
     cout << "compare: " <<  (clst_idx1 == clst_idx2) << endl;
     cout << "compare less: " <<  (clst_idx1 <  clst_idx2) << endl;
+    cout << "compare eq: " << (clst_idx1 < clst_idx3) << " and " <<  (clst_idx3 <  clst_idx1) << endl;
 
     cDepthFirstPathTracing dfpt(c);
     dfpt.generate();
@@ -73,6 +79,7 @@ int  main(int argc, char* argv[])
     CLST_IDX_LIST clst_idx_lst;
     clst_idx_lst.insert(vIdx1);
     clst_idx_lst.insert(vIdx2);
+    clst_idx_lst.insert(vIdx3);
     cout << "sizeof ... " << clst_idx_lst.size() << endl;
 
     for( auto idx:clst_idx_lst)

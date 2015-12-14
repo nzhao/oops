@@ -16,14 +16,14 @@ class cClusterIndex
 {
 public:
     cClusterIndex();
-    cClusterIndex(const vector<int>& idx);
+    cClusterIndex(const arma::uvec& idx);
     ~cClusterIndex();
 
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
 private:
-    vector<int> _index;
+    arma::uvec _index;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

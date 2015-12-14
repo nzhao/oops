@@ -1,5 +1,6 @@
 bin/*
 obj/*
 doc/*
+src/logs
 *.o
 tags

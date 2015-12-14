@@ -13,7 +13,7 @@ cClusterIndex::cClusterIndex()
     cout << "cClusterIndex default constructor" << endl;
 }
 
-cClusterIndex::cClusterIndex(const vector<int>& idx)
+cClusterIndex::cClusterIndex(const uvec& idx)
 {
     _index = idx;
     sort(_index.begin(), _index.end());
@@ -44,7 +44,7 @@ bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2)
         { if(idx1._index[i] != idx2._index[i]) return idx1._index[i] < idx2._index[i]; }
     else
         return (sz1 < sz2);
-    return 1;
+    return 0;// idx1 equals to idx2
 }
 
 ostream&  operator << (ostream& outs, const cClusterIndex& idx)
@@ -95,12 +95,22 @@ cDepthFirstPathTracing::~cDepthFirstPathTracing()
 CLST_IDX_LIST cDepthFirstPathTracing::generate()
 {
     mat subgraph = eye<mat>(size(_connection_matrix));
-    cout << subgraph << endl;
+    sp_mat sp_subgraph(subgraph);
+    cout << sp_subgraph << endl;
     cout << "list length= " <<  _cluster_index_list.size() << endl;
 
-    subgraph(0,5)=1;
-    cout << subgraph << endl;
-    uvec qq = find(subgraph.row(0));
-    cout << "qq" << qq << endl;
+    sp_subgraph(0,5)=1;
+
+    size_t iii;
+    sp_mat X=sp_subgraph.row(0);
+    sp_mat::const_iterator start = X.begin(); sp_mat::const_iterator end = X.end();
+    cout << "nonzero idx:" << endl;
+    for( sp_mat::const_iterator it = start; it != end; ++it)
+    {       //cout << sp_subgraph.row(0) << endl;
+        iii=it.col();
+        cout << iii << endl;
+    }
+//    uvec qq = find(sp_subgraph.row(0));
+//    cout << "qq" << qq << endl;
     return _cluster_index_list;
 }
