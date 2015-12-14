@@ -58,7 +58,7 @@ int  main(int argc, char* argv[])
 
     uvec vIdx1={1, 5, 2};
     uvec vIdx2={1, 4, 3};
-    uvec vIdx3={1, 2, 5};
+    uvec vIdx3={1, 2, 6};
 
     vIdx2 <<100;
     cClusterIndex clst_idx1(vIdx1);
@@ -85,4 +85,21 @@ int  main(int argc, char* argv[])
     for( auto idx:clst_idx_lst)
         cout << idx << "\t";
     cout << endl;
+
+    sp_mat X1=clst_idx1.get_array(10);
+    sp_mat X2=clst_idx3.get_array(10);
+    sp_mat X3=clst_idx3.get_array(10);
+
+    cout << X1 << endl;
+    cout << X2 << endl;
+    cout << X3 << endl;
+
+//    sp_mat XX={};
+    sp_mat XX=join_cols(sp_mat {}, X1);
+    cout << "TEST" << endl;
+    XX=join_cols(XX, X2);
+    XX=join_cols(XX, X3);
+    mat XXFull(XX);
+
+    cout << "X=" << XXFull << endl;
 }

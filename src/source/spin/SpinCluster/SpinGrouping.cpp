@@ -25,6 +25,19 @@ cClusterIndex::~cClusterIndex()
     cout << "cClusterIndex default destructor" << endl;
 }
 
+sp_mat cClusterIndex::get_array(size_t nspin)
+{
+    int nnz = _index.size();
+    vec values=ones<vec>(nnz);
+    umat locations=zeros<umat>(2,nnz);
+
+    for(int i=0; i<nnz; ++i)
+        locations(1, i)=_index[i];
+
+    sp_mat idx_array(locations, values, 1, nspin);
+    return idx_array;
+}
+
 bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2)
 {
     if(idx1._index.size() == idx2._index.size())
@@ -72,6 +85,14 @@ cSpinGrouping::~cSpinGrouping()
     cout << "cSpinGrouping destructor is called." << endl;
 }
 
+arma::sp_mat cSpinGrouping::get_cluster_mat(int order)
+{
+    int nspin=_connection_matrix.size();
+    sp_mat res={};
+    for(cClusterIndex vIdx:_cluster_index_list[order])
+        res=join_cols(res, vIdx.get_array(nspin));
+    return res;
+}
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // cSpinDepthFirstPathTracing
@@ -92,7 +113,7 @@ cDepthFirstPathTracing::~cDepthFirstPathTracing()
     cout << "cSpinDepthFirstPathTracing destructor is called." << endl;
 }
 
-CLST_IDX_LIST cDepthFirstPathTracing::generate()
+CLST cDepthFirstPathTracing::generate()
 {
     mat subgraph = eye<mat>(size(_connection_matrix));
     sp_mat sp_subgraph(subgraph);

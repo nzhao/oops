@@ -19,6 +19,8 @@ public:
     cClusterIndex(const arma::uvec& idx);
     ~cClusterIndex();
 
+    arma::sp_mat get_array(size_t nspin);
+
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
@@ -31,6 +33,7 @@ private:
 // cSpinGrouping
 
 typedef set<cClusterIndex> CLST_IDX_LIST;
+typedef vector<CLST_IDX_LIST> CLST;
 
 class cSpinGrouping
 {
@@ -38,12 +41,14 @@ public:
     cSpinGrouping(arma::umat connection_matrix);
     cSpinGrouping();
     virtual ~cSpinGrouping();
-    virtual CLST_IDX_LIST generate()=0;
+    virtual CLST generate()=0;
 
-    CLST_IDX_LIST get_cluster_index() {return _cluster_index_list;};
+    CLST get_cluster_index() {return _cluster_index_list;};
+    arma::sp_mat get_cluster_mat(int order);
 protected:
-    CLST_IDX_LIST _cluster_index_list;
+    size_t nspin;
     arma::umat _connection_matrix;
+    CLST _cluster_index_list;
 private:
 };
 
@@ -58,7 +63,7 @@ public:
     cDepthFirstPathTracing(arma::umat connection_matrix);
     virtual ~cDepthFirstPathTracing();
 
-    CLST_IDX_LIST generate();
+    CLST generate();
 
 private:
     size_t max_size;
