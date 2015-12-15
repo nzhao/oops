@@ -66,13 +66,14 @@ ostream&  operator << (ostream& outs, const cClusterIndex& idx)
         outs << i << ", ";
     return outs;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // cSpinGrouping
 cSpinGrouping::cSpinGrouping()
 {
     cout << "cSpinGrouping default constructor is called." << endl;
-    _cluster_index_list = {};
+    _cluster_index_list = CLST(4);
 }
 cSpinGrouping::cSpinGrouping(umat connection_matrix)
 {
@@ -85,14 +86,30 @@ cSpinGrouping::~cSpinGrouping()
     cout << "cSpinGrouping destructor is called." << endl;
 }
 
+void cSpinGrouping::insert_index_list(CLST_IDX_LIST clst_idx_lst)
+{
+    _cluster_index_list.push_back(clst_idx_lst);
+}
+
 arma::sp_mat cSpinGrouping::get_cluster_mat(int order)
 {
-    int nspin=_connection_matrix.size();
+    cout << nspin << endl;
     sp_mat res={};
     for(cClusterIndex vIdx:_cluster_index_list[order])
         res=join_cols(res, vIdx.get_array(nspin));
     return res;
 }
+
+void cSpinGrouping::subgraph2index(const arma::sp_mat& subgraph, int order)
+{
+    for(int i=0; i<subgraph.n_rows; ++i)
+    {
+        mat r(subgraph.row(i));
+        cClusterIndex cIdx( find(r) );
+        _cluster_index_list[order].insert(cIdx);
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // cSpinDepthFirstPathTracing
@@ -102,10 +119,12 @@ cDepthFirstPathTracing::cDepthFirstPathTracing()
     cout << "need a connection matrix." << endl;
 }
 
-cDepthFirstPathTracing::cDepthFirstPathTracing(umat  connection_matrix)
+cDepthFirstPathTracing::cDepthFirstPathTracing(umat  connection_matrix, size_t maxOrder)
 {
     cout << "cSpinDepthFirstPathTracing constructor is called." << endl;
     _connection_matrix=connection_matrix;
+    nspin=_connection_matrix.n_cols;
+    subgraph2index( speye(nspin, nspin), 0);
 }
 
 cDepthFirstPathTracing::~cDepthFirstPathTracing()
@@ -115,23 +134,7 @@ cDepthFirstPathTracing::~cDepthFirstPathTracing()
 
 CLST cDepthFirstPathTracing::generate()
 {
-    mat subgraph = eye<mat>(size(_connection_matrix));
-    sp_mat sp_subgraph(subgraph);
-    cout << sp_subgraph << endl;
-    cout << "list length= " <<  _cluster_index_list.size() << endl;
-
-    sp_subgraph(0,5)=1;
-
-    size_t iii;
-    sp_mat X=sp_subgraph.row(0);
-    sp_mat::const_iterator start = X.begin(); sp_mat::const_iterator end = X.end();
-    cout << "nonzero idx:" << endl;
-    for( sp_mat::const_iterator it = start; it != end; ++it)
-    {       //cout << sp_subgraph.row(0) << endl;
-        iii=it.col();
-        cout << iii << endl;
-    }
-//    uvec qq = find(sp_subgraph.row(0));
-//    cout << "qq" << qq << endl;
+    sp_mat subgraph= get_cluster_mat(0);
+    cout << subgraph << endl;
     return _cluster_index_list;
 }

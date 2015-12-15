@@ -13,9 +13,9 @@ public:
     ~cSpinCluster();
 
     void make();
-    CLST_IDX_LIST getClusterIndex(){return _cluster_index_list;};
+    CLST getClusterIndex(){return _cluster_index_list;};
 private:
     cSpinGrouping * _grouping;
-    CLST_IDX_LIST _cluster_index_list;
+    CLST _cluster_index_list;
 };
 #endif

@@ -43,12 +43,14 @@ public:
     virtual ~cSpinGrouping();
     virtual CLST generate()=0;
 
+    void insert_index_list(CLST_IDX_LIST clst_idx_lst);
     CLST get_cluster_index() {return _cluster_index_list;};
     arma::sp_mat get_cluster_mat(int order);
 protected:
     size_t nspin;
     arma::umat _connection_matrix;
     CLST _cluster_index_list;
+    void subgraph2index(const arma::sp_mat& subgraph, int order);
 private:
 };
 
@@ -60,7 +62,7 @@ class cDepthFirstPathTracing:public cSpinGrouping
 {
 public:
     cDepthFirstPathTracing();
-    cDepthFirstPathTracing(arma::umat connection_matrix);
+    cDepthFirstPathTracing(arma::umat connection_matrix, size_t maxOrder);
     virtual ~cDepthFirstPathTracing();
 
     CLST generate();

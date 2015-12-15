@@ -43,63 +43,27 @@ int  main(int argc, char* argv[])
         s.get_coordinate().t().print();
     }
 
-    arma::mat m=sc.getDistanceMatrix();
-    cout << m(0, 0) << "\t" << m(0, 1) <<"\t" << m(0, 2) << endl;
-    cout << m(1, 0) << "\t" << m(1, 1) <<"\t" << m(1, 2) << endl;
-    cout << m(2, 0) << "\t" << m(2, 1) <<"\t" << m(2, 2) << endl;
+    mat m=sc.getDistanceMatrix(); m.print("m=:");
+    umat c=sc.getConnectionMatrix(10.0); c.print("c=");
 
-    arma::umat c=sc.getConnectionMatrix(10.0);
-    cout << c(0, 0) << "\t" << c(0, 1) <<"\t" << c(0, 2) << endl;
-    cout << c(1, 0) << "\t" << c(1, 1) <<"\t" << c(1, 2) << endl;
-    cout << c(2, 0) << "\t" << c(2, 1) <<"\t" << c(2, 2) << endl;
 
-    cDepthFirstPathTracing cg(c);
-    cg.generate();
-
-    uvec vIdx1={1, 5, 2};
-    uvec vIdx2={1, 4, 3};
-    uvec vIdx3={1, 2, 6};
-
-    vIdx2 <<100;
-    cClusterIndex clst_idx1(vIdx1);
-    cClusterIndex clst_idx2(vIdx2);
-    cClusterIndex clst_idx3(vIdx3);
+    cClusterIndex clst_idx1(uvec {1, 5, 2});
+    cClusterIndex clst_idx2(uvec {2, 5, 1});
+    cClusterIndex clst_idx3(uvec {1, 7, 9});
 
     cout << clst_idx1 << endl;
     cout << clst_idx2 << endl;
     cout << clst_idx3 << endl;
 
-    cout << "compare: " <<  (clst_idx1 == clst_idx2) << endl;
-    cout << "compare less: " <<  (clst_idx1 <  clst_idx2) << endl;
-    cout << "compare eq: " << (clst_idx1 < clst_idx3) << " and " <<  (clst_idx3 <  clst_idx1) << endl;
-
-    cDepthFirstPathTracing dfpt(c);
-    dfpt.generate();
-
     CLST_IDX_LIST clst_idx_lst;
-    clst_idx_lst.insert(vIdx1);
-    clst_idx_lst.insert(vIdx2);
-    clst_idx_lst.insert(vIdx3);
+    clst_idx_lst.insert(clst_idx1);
+    clst_idx_lst.insert(clst_idx2);
+    clst_idx_lst.insert(clst_idx3);
     cout << "sizeof ... " << clst_idx_lst.size() << endl;
 
-    for( auto idx:clst_idx_lst)
-        cout << idx << "\t";
-    cout << endl;
+    cDepthFirstPathTracing dfpt(c, 10);
+//    dfpt.insert_index_list(clst_idx_lst);
+//    sp_mat XX=dfpt.get_cluster_mat(0);
+//    mat XXFull(XX); XXFull.print("XX");
 
-    sp_mat X1=clst_idx1.get_array(10);
-    sp_mat X2=clst_idx3.get_array(10);
-    sp_mat X3=clst_idx3.get_array(10);
-
-    cout << X1 << endl;
-    cout << X2 << endl;
-    cout << X3 << endl;
-
-//    sp_mat XX={};
-    sp_mat XX=join_cols(sp_mat {}, X1);
-    cout << "TEST" << endl;
-    XX=join_cols(XX, X2);
-    XX=join_cols(XX, X3);
-    mat XXFull(XX);
-
-    cout << "X=" << XXFull << endl;
 }
