@@ -6,7 +6,7 @@
 #include "include/spin/SpinCollection.h"
 #include "include/spin/SpinSource.h"
 #include "include/spin/SpinCluster.h"
-#include "include/spin/SpinGrouping.h"
+#include "include/spin/SpinClusterAlgorithm.h"
 
 #include "include/easylogging++.h"
 #include "include/misc/misc.h"
@@ -44,26 +44,14 @@ int  main(int argc, char* argv[])
     }
 
     mat m=sc.getDistanceMatrix(); m.print("m=:");
-    umat c=sc.getConnectionMatrix(10.0); c.print("c=");
+    sp_mat c=sc.getConnectionMatrix(10.0);
+    mat cF(c); cF.print("c=");
 
+    cDepthFirstPathTracing dfpt(c, 4);
+    cSpinCluster cluster(&dfpt);
 
-    cClusterIndex clst_idx1(uvec {1, 5, 2});
-    cClusterIndex clst_idx2(uvec {2, 5, 1});
-    cClusterIndex clst_idx3(uvec {1, 7, 9});
+    cluster.make();
 
-    cout << clst_idx1 << endl;
-    cout << clst_idx2 << endl;
-    cout << clst_idx3 << endl;
-
-    CLST_IDX_LIST clst_idx_lst;
-    clst_idx_lst.insert(clst_idx1);
-    clst_idx_lst.insert(clst_idx2);
-    clst_idx_lst.insert(clst_idx3);
-    cout << "sizeof ... " << clst_idx_lst.size() << endl;
-
-    cDepthFirstPathTracing dfpt(c, 10);
-//    dfpt.insert_index_list(clst_idx_lst);
-//    sp_mat XX=dfpt.get_cluster_mat(0);
-//    mat XXFull(XX); XXFull.print("XX");
+    cout << cluster << endl;
 
 }

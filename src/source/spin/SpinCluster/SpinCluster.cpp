@@ -1,5 +1,5 @@
 #include "include/spin/SpinCluster.h"
-#include "include/spin/SpinGrouping.h"
+#include "include/spin/SpinClusterAlgorithm.h"
 
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -16,6 +16,14 @@ cSpinCluster::~cSpinCluster()
 
 void cSpinCluster::make()
 {
-    _cluster_index_list = _grouping->generate();
+    _grouping->generate();
+    _cluster_index_list = _grouping->get_cluster_index();
 }
 
+ostream&  operator << (ostream& outs, const cSpinCluster& clst)
+{
+    for(auto clst_set: clst._cluster_index_list)
+        for(auto idx: clst_set)
+            outs << idx << endl;
+    return outs;
+}

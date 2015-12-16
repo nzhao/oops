@@ -2,6 +2,9 @@
 #include "include/spin/SpinCollection.h"
 #include "include/misc/misc.h"
 
+using namespace std;
+using namespace arma;
+
 cSpinCollection::cSpinCollection(cSpinSource * source)
 {
     _source = source;
@@ -17,7 +20,7 @@ void cSpinCollection::make()
     spin_list= _source->generate();
 
     int nspin=spin_list.size();
-    arma::mat d(nspin, nspin);
+    mat d(nspin, nspin);
     for (int i=0; i<spin_list.size(); ++i)
     {
         for (int j=i; j<spin_list.size(); ++j)
@@ -29,8 +32,11 @@ void cSpinCollection::make()
     dist_mat=d;
 }
 
-arma::umat cSpinCollection::getConnectionMatrix(double threshold)
-{
-    return (dist_mat<=threshold);
+sp_mat cSpinCollection::getConnectionMatrix(double threshold)
+{ 
+    umat u = (dist_mat<=threshold);
+    sp_mat res( conv_to< mat >::from(u) );
+    for(int i=0; i<res.n_rows; ++i) res(i, i)=0;
+    return res;
 }
 

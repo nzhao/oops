@@ -6,6 +6,9 @@
 #include "include/spin/Spin.h"
 #include "include/spin/SpinSource.h"
 
+using namespace std;
+using namespace arma;
+
 class cSpinCollection
 {
 public:
@@ -14,12 +17,12 @@ public:
 
     void make();
     vector<cSPIN>& getSpinList(){return spin_list;};
-    arma::mat& getDistanceMatrix(){return dist_mat;};
-    arma::umat getConnectionMatrix(double threshold);
+    mat& getDistanceMatrix(){return dist_mat;};
+    sp_mat getConnectionMatrix(double threshold);
 private:
     cSpinSource* _source;
     vector<cSPIN> spin_list;
 
-    arma::mat dist_mat;
+    mat dist_mat;
 };
 #endif

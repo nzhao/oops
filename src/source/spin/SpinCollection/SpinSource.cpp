@@ -15,17 +15,15 @@ using namespace std;
 cSpinSource::cSpinSource()
 {
     vector<cSPIN> spin_list;
-    cout << "spin_list is initialized in cSpinSource" << endl;
+//    cout << "spin_list is initialized in cSpinSource" << endl;
 }
 
 cSpinSource::~cSpinSource()
-{
-    cout << "destructor: cSpinSource is called" << endl;
+{// cout << "destructor: cSpinSource is called" << endl;
 }
 
 vector<cSPIN>& cSpinSource::generate()
-{
-    cout << "cSpinSource::generate is called" << endl;
+{ //cout << "cSpinSource::generate is called" << endl;
     return spin_list;
 }
 
@@ -44,8 +42,7 @@ cSpinSourceFromFile::cSpinSourceFromFile(string filename)
 }
 
 cSpinSourceFromFile::~cSpinSourceFromFile()
-{
-    cout << "destructor: cSpinSourceFromFile is called" << endl;
+{// cout << "destructor: cSpinSourceFromFile is called" << endl;
 }
 
 vector<cSPIN>& cSpinSourceFromFile::generate()

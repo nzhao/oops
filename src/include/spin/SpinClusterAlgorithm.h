@@ -1,5 +1,7 @@
 #ifndef SPINGROUPING_H
 #define SPINGROUPING_H
+#define MAX_CLUSTER_ORDER  4
+
 #include <iostream>
 #include <vector>
 #include <set>
@@ -8,6 +10,8 @@
 #include "include/spin/Spin.h"
 
 using namespace std;
+using namespace arma;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,41 +20,41 @@ class cClusterIndex
 {
 public:
     cClusterIndex();
-    cClusterIndex(const arma::uvec& idx);
+    cClusterIndex(const uvec& idx);
     ~cClusterIndex();
 
-    arma::sp_mat get_array(size_t nspin);
+    sp_mat get_array(size_t nspin);
 
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
 private:
-    arma::uvec _index;
+    uvec _index;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // cSpinGrouping
 
-typedef set<cClusterIndex> CLST_IDX_LIST;
-typedef vector<CLST_IDX_LIST> CLST;
+typedef set<cClusterIndex>          FIX_ORDER_INDEX_SET;
+typedef vector<FIX_ORDER_INDEX_SET> CLST_IDX_LIST;
 
 class cSpinGrouping
 {
 public:
-    cSpinGrouping(arma::umat connection_matrix);
+    cSpinGrouping(const sp_mat& connection_matrix);
     cSpinGrouping();
     virtual ~cSpinGrouping();
-    virtual CLST generate()=0;
+    virtual void generate()=0;
 
-    void insert_index_list(CLST_IDX_LIST clst_idx_lst);
-    CLST get_cluster_index() {return _cluster_index_list;};
-    arma::sp_mat get_cluster_mat(int order);
+    CLST_IDX_LIST& get_cluster_index() {return _cluster_index_list;};
 protected:
-    size_t nspin;
-    arma::umat _connection_matrix;
-    CLST _cluster_index_list;
-    void subgraph2index(const arma::sp_mat& subgraph, int order);
+    size_t        _nspin;
+    sp_mat        _connection_matrix;
+    CLST_IDX_LIST _cluster_index_list;
+
+    void subgraph2index(const sp_mat& subgraph);
+    sp_mat index2subgraph(int order);
 private:
 };
 
@@ -62,13 +66,14 @@ class cDepthFirstPathTracing:public cSpinGrouping
 {
 public:
     cDepthFirstPathTracing();
-    cDepthFirstPathTracing(arma::umat connection_matrix, size_t maxOrder);
+    cDepthFirstPathTracing(const sp_mat& connection_matrix, size_t maxOrder);
     virtual ~cDepthFirstPathTracing();
 
-    CLST generate();
+    void generate();
 
 private:
-    size_t max_size;
+    size_t _max_order;
+    sp_mat subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order);
 
 };
 #endif
