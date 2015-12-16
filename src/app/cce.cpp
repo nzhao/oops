@@ -42,12 +42,13 @@ int  main(int argc, char* argv[])
     {
         s.get_coordinate().t().print();
     }
+    cout << distance(sl[2], sl[6]) << endl;
 
     mat m=sc.getDistanceMatrix(); m.print("m=:");
     sp_mat c=sc.getConnectionMatrix(10.0);
     mat cF(c); cF.print("c=");
 
-    cDepthFirstPathTracing dfpt(c, 4);
+    cDepthFirstPathTracing dfpt(c, 2);
     cSpinCluster cluster(&dfpt);
 
     cluster.make();

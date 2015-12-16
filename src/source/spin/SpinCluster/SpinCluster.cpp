@@ -22,8 +22,24 @@ void cSpinCluster::make()
 
 ostream&  operator << (ostream& outs, const cSpinCluster& clst)
 {
+    int i, j, tot; i=1; j=1; tot=0;
+    
+    outs << "Total Order = " << clst._cluster_index_list.size() << endl;
     for(auto clst_set: clst._cluster_index_list)
-        for(auto idx: clst_set)
-            outs << idx << endl;
+    {
+        j=1; tot += clst_set.size();
+        if(clst_set.size() > 0)
+        {
+            outs << "Cluster Order = " << i << ": Number = " << clst_set.size() << ": " << endl;
+            for(auto idx: clst_set)
+            {
+                outs << j << ": " <<  idx << endl;
+                j++;
+            }
+            outs << endl;
+        }
+        i++;
+    }
+    outs << tot << " clusters are generated." << endl;
     return outs;
 }

@@ -20,7 +20,7 @@ void cSpinCollection::make()
     spin_list= _source->generate();
 
     int nspin=spin_list.size();
-    mat d(nspin, nspin);
+    mat d(nspin, nspin); d.zeros();
     for (int i=0; i<spin_list.size(); ++i)
     {
         for (int j=i; j<spin_list.size(); ++j)

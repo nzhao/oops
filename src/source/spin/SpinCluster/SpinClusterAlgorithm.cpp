@@ -59,8 +59,12 @@ bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2)
 
 ostream&  operator << (ostream& outs, const cClusterIndex& idx)
 {
-    for(auto i: idx._index)
-        outs << i << ", ";
+    for(auto it=idx._index.begin(); it !=idx._index.end(); ++it)
+    {
+        outs << *it;
+        if(next(it) != idx._index.end())
+            outs << ", ";
+    }
     return outs;
 }
 
