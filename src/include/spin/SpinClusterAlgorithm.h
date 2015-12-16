@@ -1,6 +1,6 @@
 #ifndef SPINGROUPING_H
 #define SPINGROUPING_H
-#define MAX_CLUSTER_ORDER  4
+#define MAX_CLUSTER_ORDER  10
 
 #include <iostream>
 #include <vector>

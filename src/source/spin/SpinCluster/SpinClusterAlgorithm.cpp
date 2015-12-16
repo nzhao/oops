@@ -142,6 +142,8 @@ sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_
 
     for(int i=0; i<subgraph.n_rows; ++i)
     {
+        cout << "\r"<< i+1 <<  "/" << subgraph.n_rows << " clusters are generated of spin order= " << subgraph_order+1;
+        cout.flush();
         sp_mat parent_row(subgraph.row(i));
         mat r(neighbor.row(i));    uvec candidate = find(r);
 
@@ -160,6 +162,7 @@ sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_
             //cout << endl;
         }
     }
+    cout << endl;
 
     //cout << "new_subgraph:" << endl;
     //cout << conv_to<mat>::from(new_subgraph) << endl;
