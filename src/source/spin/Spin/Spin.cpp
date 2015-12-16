@@ -1,16 +1,17 @@
 #include <vector>
 #include <string>
+#include <armadillo>
 #include "include/spin/Spin.h"
 
 using namespace std;
 
 cSPIN::cSPIN()
 {
-    coordinate = vector<double> {0, 0, 0};
+    coordinate = arma::vec {0, 0, 0};
     isotope = "None";
 }
 
-cSPIN::cSPIN(vector<double> coord, string isotope_str)
+cSPIN::cSPIN(arma::vec coord, string isotope_str)
 {
     coordinate = coord;
     isotope = isotope_str;

@@ -5,13 +5,23 @@
 #include "include/spin/SpinData.h"
 #include "include/spin/SpinCollection.h"
 #include "include/spin/SpinSource.h"
+#include "include/spin/SpinCluster.h"
+#include "include/spin/SpinClusterAlgorithm.h"
+
+#include "include/easylogging++.h"
+#include "include/misc/misc.h"
+
+INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
+using namespace arma;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
-int  main()
+int  main(int argc, char* argv[])
 {
+    START_EASYLOGGINGPP(argc, argv);
+    LOG(INFO) << "My first info log using default logger";
 
     vector<double> coordinate {1.0, 2.0, 3.0};
     string isotope="13C";
@@ -21,7 +31,7 @@ int  main()
     cout << s1.get_coordinate()[1] << "\t" << s1.get_isotope() << endl;
     cout << s1.get_multiplicity() << "\t" << s1.get_gamma() << endl;
 
-    cSpinSourceFromFile spin_file("RoyCoord.xyz");
+    cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
     cSpinCollection sc(&spin_file);
 
     sc.make();
@@ -30,10 +40,19 @@ int  main()
 
     for ( cSPIN s:sl)
     {
-        cout << s.get_isotope() << "\t" 
-            << "[" <<  s.get_coordinate()[0] 
-            << ","  << s.get_coordinate()[1] 
-            << ","  << s.get_coordinate()[2]  << "]" << endl;
+        s.get_coordinate().t().print();
     }
-    return 0;
+    cout << distance(sl[2], sl[6]) << endl;
+
+    mat m=sc.getDistanceMatrix(); m.print("m=:");
+    sp_mat c=sc.getConnectionMatrix(10.0);
+    mat cF(c); cF.print("c=");
+
+    cDepthFirstPathTracing dfpt(c, 2);
+    cSpinCluster cluster(&dfpt);
+
+    cluster.make();
+
+    cout << cluster << endl;
+
 }
