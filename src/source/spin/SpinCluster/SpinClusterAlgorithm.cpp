@@ -15,8 +15,7 @@ cClusterIndex::cClusterIndex()
 cClusterIndex::cClusterIndex(const uvec& idx)
 {
     _index = idx;
-    sort(_index.begin(), _index.end());
-}
+    sort(_index.begin(), _index.end()); }
 
 cClusterIndex::~cClusterIndex()
 { //cout << "cClusterIndex default destructor" << endl;
@@ -137,34 +136,31 @@ void cDepthFirstPathTracing::generate()
 
 sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order)
 {
-    sp_mat new_subgraph={};
-    int n_child = 0;
+    mat new_subgraph=zeros( sum(nonzeros(neighbor)), _nspin);
 
+    int nGen=0;
     for(int i=0; i<subgraph.n_rows; ++i)
     {
-        cout << "\r"<< i+1 <<  "/" << subgraph.n_rows << " clusters are generated of spin order= " << subgraph_order+1;
-        cout.flush();
-        sp_mat parent_row(subgraph.row(i));
+        cout << "\r"<< i+1 <<  "/" << subgraph.n_rows
+             << " clusters are generated of spin order= " << subgraph_order+1 << "\t";
+
+        mat parent_row(subgraph.row(i));
         mat r(neighbor.row(i));    uvec candidate = find(r);
 
-        //cout << "p: " << conv_to<mat>::from(parent_row) << endl;
+        int row_idx=0;
         for(int j=0; j<candidate.size(); ++j)
         {
-            sp_mat temp_row=parent_row;
-            //cout << candidate(j) << ": ";
-            if( parent_row(candidate(j))==0 )
+            if(parent_row(candidate(j))==0)
             {
-                temp_row( candidate(j) ) = 1;
-                new_subgraph=join_cols(new_subgraph, temp_row);
-                n_child++;
-                //cout << conv_to<mat>::from(temp_row);
+                new_subgraph.row(nGen)=parent_row;
+                new_subgraph(nGen, candidate(j))=1;
+                nGen++;
             }
-            //cout << endl;
         }
+        cout << nGen;
+        cout.flush();
     }
     cout << endl;
 
-    //cout << "new_subgraph:" << endl;
-    //cout << conv_to<mat>::from(new_subgraph) << endl;
-    return new_subgraph;
+    return conv_to<sp_mat>::from( new_subgraph.rows(0, nGen-1) );
 }
