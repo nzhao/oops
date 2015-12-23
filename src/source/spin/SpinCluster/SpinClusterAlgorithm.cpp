@@ -162,5 +162,31 @@ sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_
     }
     cout << endl;
 
-    return conv_to<sp_mat>::from( new_subgraph.rows(0, nGen-1) );
+    mat res_mat=new_subgraph.rows(0, nGen-1);
+
+// Checking replica: 
+//    cout << "begin searching rep" << endl;
+//    mat res_mat2 = res_mat*res_mat.t();
+//    for(int i=0; i<nGen; ++i)
+//        res_mat2(i, i)=0;
+//
+//    uvec q=find(res_mat2 ==subgraph_order+1);
+//
+//    set<int> to_remove;
+//    for(int i=0; i<q.size(); ++i)
+//    {
+//        int quo=q(i)/nGen; int rem=q(i)%nGen;
+//        int q_large= quo > rem ? quo : rem;
+//        to_remove.insert(q_large);
+//    }
+//    int removed=0;
+//    for(int  q : to_remove)
+//    {
+//       res_mat.shed_row(q-removed);
+//       removed++;
+//    }
+//
+//    cout << "growth finished" << endl;
+//
+    return conv_to<sp_mat>::from( res_mat );
 }
