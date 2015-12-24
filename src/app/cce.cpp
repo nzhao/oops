@@ -44,13 +44,13 @@ int  main(int argc, char* argv[])
     }
 
     mat m=sc.getDistanceMatrix();// m.print("m=:");
-    sp_mat c=sc.getConnectionMatrix(6.0);
+    sp_mat c=sc.getConnectionMatrix(8.0);
 
     cDepthFirstPathTracing dfpt(c, 6);
     cSpinCluster cluster(&dfpt);
 
     cluster.make();
 
-    cout << cluster << endl;
+//    cout << cluster << endl;
 
 }
