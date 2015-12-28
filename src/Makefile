@@ -1,5 +1,5 @@
 ../bin/cce: ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/cce.o
-	g++ ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o -o ../bin/cce -std=c++11
+	g++ ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o -o ../bin/cce -std=c++11 -larmadillo
 
 ../obj/Spin.o: source/spin/Spin/Spin.cpp include/spin/Spin.h
 	g++ -c source/spin/Spin/Spin.cpp -o ../obj/Spin.o  -I. -std=c++11

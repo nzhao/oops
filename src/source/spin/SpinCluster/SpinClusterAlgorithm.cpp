@@ -15,23 +15,19 @@ cClusterIndex::cClusterIndex()
 cClusterIndex::cClusterIndex(const uvec& idx)
 {
     _index = idx;
-    sort(_index.begin(), _index.end());
-}
+    sort(_index.begin(), _index.end()); }
 
 cClusterIndex::~cClusterIndex()
 { //cout << "cClusterIndex default destructor" << endl;
 }
 
-sp_mat cClusterIndex::get_array(size_t nspin)
+mat cClusterIndex::get_array(size_t nspin)
 {
+    mat idx_array=zeros(1, nspin);
     int nnz = _index.size();
-    vec values=ones<vec>(nnz);
-    umat locations=zeros<umat>(2,nnz);
 
     for(int i=0; i<nnz; ++i)
-        locations(1, i)=_index[i];
-
-    sp_mat idx_array(locations, values, 1, nspin);
+        idx_array[_index[i]]=1;
     return idx_array;
 }
 
@@ -86,20 +82,29 @@ cSpinGrouping::~cSpinGrouping()
 
 sp_mat cSpinGrouping::index2subgraph(int order)
 {
-    sp_mat res={};
+    int nClst=_cluster_index_list[order].size();
+    mat res=zeros(nClst, _nspin);
+
+    int i=0;
     for(cClusterIndex vIdx:_cluster_index_list[order])
-        res=join_cols(res, vIdx.get_array(_nspin));
-    return res;
+    {
+        res.row(i) = vIdx.get_array(_nspin);
+        i++;
+    }
+    return conv_to<sp_mat>::from(res);
 }
 
 void cSpinGrouping::subgraph2index(const sp_mat& subgraph)
 {
     for(int i=0; i<subgraph.n_rows; ++i)
     {
+        cout << "\r" <<  i << "/" << subgraph.n_rows << "subgraphs are inserted. \t";
         mat r(subgraph.row(i));  uvec nz_r = find(r);  int order = nz_r.size()-1;
         cClusterIndex cIdx( nz_r );
         _cluster_index_list[ order ].insert(cIdx);
+        //_cluster_index_list[ order ].push_back(cIdx);
     }
+    cout <<endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,34 +142,69 @@ void cDepthFirstPathTracing::generate()
 
 sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order)
 {
-    sp_mat new_subgraph={};
-    int n_child = 0;
+    mat new_subgraph=zeros( sum(nonzeros(neighbor)), _nspin);
 
+    int nGen=0;
     for(int i=0; i<subgraph.n_rows; ++i)
     {
-        cout << "\r"<< i+1 <<  "/" << subgraph.n_rows << " clusters are generated of spin order= " << subgraph_order+1;
-        cout.flush();
-        sp_mat parent_row(subgraph.row(i));
+        cout << "\r"<< i+1 <<  "/" << subgraph.n_rows
+             << " clusters are generated of spin order= " << subgraph_order+1 << "\t";
+
+        mat parent_row(subgraph.row(i));
         mat r(neighbor.row(i));    uvec candidate = find(r);
 
-        //cout << "p: " << conv_to<mat>::from(parent_row) << endl;
+        int row_idx=0;
         for(int j=0; j<candidate.size(); ++j)
         {
-            sp_mat temp_row=parent_row;
-            //cout << candidate(j) << ": ";
-            if( parent_row(candidate(j))==0 )
+            if(parent_row(candidate(j))==0)
             {
-                temp_row( candidate(j) ) = 1;
-                new_subgraph=join_cols(new_subgraph, temp_row);
-                n_child++;
-                //cout << conv_to<mat>::from(temp_row);
+                new_subgraph.row(nGen)=parent_row;
+                new_subgraph(nGen, candidate(j))=1;
+                nGen++;
             }
-            //cout << endl;
         }
+        cout.flush();
     }
     cout << endl;
 
-    //cout << "new_subgraph:" << endl;
-    //cout << conv_to<mat>::from(new_subgraph) << endl;
-    return new_subgraph;
+    sp_mat res_mat=conv_to<sp_mat>::from( new_subgraph.rows(0, nGen-1) );
+
+    return res_mat;
+    //return remove_repeat(res_mat, subgraph_order);
+}
+
+sp_mat cDepthFirstPathTracing::remove_repeat(sp_mat subgraph, int subgraph_order)
+{
+    cout << "removing repeated clusters... " << endl;
+    int nGen=subgraph.n_rows;
+    sp_mat res_mat2 = subgraph*subgraph.t();
+    for(int i=0; i<nGen; ++i)
+        res_mat2(i, i)=0;
+    cout << "mat prod finished." << endl;
+
+    set<int> to_remove;
+    for(sp_mat::const_iterator it = res_mat2.begin(); it != res_mat2.end(); ++it)
+    {
+        if( (*it) == subgraph_order+1 )
+        {
+            to_remove.insert( it.row() > it.col() ? it.row() : it.col() );
+        }
+    }
+
+    vec idx=zeros(subgraph.n_rows);
+    int count =0;
+    for(int i=0; i<nGen; ++i)
+    {
+        if( to_remove.find(i) == to_remove.end() )
+        {
+            idx(count)=i;
+            count++;
+        }
+    }
+    cout << "finished." << endl;
+
+    uvec x=conv_to<uvec>::from(idx.rows(0, count-1));
+    mat subgraph_full=conv_to<mat>::from( subgraph );
+    sp_mat res_mat_sel=conv_to<sp_mat>::from( subgraph_full.rows(x) );
+    return res_mat_sel;
 }

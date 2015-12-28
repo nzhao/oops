@@ -23,7 +23,7 @@ public:
     cClusterIndex(const uvec& idx);
     ~cClusterIndex();
 
-    sp_mat get_array(size_t nspin);
+    mat get_array(size_t nspin);
 
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
@@ -74,6 +74,7 @@ public:
 private:
     size_t _max_order;
     sp_mat subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order);
+    sp_mat remove_repeat(sp_mat subgraph, int subgraph_order);
 
 };
 #endif
