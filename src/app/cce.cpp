@@ -7,6 +7,7 @@
 #include "include/spin/SpinSource.h"
 #include "include/spin/SpinCluster.h"
 #include "include/spin/SpinClusterAlgorithm.h"
+#include "include/spin/SpinInteraction.h"
 
 #include "include/easylogging++.h"
 #include "include/misc/misc.h"
@@ -49,8 +50,11 @@ int  main(int argc, char* argv[])
     cDepthFirstPathTracing dfpt(c, 6);
     cSpinCluster cluster(&dfpt);
 
-    cluster.make();
-
+//    cluster.make();
 //    cout << cluster << endl;
+
+    SpinDipolarInteraction dip(sl);
+    dip.make();
+
 
 }
