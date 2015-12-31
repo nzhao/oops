@@ -69,11 +69,28 @@ cSpinInteractionForm::~cSpinInteractionForm()
 //{{{ TwoSpinInteractionFrom
 TwoSpinInteractionFrom::TwoSpinInteractionFrom(cSpinInteractionDomain& domain)
 {
+    _nterm = 9;
+
     auto sag = domain.getSpinAggregate();
     for(auto it=sag.begin(); it!=sag.end(); ++it)
     {
         cSPIN spin0=(*it)[0];    cSPIN spin1=(*it)[1];
-        cout << spin0.sx() * spin1.sy() << endl;
+
+        vector<TERM> term_list;
+
+        term_list.push_back( TERM { spin0.sx(), spin1.sx() } );
+        term_list.push_back( TERM { spin0.sx(), spin1.sy() } );
+        term_list.push_back( TERM { spin0.sx(), spin1.sz() } );
+
+        term_list.push_back( TERM { spin0.sy(), spin1.sx() } );
+        term_list.push_back( TERM { spin0.sy(), spin1.sy() } );
+        term_list.push_back( TERM { spin0.sy(), spin1.sz() } );
+
+        term_list.push_back( TERM { spin0.sz(), spin1.sx() } );
+        term_list.push_back( TERM { spin0.sz(), spin1.sy() } );
+        term_list.push_back( TERM { spin0.sz(), spin1.sz() } );
+
+        _mat_list.push_back( term_list );
     }
 }
 TwoSpinInteractionFrom::~TwoSpinInteractionFrom()

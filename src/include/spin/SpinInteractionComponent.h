@@ -8,8 +8,9 @@
 using namespace std;
 using namespace arma;
 
+typedef vector< cx_mat > TERM;
 typedef vector< vector<int> > INDEX_LIST;
-typedef vector< vector<cx_mat> > MAT_LIST;
+typedef vector< vector<TERM> > MAT_LIST;
 typedef vector< double > COEFF_LIST;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +57,7 @@ public:
     MAT_LIST getMatList(){return _mat_list;};
     int getLength(){return _mat_list.size();};
     int get_nTerm(){return _nterm;};
-private:
+protected:
     int _nterm;
     MAT_LIST _mat_list;
 };
