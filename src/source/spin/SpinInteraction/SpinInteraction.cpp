@@ -34,10 +34,14 @@ SpinDipolarInteraction::SpinDipolarInteraction()
 SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
 {
     cout << "constructor of SpinDipolarInteraction with spin_list." << endl;
-    _spin_list=spin_list;
-    _domain=SpinPair(_spin_list.size());
 
-    cout << _domain << endl;
+    int nspin;
+    _spin_list=spin_list;
+
+    _domain=SpinPair(spin_list);
+    _form=TwoSpinInteractionFrom(_domain);
+
+//    cout << _domain << endl;
 }
 
 SpinDipolarInteraction::~SpinDipolarInteraction()

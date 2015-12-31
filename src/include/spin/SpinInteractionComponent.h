@@ -9,7 +9,7 @@ using namespace std;
 using namespace arma;
 
 typedef vector< vector<int> > INDEX_LIST;
-typedef vector< vector<mat> > MAT_LIST;
+typedef vector< vector<cx_mat> > MAT_LIST;
 typedef vector< double > COEFF_LIST;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,12 +21,14 @@ public:
     ~cSpinInteractionDomain();
 
     INDEX_LIST getIndexList(){return _index_list;};
+    vector< vector<cSPIN> > getSpinAggregate(){return _spin_aggregate;};
     int getLength(){return _index_list.size();};
     int get_nBody(){return _nbody;};
 
     friend ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm);
 protected:
     int _nbody;
+    vector< vector<cSPIN> > _spin_aggregate;
     INDEX_LIST _index_list;
 };
 //}}}
@@ -35,7 +37,7 @@ protected:
 class SpinPair:public cSpinInteractionDomain
 {
 public:
-    SpinPair(int nspin);
+    SpinPair(const vector<cSPIN>& spin_list);
     ~SpinPair();
 };
 //}}}
@@ -57,6 +59,15 @@ public:
 private:
     int _nterm;
     MAT_LIST _mat_list;
+};
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ TwoSpinInteractionFrom
+class TwoSpinInteractionFrom:public cSpinInteractionForm
+{
+public:
+    TwoSpinInteractionFrom(cSpinInteractionDomain& domain);
+    ~TwoSpinInteractionFrom();
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
