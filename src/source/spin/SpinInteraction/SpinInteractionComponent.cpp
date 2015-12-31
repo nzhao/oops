@@ -3,8 +3,7 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-// cSpinInteractionDomain
+//{{{ cSpinInteractionDomain
 cSpinInteractionDomain::cSpinInteractionDomain()
 {
     cout << "cSpinInteractionDomain" << endl;
@@ -29,8 +28,9 @@ ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm)
     }
     return outs;
 }
-
+//}}}
 //----------------------------------------------------------------------------//
+//{{{ SpinPair
 SpinPair::SpinPair(int nspin)
 {
     cout << "SpinPair constructor" << endl;
@@ -45,11 +45,13 @@ SpinPair::~SpinPair()
 {
     cout << "SpinPair, destructed." << endl;
 }
-//----------------------------------------------------------------------------//
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-// cSpinInteractionForm
+//{{{ cSpinInteractionForm
 cSpinInteractionForm::cSpinInteractionForm()
 {
     cout << "cSpinInteractionForm" << endl;
@@ -58,11 +60,13 @@ cSpinInteractionForm::~cSpinInteractionForm()
 {
     cout << "cSpinInteractionForm, destructed." << endl;
 }
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-// cSpinInteractionCoeff
+//{{{ cSpinInteractionCoeff
 cSpinInteractionCoeff::cSpinInteractionCoeff()
 {
     cout << "cSpinInteractionCoeff" << endl;
@@ -71,3 +75,5 @@ cSpinInteractionCoeff::~cSpinInteractionCoeff()
 {
     cout << "cSpinInteractionCoeff, destructed." << endl;
 }
+//}}}
+////////////////////////////////////////////////////////////////////////////////
