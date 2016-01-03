@@ -8,10 +8,11 @@
 using namespace std;
 using namespace arma;
 
+typedef arma::vec  COEFFs;
 typedef vector< cx_mat > TERM;
 typedef vector< vector<int> > INDEX_LIST;
 typedef vector< vector<TERM> > MAT_LIST;
-typedef vector< double > COEFF_LIST;
+typedef vector< COEFFs > COEFF_LIST;
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteractionDomain
@@ -57,6 +58,8 @@ public:
     MAT_LIST getMatList(){return _mat_list;};
     int getLength(){return _mat_list.size();};
     int get_nTerm(){return _nterm;};
+
+    friend ostream&  operator << (ostream& outs, cSpinInteractionForm& form);
 protected:
     int _nterm;
     MAT_LIST _mat_list;
@@ -85,8 +88,20 @@ public:
 
     COEFF_LIST getCoeffList(){return _coeff_list;};
     int getLength(){return _coeff_list.size();};
-private:
+
+    friend ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef);
+protected:
+    int _nCoeff;
     COEFF_LIST _coeff_list;
+};
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ DipolarInteractionCoeff
+class DipolarInteractionCoeff:public cSpinInteractionCoeff
+{
+public:
+    DipolarInteractionCoeff(cSpinInteractionDomain& domain);
+    ~DipolarInteractionCoeff();
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

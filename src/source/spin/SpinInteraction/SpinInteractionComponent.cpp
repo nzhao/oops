@@ -1,3 +1,4 @@
+#include "include/misc/misc.h"
 #include "include/spin/SpinInteractionComponent.h"
 
 using namespace std;
@@ -64,6 +65,32 @@ cSpinInteractionForm::~cSpinInteractionForm()
 {
     cout << "cSpinInteractionForm, destructed." << endl;
 }
+ostream&  operator << (ostream& outs, cSpinInteractionForm& form)
+{
+    int i = 0;
+    MAT_LIST matlist=form.getMatList();
+    for(auto term_list : matlist)
+    {
+        int j = 0;
+        for(auto term : term_list)
+        {
+            outs << "form[" << i << "], " << "term[" << j << "]= " << endl << endl;
+            int q = 0;
+            for(auto mat : term)
+            {
+                outs << mat << endl;
+                if(q<term.size()-1)
+                    outs << " \t \t \t * " << endl << endl;
+                q++;
+            }
+            outs << "--------------------------------------------------------"<< endl;
+            outs << endl;
+            j++;
+        }
+        i++;
+    }
+    return outs;
+}
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ TwoSpinInteractionFrom
@@ -111,6 +138,40 @@ cSpinInteractionCoeff::cSpinInteractionCoeff()
 cSpinInteractionCoeff::~cSpinInteractionCoeff()
 {
     cout << "cSpinInteractionCoeff, destructed." << endl;
+}
+ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef)
+{
+    int i = 0;
+    COEFF_LIST coefflist = coef.getCoeffList(); 
+    for(auto co : coefflist)
+    {
+        int j = 0;
+        for(auto val : co)
+        {
+            cout << val << ", ";
+        }
+        cout << endl;
+    }
+   return outs;
+}
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ DipolarInteractionCoeff
+DipolarInteractionCoeff::DipolarInteractionCoeff(cSpinInteractionDomain& domain)
+{
+    _nCoeff = 9;
+
+    auto sag = domain.getSpinAggregate();
+    for(auto it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];    cSPIN spin1=(*it)[1];
+        vec coeffs = dipole(spin0, spin1);
+        _coeff_list.push_back(coeffs);
+    }
+}
+DipolarInteractionCoeff::~DipolarInteractionCoeff()
+{
+    cout << "Destructor: DipolarInteractionCoeff" << endl;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

@@ -40,8 +40,11 @@ SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
 
     _domain=SpinPair(spin_list);
     _form=TwoSpinInteractionFrom(_domain);
+    _coeff=DipolarInteractionCoeff(_domain);
 
 //    cout << _domain << endl;
+//    cout << _form << endl;
+    cout << _coeff << endl;
 }
 
 SpinDipolarInteraction::~SpinDipolarInteraction()

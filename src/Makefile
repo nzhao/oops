@@ -1,5 +1,5 @@
-../bin/cce: ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/cce.o
-	g++ ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o -o ../bin/cce -std=c++11 -larmadillo
+../bin/cce: ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o  ../obj/cce.o
+	g++ ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o  -o ../bin/cce -std=c++11 -larmadillo
 
 ../obj/Spin.o: source/spin/Spin/Spin.cpp include/spin/Spin.h
 	g++ -c source/spin/Spin/Spin.cpp -o ../obj/Spin.o  -I. -std=c++11
@@ -22,8 +22,11 @@
 ../obj/SpinInteraction.o: source/spin/SpinInteraction/SpinInteraction.cpp include/spin/SpinInteraction.h
 	g++ -c source/spin/SpinInteraction/SpinInteraction.cpp -o ../obj/SpinInteraction.o  -I. -std=c++11
 
-../obj/SpinInteractionComponent.o: source/spin/SpinInteraction/SpinInteractionComponent.cpp include/spin/SpinInteractionComponent.h
+../obj/SpinInteractionComponent.o: source/spin/SpinInteraction/SpinInteractionComponent.cpp include/spin/SpinInteractionComponent.h include/misc/misc.h
 	g++ -c source/spin/SpinInteraction/SpinInteractionComponent.cpp -o ../obj/SpinInteractionComponent.o  -I. -std=c++11
+
+#../obj/misc.o: source/misc/misc.cpp include/misc/misc.h
+#	g++ -c source/misc/misc.cpp -o ../obj/misc.o  -I. -std=c++11
 
 ../obj/cce.o: app/cce.cpp
 	g++ -c app/cce.cpp -o ../obj/cce.o  -I. -std=c++11
