@@ -21,6 +21,8 @@ public:
     string get_isotope() { return isotope; };
     int get_multiplicity() { return multiplicity; };
     double get_gamma() { return gamma; };
+    double get_omegaQ() { return omegaQ; };
+    double get_eta() { return eta; };
 
     void set_coordinate(vec coord) { coordinate = coord; };
     void set_isotope(string iso_str) { isotope =  iso_str; };
@@ -33,6 +35,8 @@ private:
     string isotope;
     int multiplicity;
     double gamma;
+    double omegaQ;
+    double eta;
 };
 
 #endif

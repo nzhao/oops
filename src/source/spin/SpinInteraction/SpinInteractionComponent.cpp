@@ -51,6 +51,26 @@ SpinPair::~SpinPair()
     cout << "SpinPair, destructed." << endl;
 }
 //}}}
+//----------------------------------------------------------------------------//
+//{{{ SingleSpin
+SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
+{
+    cout << "SingleSpin constructor" << endl;
+    int nspin=spin_list.size();
+
+    _nbody = 1;
+
+    for(int i=0; i<nspin; ++i)
+        _index_list.push_back( vector<int> {i} );
+
+    for(auto idx:_index_list)
+        _spin_aggregate.push_back( vector<cSPIN> { spin_list[ idx[0] ] });
+}
+SingleSpin::~SingleSpin()
+{
+    cout << "SingleSpin, destructed." << endl;
+}
+//}}}
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -94,7 +114,7 @@ ostream&  operator << (ostream& outs, cSpinInteractionForm& form)
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ TwoSpinInteractionFrom
-TwoSpinInteractionFrom::TwoSpinInteractionFrom(cSpinInteractionDomain& domain)
+TwoSpinInteractionForm::TwoSpinInteractionForm(cSpinInteractionDomain& domain)
 {
     _nterm = 9;
 
@@ -120,9 +140,38 @@ TwoSpinInteractionFrom::TwoSpinInteractionFrom(cSpinInteractionDomain& domain)
         _mat_list.push_back( term_list );
     }
 }
-TwoSpinInteractionFrom::~TwoSpinInteractionFrom()
+TwoSpinInteractionForm::~TwoSpinInteractionForm()
 {
-    cout << "desctructor TwoSpinInteractionFrom" << endl;
+    cout << "desctructor TwoSpinInteractionForm" << endl;
+}
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ SingleSpinInteractionForm
+SingleSpinInteractionForm::SingleSpinInteractionForm(cSpinInteractionDomain& domain)
+{
+    _nterm = 6;
+
+    auto sag = domain.getSpinAggregate();
+    for(auto it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];
+
+        vector<TERM> term_list;
+
+        term_list.push_back( TERM { spin0.sx() } );
+        term_list.push_back( TERM { spin0.sy() } );
+        term_list.push_back( TERM { spin0.sz() } );
+
+        term_list.push_back( TERM { spin0.sx()*spin0.sx() } );
+        term_list.push_back( TERM { spin0.sy()*spin0.sy() } );
+        term_list.push_back( TERM { spin0.sz()*spin0.sz() } );
+
+        _mat_list.push_back( term_list );
+    }
+}
+SingleSpinInteractionForm::~SingleSpinInteractionForm()
+{
+    cout << "desctructor SingleSpinInteractionForm" << endl;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,6 +219,25 @@ DipolarInteractionCoeff::DipolarInteractionCoeff(cSpinInteractionDomain& domain)
     }
 }
 DipolarInteractionCoeff::~DipolarInteractionCoeff()
+{
+    cout << "Destructor: DipolarInteractionCoeff" << endl;
+}
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ ZeemanInteractionCoeff
+ZeemanInteractionCoeff::ZeemanInteractionCoeff(cSpinInteractionDomain& domain, const vec& magB)
+{
+    _nCoeff = 6;
+
+    auto sag = domain.getSpinAggregate();
+    for(auto it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];
+        vec coeffs = zeeman(spin0, magB);
+        _coeff_list.push_back(coeffs);
+    }
+}
+ZeemanInteractionCoeff::~ZeemanInteractionCoeff()
 {
     cout << "Destructor: DipolarInteractionCoeff" << endl;
 }

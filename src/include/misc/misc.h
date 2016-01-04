@@ -33,4 +33,15 @@ vec dipole(T& spin1, T& spin2)
                 -3.0*nz*nx,    -3.0*nz*ny, 1.0-3.0*nz*nz };
     return prefactor*res;
 };
+template<class T>
+vec zeeman(T&spin, const vec& magB)
+{
+    double bx=magB[0], by=magB[1], bz=magB[2];
+    double g=spin.get_gamma();
+    double q=spin.get_omegaQ();
+    double e=spin.get_eta();
+
+    vec res={-g*bx,  -g*by, -g*bz,   e/3.0, -e/3.0,     q};
+    return res;
+};
 #endif

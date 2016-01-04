@@ -43,6 +43,15 @@ public:
     ~SpinPair();
 };
 //}}}
+//----------------------------------------------------------------------------//
+//{{{ SingleSpin
+class SingleSpin:public cSpinInteractionDomain
+{
+public:
+    SingleSpin(const vector<cSPIN>& spin_list);
+    ~SingleSpin();
+};
+//}}}
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -66,12 +75,21 @@ protected:
 };
 //}}}
 //----------------------------------------------------------------------------//
-//{{{ TwoSpinInteractionFrom
-class TwoSpinInteractionFrom:public cSpinInteractionForm
+//{{{ TwoSpinInteractionForm
+class TwoSpinInteractionForm:public cSpinInteractionForm
 {
 public:
-    TwoSpinInteractionFrom(cSpinInteractionDomain& domain);
-    ~TwoSpinInteractionFrom();
+    TwoSpinInteractionForm(cSpinInteractionDomain& domain);
+    ~TwoSpinInteractionForm();
+};
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ SingleSpinInteractionForm
+class SingleSpinInteractionForm:public cSpinInteractionForm
+{
+public:
+    SingleSpinInteractionForm(cSpinInteractionDomain& domain);
+    ~SingleSpinInteractionForm();
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +120,15 @@ class DipolarInteractionCoeff:public cSpinInteractionCoeff
 public:
     DipolarInteractionCoeff(cSpinInteractionDomain& domain);
     ~DipolarInteractionCoeff();
+};
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ ZeemanInteractionCoeff
+class ZeemanInteractionCoeff:public cSpinInteractionCoeff
+{
+public:
+    ZeemanInteractionCoeff(cSpinInteractionDomain& domain, const vec& magB);
+    ~ZeemanInteractionCoeff();
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

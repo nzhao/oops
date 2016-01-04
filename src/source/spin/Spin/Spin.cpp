@@ -18,6 +18,8 @@ cSPIN::cSPIN(arma::vec coord, string isotope_str)
     isotope = isotope_str;
     multiplicity = SPIN_DATABASE.getData(isotope_str).multiplicity;
     gamma = SPIN_DATABASE.getData(isotope_str).gamma;
+    omegaQ = SPIN_DATABASE.getData(isotope_str).omegaQ;
+    eta = SPIN_DATABASE.getData(isotope_str).eta;
 }
 
 cx_mat cSPIN::sx()

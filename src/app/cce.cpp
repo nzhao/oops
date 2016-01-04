@@ -50,11 +50,14 @@ int  main(int argc, char* argv[])
     cDepthFirstPathTracing dfpt(c, 6);
     cSpinCluster cluster(&dfpt);
 
-//    cluster.make();
-//    cout << cluster << endl;
+    cluster.make();
+    cout << cluster << endl;
 
     SpinDipolarInteraction dip(sl);
-    dip.make();
+//    dip.make();
+
+    vec magB={0.0, 0.0, 1.0};
+    SpinZeemanInteraction zee(sl, magB);
 
 
 }
