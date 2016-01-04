@@ -20,9 +20,13 @@ public:
     vec get_coordinate() { return coordinate; };
     string get_isotope() { return isotope; };
     int get_multiplicity() { return multiplicity; };
+    int get_dimension() {return multiplicity; };
     double get_gamma() { return gamma; };
     double get_omegaQ() { return omegaQ; };
     double get_eta() { return eta; };
+    
+    double S() {return 0.5*(multiplicity-1);}
+    double S2() {return S()*(S()+1.0);}
 
     void set_coordinate(vec coord) { coordinate = coord; };
     void set_isotope(string iso_str) { isotope =  iso_str; };
