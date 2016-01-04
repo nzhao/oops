@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "include/spin/SpinInteraction.h"
+#include "include/kron/KronProd.h"
 
 using namespace std;
 
@@ -31,20 +32,32 @@ void cSpinInteraction::make()
     assert(_domain.getLength() == _coeff.getLength());
     assert(_form.get_nTerm() == _coeff.get_nCoeff() );
 
+    if( !_spin_list.empty() )
+        for(auto spin: _spin_list)
+            _dim_list.push_back( spin.get_dimension() );
+
     INDEX_LIST  idxList=_domain.getIndexList();
     MAT_LIST    matList=_form.getMatList();
     COEFF_LIST coefList=_coeff.getCoeffList();
 
+    vector<KronProd> kronProd_list;
     int domainSize = _domain.getLength();
     int nTerm = _form.get_nTerm();
     for(int i=0; i<domainSize; ++i)
-    {
         for(int j=0; j<nTerm; ++j)
-        {
             if(coefList[i][j] != 0.0)
-                _kronProd_list.push_back( KronProdForm {idxList[i], coefList[i][j], matList[i][j] } );
-        }
-    }
+            {
+                KronProd kp=KronProd(_dim_list);
+                kp.fill( idxList[i], coefList[i][j], matList[i][j] );
+                kronProd_list.push_back( kp );
+            }
+    _sum_kron_prod=SumKronProd(kronProd_list);
+}
+
+ostream&  operator << (ostream& outs, cSpinInteraction& interaction)
+{
+    cout << interaction._sum_kron_prod << endl;
+    return outs;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,9 +114,9 @@ SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, con
     _form=SingleSpinInteractionForm(_domain);
     _coeff=ZeemanInteractionCoeff(_domain, magB);
 
-    cout << _domain << endl;
-    cout << _form << endl;
-    cout << _coeff << endl;
+//    cout << _domain << endl;
+//    cout << _form << endl;
+//    cout << _coeff << endl;
 }
 
 SpinZeemanInteraction::~SpinZeemanInteraction()

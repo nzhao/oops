@@ -47,7 +47,7 @@ int  main(int argc, char* argv[])
     mat m=sc.getDistanceMatrix();// m.print("m=:");
     sp_mat c=sc.getConnectionMatrix(8.0);
 
-    cDepthFirstPathTracing dfpt(c, 6);
+    cDepthFirstPathTracing dfpt(c, 1);
     cSpinCluster cluster(&dfpt);
 
     cluster.make();
@@ -55,10 +55,16 @@ int  main(int argc, char* argv[])
 
     SpinDipolarInteraction dip(sl);
     dip.make();
+    cout << dip << endl;
 
     vec magB={0.0, 0.0, 1.0};
     SpinZeemanInteraction zee(sl, magB);
     zee.make();
+    cout << zee << endl;
 
+    SumKronProd skp1=dip.getSumKronProd();
+    SumKronProd skp2=zee.getSumKronProd();
 
+    SumKronProd skp = skp1 + skp2;
+//    cout << skp << endl;
 }

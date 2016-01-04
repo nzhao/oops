@@ -2,19 +2,10 @@
 #define SPININTERACTION_H
 
 #include <vector>
-#include "include/spin/SpinInteractionComponent.h"
 #include "include/spin/Spin.h"
-////////////////////////////////////////////////////////////////////////////////
-//{{{ KronProdForm
-struct KronProdForm
-{
-    INDICES spin_index;
-    double coeff;
-    TERM mat;
-};
-//}}}
-////////////////////////////////////////////////////////////////////////////////
-
+#include "include/spin/SpinInteractionComponent.h"
+#include "include/spin/SpinInteractionDefine.h"
+#include "include/Kron/KronProd.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,16 +18,18 @@ public:
     ~cSpinInteraction();
 
     void make();
-    vector<KronProdForm> getKronProdList(){return _kronProd_list;};
+    SumKronProd& getSumKronProd(){return _sum_kron_prod;};
 
+    friend ostream&  operator << (ostream& outs, cSpinInteraction& spin_interaction);
 protected:
     vector<cSPIN> _spin_list;
     cSpinInteractionDomain _domain;
     cSpinInteractionForm   _form;
     cSpinInteractionCoeff  _coeff;
 
-    vector<KronProdForm> _kronProd_list;
 private:
+    DIM_LIST _dim_list;    
+    SumKronProd _sum_kron_prod;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

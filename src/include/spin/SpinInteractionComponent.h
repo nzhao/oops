@@ -4,16 +4,10 @@
 #include <vector>
 #include <armadillo>
 #include "include/spin/Spin.h"
+#include "include/Spin/SpinInteractionDefine.h"
 
 using namespace std;
 using namespace arma;
-
-typedef vector<int> INDICES;
-typedef vector< cx_mat > TERM;
-
-typedef vector< INDICES > INDEX_LIST;
-typedef vector< vector<TERM> > MAT_LIST;
-typedef vector< Col<double>  > COEFF_LIST;
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteractionDomain
