@@ -3,4 +3,5 @@ obj/*
 doc/*
 src/logs
 *.o
+*.swp
 tags

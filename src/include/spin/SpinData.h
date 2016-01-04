@@ -10,6 +10,8 @@ struct SpinProperty
 {
     int multiplicity;
     double gamma;
+    double omegaQ;
+    double eta;
 };
 
 class cSPINDATA
