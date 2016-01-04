@@ -4,6 +4,18 @@
 #include <vector>
 #include "include/spin/SpinInteractionComponent.h"
 #include "include/spin/Spin.h"
+////////////////////////////////////////////////////////////////////////////////
+//{{{ KronProdForm
+struct KronProdForm
+{
+    INDICES spin_index;
+    double coeff;
+    TERM mat;
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteraction
@@ -14,7 +26,8 @@ public:
      cSpinInteraction(const vector<cSPIN>& spin_list);
     ~cSpinInteraction();
 
-    virtual void make() = 0;
+    void make();
+    vector<KronProdForm> getKronProdList(){return _kronProd_list;};
 
 protected:
     vector<cSPIN> _spin_list;
@@ -22,6 +35,7 @@ protected:
     cSpinInteractionForm   _form;
     cSpinInteractionCoeff  _coeff;
 
+    vector<KronProdForm> _kronProd_list;
 private:
 };
 //}}}
@@ -37,7 +51,6 @@ public:
     SpinDipolarInteraction();
     SpinDipolarInteraction(const vector<cSPIN>& spin_list);
     ~SpinDipolarInteraction();
-    void make();
 protected:
 private:
 };
@@ -54,7 +67,6 @@ public:
     SpinZeemanInteraction();
     SpinZeemanInteraction(const vector<cSPIN>& spin_list, const vec& magB);
     ~SpinZeemanInteraction();
-    void make();
 protected:
 private:
 };

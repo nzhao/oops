@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "include/spin/SpinInteraction.h"
 
 using namespace std;
@@ -18,6 +19,32 @@ cSpinInteraction::cSpinInteraction(const vector<cSPIN>& spin_list)
 cSpinInteraction::~cSpinInteraction()
 {
     cout << "default destruction function of SpinInteraction." << endl;
+}
+
+void cSpinInteraction::make()
+{
+    cout << "cSpinInteraction make is called." << endl;
+    cout << "domain size: " << _domain.getLength() << endl;
+    cout << "matlist nTerm: " << _form.get_nTerm() << endl;
+
+    assert(_domain.getLength() == _form.getLength());
+    assert(_domain.getLength() == _coeff.getLength());
+    assert(_form.get_nTerm() == _coeff.get_nCoeff() );
+
+    INDEX_LIST  idxList=_domain.getIndexList();
+    MAT_LIST    matList=_form.getMatList();
+    COEFF_LIST coefList=_coeff.getCoeffList();
+
+    int domainSize = _domain.getLength();
+    int nTerm = _form.get_nTerm();
+    for(int i=0; i<domainSize; ++i)
+    {
+        for(int j=0; j<nTerm; ++j)
+        {
+            if(coefList[i][j] != 0.0)
+                _kronProd_list.push_back( KronProdForm {idxList[i], coefList[i][j], matList[i][j] } );
+        }
+    }
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,11 +78,6 @@ SpinDipolarInteraction::~SpinDipolarInteraction()
 {
     cout << "default destruction function of SpinDipolarInteraction." << endl;
 }
-
-void SpinDipolarInteraction::make()
-{
-    cout << "make is called." << endl;
-}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -87,11 +109,6 @@ SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, con
 SpinZeemanInteraction::~SpinZeemanInteraction()
 {
     cout << "default destruction function of SpinZeemanInteraction." << endl;
-}
-
-void SpinZeemanInteraction::make()
-{
-    cout << "make is called." << endl;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

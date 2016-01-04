@@ -30,7 +30,7 @@ int  main(int argc, char* argv[])
     cSPIN s1=cSPIN(coordinate, isotope);
 
     cout << s1.get_coordinate()[1] << "\t" << s1.get_isotope() << endl;
-    cout << s1.get_multiplicity() << "\t" << s1.get_gamma() << endl;
+    cout << s1.get_multiplicity() << "\t" << s1.get_gamma() << "\t"  << s1.get_omegaQ() << "\t" << s1.get_eta() << endl;
 
     cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
     cSpinCollection sc(&spin_file);
@@ -54,10 +54,11 @@ int  main(int argc, char* argv[])
     cout << cluster << endl;
 
     SpinDipolarInteraction dip(sl);
-//    dip.make();
+    dip.make();
 
     vec magB={0.0, 0.0, 1.0};
     SpinZeemanInteraction zee(sl, magB);
+    zee.make();
 
 
 }

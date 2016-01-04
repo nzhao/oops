@@ -8,11 +8,12 @@
 using namespace std;
 using namespace arma;
 
-typedef arma::vec  COEFFs;
+typedef vector<int> INDICES;
 typedef vector< cx_mat > TERM;
-typedef vector< vector<int> > INDEX_LIST;
+
+typedef vector< INDICES > INDEX_LIST;
 typedef vector< vector<TERM> > MAT_LIST;
-typedef vector< COEFFs > COEFF_LIST;
+typedef vector< Col<double>  > COEFF_LIST;
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteractionDomain
@@ -106,6 +107,7 @@ public:
 
     COEFF_LIST getCoeffList(){return _coeff_list;};
     int getLength(){return _coeff_list.size();};
+    int get_nCoeff(){return _nCoeff;};
 
     friend ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef);
 protected:
