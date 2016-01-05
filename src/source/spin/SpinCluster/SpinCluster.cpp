@@ -2,8 +2,7 @@
 #include "include/spin/SpinClusterAlgorithm.h"
 
 ////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-// cSpinCluster
+//{{{ cSpinCluster
 cSpinCluster::cSpinCluster(cSpinGrouping * grouping)
 {
     _grouping = grouping;
@@ -16,12 +15,14 @@ cSpinCluster::~cSpinCluster()
 
 void cSpinCluster::make()
 {
+/// This function calls the 'generate' method of the grouping algorithm.
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
 }
 
 ostream&  operator << (ostream& outs, const cSpinCluster& clst)
 {
+/// Operator << is reloaded to display the cluster index one by one.
     int i, j, tot; i=1; j=1; tot=0;
     
     outs << "Total Order = " << clst._cluster_index_list.size() << endl;
@@ -43,3 +44,5 @@ ostream&  operator << (ostream& outs, const cSpinCluster& clst)
     outs << tot << " clusters are generated." << endl;
     return outs;
 }
+//}}}
+////////////////////////////////////////////////////////////////////

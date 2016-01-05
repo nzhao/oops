@@ -6,6 +6,11 @@
 #include "include/spin/Spin.h"
 #include "include/spin/SpinClusterAlgorithm.h"
 
+
+////////////////////////////////////////////////////////////////////
+//{{{ cSpinCluster
+/// This class generates spin clusters with a given grouping algorithm.
+///
 class cSpinCluster
 {
 public:
@@ -20,4 +25,6 @@ private:
     cSpinGrouping * _grouping;
     CLST_IDX_LIST _cluster_index_list;
 };
+//}}}
+////////////////////////////////////////////////////////////////////
 #endif

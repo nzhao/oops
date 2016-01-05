@@ -5,6 +5,8 @@
 using namespace std;
 using namespace arma;
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{ cSpinCollection
 cSpinCollection::cSpinCollection(cSpinSource * source)
 {
     _source = source;
@@ -17,6 +19,7 @@ cSpinCollection::~cSpinCollection()
 
 void cSpinCollection::make()
 {
+/// call the 'generate' method of the cSpinSource to generate spin_list.
     spin_list= _source->generate();
 
     int nspin=spin_list.size();
@@ -39,4 +42,5 @@ sp_mat cSpinCollection::getConnectionMatrix(double threshold)
     for(int i=0; i<res.n_rows; ++i) res(i, i)=0;
     return res;
 }
-
+//}}}
+////////////////////////////////////////////////////////////////////////////////
