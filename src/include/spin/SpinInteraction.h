@@ -19,6 +19,7 @@ public:
 
     void make();
     SumKronProd& getSumKronProd(){return _sum_kron_prod;};
+    DIM_LIST getDimList() {return _dim_list;};
 
     friend ostream&  operator << (ostream& outs, cSpinInteraction& spin_interaction);
 protected:

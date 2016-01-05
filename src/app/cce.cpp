@@ -8,6 +8,8 @@
 #include "include/spin/SpinCluster.h"
 #include "include/spin/SpinClusterAlgorithm.h"
 #include "include/spin/SpinInteraction.h"
+#include "include/spin/SpinSystem.h"
+#include "include/kron/KronProd.h"
 
 #include "include/easylogging++.h"
 #include "include/misc/misc.h"
@@ -55,16 +57,17 @@ int  main(int argc, char* argv[])
 
     SpinDipolarInteraction dip(sl);
     dip.make();
-    cout << dip << endl;
+//    cout << dip << endl;
 
     vec magB={0.0, 0.0, 1.0};
     SpinZeemanInteraction zee(sl, magB);
     zee.make();
-    cout << zee << endl;
+//    cout << zee << endl;
 
-    SumKronProd skp1=dip.getSumKronProd();
-    SumKronProd skp2=zee.getSumKronProd();
+    cSpinSystem ss(sl);
+    ss.addSpinInteraction(dip);
+    ss.addSpinInteraction(zee);
 
-    SumKronProd skp = skp1 + skp2;
-//    cout << skp << endl;
+    SumKronProd skpp=ss.getSumKronOperator();
+    cout << skpp << endl;
 }
