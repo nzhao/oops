@@ -1,6 +1,7 @@
 bin/*
 obj/*
-doc/*
+doc/html/*
+doc/*.old
 src/logs
 *.o
 *.swp
