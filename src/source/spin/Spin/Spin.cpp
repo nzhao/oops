@@ -6,6 +6,8 @@
 using namespace std;
 using namespace arma;
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{ cSPIN
 cSPIN::cSPIN()
 {
     coordinate = arma::vec {0, 0, 0};
@@ -24,6 +26,8 @@ cSPIN::cSPIN(arma::vec coord, string isotope_str)
 
 cx_mat cSPIN::sx()
 {
+/// Spin operator Sx.
+/// So far, only spin-1/2 is implemented.
     cx_mat res(2, 2);
     res(0, 0) = 0.0; res(0, 1) = 1.0;
     res(1, 0) = 1.0; res(1, 1) = 0.0;
@@ -32,6 +36,8 @@ cx_mat cSPIN::sx()
 
 cx_mat cSPIN::sy()
 {
+/// Spin operator Sy.
+/// So far, only spin-1/2 is implemented.
     cx_mat res(2, 2);
     res(0, 0) = 0.0;                 res(0, 1) = cx_double(0.0, -1.0);
     res(1, 0) = cx_double(0.0, 1.0); res(1, 1) = 0.0;
@@ -40,8 +46,12 @@ cx_mat cSPIN::sy()
 
 cx_mat cSPIN::sz()
 {
+/// Spin operator Sz.
+/// So far, only spin-1/2 is implemented.
     cx_mat res(2, 2);
     res(0, 0) = 1.0; res(0, 1) = 0.0;
     res(1, 0) = 0.0; res(1, 1) = -1.0;
     return res;
 }
+//}}}
+////////////////////////////////////////////////////////////////////////////////

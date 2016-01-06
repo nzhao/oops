@@ -6,14 +6,30 @@
 
 using namespace std;
 
+/// \addtogroup Spin
+/// @{
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ SpinProperty
+/// Spin data.
+///
 struct SpinProperty
 {
-    int multiplicity;
-    double gamma;
-    double omegaQ;
-    double eta;
+    int multiplicity; ///< 2S+1.
+    double gamma; ///< in SI unit: rad/s/T.
+    double omegaQ; ///< in MHz.
+    double eta; ///< in MHz.
 };
+//}}}
+////////////////////////////////////////////////////////////////////////////////
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ cSPINDATA
+/// This class provides spin data.
+/// The data are stored in a form defined by structure SpinProperty.
+///
 class cSPINDATA
 {
 public:
@@ -23,4 +39,8 @@ private:
     map<string, SpinProperty> data;
 
 };
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+/// @}
 #endif
