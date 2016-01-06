@@ -6,6 +6,11 @@
 #include "include/spin/Spin.h"
 #include "include/spin/SpinClusterAlgorithm.h"
 
+/// \addtogroup SpinList
+/// @{
+
+/// \defgroup SpinCluster SpinCluster
+/// @{
 
 ////////////////////////////////////////////////////////////////////
 //{{{ cSpinCluster
@@ -27,4 +32,7 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////
+
+/// @}
+/// @}
 #endif

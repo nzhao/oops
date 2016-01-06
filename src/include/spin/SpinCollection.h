@@ -9,6 +9,11 @@
 using namespace std;
 using namespace arma;
 
+/// \defgroup SpinList SpinList
+/// @{
+
+/// \defgroup SpinCollection SpinCollection
+/// @{
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinCollection
 /// This class generates a collection of spins (spin_list) from a given cSpinSource.
@@ -37,4 +42,7 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+/// @}
+
+/// @}
 #endif

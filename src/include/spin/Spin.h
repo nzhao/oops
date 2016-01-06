@@ -11,6 +11,9 @@ using namespace arma;
 
 extern cSPINDATA SPIN_DATABASE;
 
+/// \defgroup Spin Spin
+/// @{
+
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSPIN
 /// This class creates spins with given coordinate and spin name string (e.g., nulcear spin isotope "13C", "1H", etc.).
@@ -58,4 +61,6 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+/// @}
 #endif

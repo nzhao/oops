@@ -36,3 +36,7 @@
 
 clean: 
 	rm ../obj/*.o
+
+doc:
+	/Applications/Doxygen.app/Contents/Resources/doxygen ../doc/DocGen 
+

@@ -8,10 +8,18 @@
 #include <string>
 #include <armadillo>
 #include "include/spin/Spin.h"
+//#include "include/spin/SpinCluster.h"
 
 using namespace std;
 using namespace arma;
 
+
+
+/// \addtogroup SpinList
+/// @{
+
+/// \addtogroup SpinCluster
+/// @{
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cClusterIndex
@@ -35,10 +43,14 @@ private:
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-//{{{ cSpinGrouping
+/// \defgroup SpinGrouping
+/// @{
+
 typedef set<cClusterIndex>          FIX_ORDER_INDEX_SET;
 typedef vector<FIX_ORDER_INDEX_SET> CLST_IDX_LIST;
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ cSpinGrouping
 
 /// This is an abstract class of spin grouping algorithm.
 ///
@@ -65,7 +77,7 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//{{{ cSpinSourceFromFile
+//{{{ cDepthFirstPathTracing
 /// This class implements a concreate grouping algorithm by 'depth-first search'. Ref. Spinach. 
 ///
 class cDepthFirstPathTracing:public cSpinGrouping
@@ -85,4 +97,7 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+/// @}
+/// @}
+/// @}
 #endif

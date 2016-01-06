@@ -8,6 +8,14 @@
 #include "include/Kron/KronProd.h"
 
 
+/// \defgroup SpinInteraction SpinInteraction
+/// @{
+
+/// \defgroup SpinInteractionClasses SpinInteractionClasses
+/// @{
+/// This class defines an abstract class. 
+/// cSpinInteraction.
+///
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteraction
 class cSpinInteraction
@@ -66,4 +74,7 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+/// @}
+
+/// @}
 #endif
