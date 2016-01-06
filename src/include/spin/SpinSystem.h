@@ -5,6 +5,9 @@
 #include "include/spin/SpinInteractionDefine.h"
 #include "include/kron/KronProd.h"
 
+/// \addtogroup Spin
+/// @{
+
 /// \defgroup SpinSystem SpinSystem
 /// @{
 
@@ -28,5 +31,6 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+/// @}
 /// @}
 #endif

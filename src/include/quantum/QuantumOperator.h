@@ -1,0 +1,23 @@
+#ifndef QUANTUMOPERATOR_H
+#define QUANTUMOPERATOR_H
+
+/// \defgroup Quantum Quantum
+/// @{
+
+/// \defgroup QuantumOperator QuantumOperator
+/// @{
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ QuantumOperator
+class QuantumOperator
+{
+public:
+protected:
+private:
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+/// @}
+/// @}
+#endif

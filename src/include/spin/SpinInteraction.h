@@ -7,6 +7,8 @@
 #include "include/spin/SpinInteractionDefine.h"
 #include "include/Kron/KronProd.h"
 
+/// \addtogroup Spin
+/// @{
 
 /// \defgroup SpinInteraction SpinInteraction
 /// @{
@@ -76,5 +78,6 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 /// @}
 
+/// @}
 /// @}
 #endif
