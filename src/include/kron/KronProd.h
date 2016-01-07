@@ -23,10 +23,9 @@ public:
     void   fill(INDICES idx, MULTIPLIER coeff, TERM mat);
     cx_mat full();
 
-    KronProd Flat();
-    KronProd Sharp();
-    KronProd FlatSharp();
-    KronProd CircleC();
+    friend KronProd Flat(const KronProd& kp);
+    friend KronProd Sharp(const KronProd& kp);
+    friend KronProd CircleC(const KronProd& kp);
 
     friend ostream&  operator << (ostream& outs, const KronProd& kp);
 protected:
@@ -52,6 +51,10 @@ public:
 
     cx_mat full();
     vector<KronProd> getKronProdList(){return _kron_prod_list;};
+    
+    friend SumKronProd Flat(const SumKronProd& skp);
+    friend SumKronProd Sharp(const SumKronProd& skp);
+    friend SumKronProd CircleC(const SumKronProd& skp);
     friend SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp);
     friend ostream&  operator << (ostream& outs, SumKronProd& skp);
 protected:
