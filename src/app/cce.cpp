@@ -13,6 +13,7 @@
 
 #include "include/easylogging++.h"
 #include "include/misc/misc.h"
+#include "include/quantum/HilbertSpaceOperator.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -24,8 +25,12 @@ cSPINDATA SPIN_DATABASE=cSPINDATA();
 int  main(int argc, char* argv[])
 {
     START_EASYLOGGINGPP(argc, argv);
-    LOG(INFO) << "My first info log using default logger";
+    el::Configurations conf("/Users/nzhao/code/lib/active/oops/src/logs/log.conf");
+    el::Loggers::reconfigureAllLoggers(conf);
 
+    LOG(INFO) << endl;
+    LOG(INFO) << "###################################################";
+    LOG(INFO) << "Program begins."; 
     vector<double> coordinate {1.0, 2.0, 3.0};
     string isotope="13C";
 
@@ -64,10 +69,20 @@ int  main(int argc, char* argv[])
     zee.make();
 //    cout << zee << endl;
 
-    cSpinSystem ss(sl);
-    ss.addSpinInteraction(dip);
-    ss.addSpinInteraction(zee);
+//    cSpinSystem ss(sl);
+//    ss.addSpinInteraction(dip);
+//    ss.addSpinInteraction(zee);
+//
+//    SumKronProd skpp=ss.getSumKronOperator();
+//    cout << skpp << endl;
 
-    SumKronProd skpp=ss.getSumKronOperator();
-    cout << skpp << endl;
+    Hamiltonian hami(sl);
+    hami.addInteraction(dip);
+    hami.addInteraction(zee);
+
+//    SumKronProd skpp=hami.kronProdForm();
+//    cout << skpp << endl;
+    hami.kronProdForm();
+    cx_mat fmat=hami.fullMatrix();
+    cout << fmat << endl;
 }

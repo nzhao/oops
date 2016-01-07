@@ -1,18 +1,19 @@
 #include <armadillo>
 #include "include/kron/KronProd.h"
 
+#include "include/easylogging++.h"
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ KronProd
+
 KronProd::KronProd()
-{
-    cout << "default KronProd constructor" << endl;
-}
+{ LOG(INFO) << "Default constructor: KronProd";}
+
+KronProd::~KronProd()
+{ LOG(INFO) << "Default destructor: KronProd";}
+
 KronProd::KronProd(DIM_LIST dim_list)
 {
     _dim_list = dim_list;
-}
-KronProd::~KronProd()
-{// cout << "desctructor: KronProd." << endl;
 }
 
 void KronProd::fill(INDICES idx, MULTIPLIER coeff, TERM mat)
@@ -36,6 +37,10 @@ cx_mat KronProd::full()
         res=kron(res, all_mat[i]);
 
     return _coeff*res;
+}
+
+KronProd& KronProd::Flat()
+{
 }
 
 ostream&  operator << (ostream& outs, const KronProd& kp)

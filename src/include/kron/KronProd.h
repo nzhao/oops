@@ -20,8 +20,13 @@ public:
     KronProd(DIM_LIST dim_list);
     ~KronProd();
 
-    void fill(INDICES idx, MULTIPLIER coeff, TERM mat);
+    void   fill(INDICES idx, MULTIPLIER coeff, TERM mat);
     cx_mat full();
+
+    KronProd Flat();
+    KronProd Sharp();
+    KronProd FlatSharp();
+    KronProd CircleC();
 
     friend ostream&  operator << (ostream& outs, const KronProd& kp);
 protected:

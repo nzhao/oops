@@ -1,5 +1,5 @@
-../bin/cce: ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/KronProd.o ../obj/SpinSystem.o ../obj/cce.o
-	g++ ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/KronProd.o ../obj/SpinSystem.o -o ../bin/cce -std=c++11 -larmadillo
+../bin/cce: ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/KronProd.o ../obj/SpinSystem.o ../obj/QuantumOperator.o ../obj/HilbertSpaceOperator.o ../obj/LiouvilleSpaceOperator.o ../obj/cce.o
+	g++ ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/KronProd.o ../obj/SpinSystem.o ../obj/QuantumOperator.o ../obj/HilbertSpaceOperator.o ../obj/LiouvilleSpaceOperator.o -o  ../bin/cce -std=c++11 -larmadillo
 
 ../obj/Spin.o: source/spin/Spin/Spin.cpp include/spin/Spin.h
 	g++ -c source/spin/Spin/Spin.cpp -o ../obj/Spin.o  -I. -std=c++11
@@ -30,6 +30,15 @@
 
 ../obj/SpinSystem.o: source/spin/SpinSystem/SpinSystem.cpp include/spin/SpinSystem.h include/spin/SpinInteractionDefine.h
 	g++ -c source/spin/SpinSystem/SpinSystem.cpp -o ../obj/SpinSystem.o  -I. -std=c++11
+
+../obj/QuantumOperator.o: source/quantum/QuantumOperator/QuantumOperator.cpp include/quantum/QuantumOperator.h
+	g++ -c source/quantum/QuantumOperator/QuantumOperator.cpp -o ../obj/QuantumOperator.o -I. -std=c++11
+
+../obj/HilbertSpaceOperator.o: source/quantum/QuantumOperator/HilbertSpaceOperator.cpp include/quantum/HilbertSpaceOperator.h
+	g++ -c source/quantum/QuantumOperator/HilbertSpaceOperator.cpp -o ../obj/HilbertSpaceOperator.o -I. -std=c++11
+
+../obj/LiouvilleSpaceOperator.o: source/quantum/QuantumOperator/LiouvilleSpaceOperator.cpp include/quantum/LiouvilleSpaceOperator.h
+	g++ -c source/quantum/QuantumOperator/LiouvilleSpaceOperator.cpp -o ../obj/LiouvilleSpaceOperator.o -I. -std=c++11
 
 ../obj/cce.o: app/cce.cpp
 	g++ -c app/cce.cpp -o ../obj/cce.o  -I. -std=c++11
