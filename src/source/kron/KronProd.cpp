@@ -44,10 +44,17 @@ cx_mat KronProd::full()
 KronProd Flat(const KronProd& kp)
 {
     DIM_LIST new_dim;
-    new_dim.reserve( kp._dim_list.size() );
-    transform(kp._dim_list.cbegin(), kp._dim_list.cend(),
-              new_dim.begin(), bind(multiplies<int>(), _1, _1));
+//    new_dim.reserve( kp._dim_list.size() );
+//    transform(kp._dim_list.cbegin(), kp._dim_list.cend(),
+//              new_dim.begin(), bind(multiplies<int>(), _1, _1));
+    for (auto d : kp._dim_list)
+        new_dim.push_back( d*d );
+
     KronProd res(new_dim);
+
+//    for(auto d : new_dim )
+//        cout << "dim: " << d  << " ";
+//    cout << "end of dim" << kp._dim_list.size() << new_dim.size() <<  endl;
 
     TERM new_mat;
     for(cx_mat A : kp._mat)

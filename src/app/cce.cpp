@@ -82,12 +82,13 @@ int  main(int argc, char* argv[])
     hami.makeKronForm();
 
     SumKronProd skpp=hami.getKronProdForm();
-    //cout << skpp << endl;
+    cout << skpp << endl;
 
     cout << "test" << endl;
     SumKronProd flatKron=Flat(skpp);
-    cout << flatKron << endl;
-    cout << "full" << endl;
+//    cout << flatKron << endl;
     cx_mat fmat=hami.fullMatrix();
     cout << fmat << endl;
+
+    cout << flatKron.full() << endl;
 }
