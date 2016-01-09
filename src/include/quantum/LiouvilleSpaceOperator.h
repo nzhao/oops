@@ -13,7 +13,7 @@
 struct EXPAN 
 {
     HilbertSpaceOperator op;
-    FUNC * func;
+    MatExpanFunc* func;
 };
 
 
@@ -25,7 +25,7 @@ public:
     LiouvilleSpaceOperator();
     ~LiouvilleSpaceOperator();
 
-    LiouvilleSpaceOperator(const HilbertSpaceOperator& op, FUNC* func);
+    LiouvilleSpaceOperator(const HilbertSpaceOperator& op, MatExpanFunc* func);
 protected:
 private:
     bool _is_expanded;

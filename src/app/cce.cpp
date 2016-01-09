@@ -88,16 +88,13 @@ int  main(int argc, char* argv[])
     cout << skpp << endl;
 
 
-    SumKronProd flatKron=FlatOperation(skpp);
+    SumKronProd flatKron=Expand(skpp, FLAT);
     cx_mat fmat=hami.fullMatrix();
     cout << fmat << endl;
 
     cout << flatKron.full() << endl;
 
-
-
-
     cout << "creating lv" << endl;
 
-    LiouvilleSpaceOperator lv(hami, CircleCOperation);
+    LiouvilleSpaceOperator lv(hami, CIRCLEC);
 }

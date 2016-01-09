@@ -11,6 +11,15 @@ using namespace arma;
 /// \defgroup KronProd Kron
 ///@{
 
+cx_mat Flat(const cx_mat& m);
+cx_mat Sharp(const cx_mat& m);
+cx_mat CircleC(const cx_mat& m);
+typedef cx_mat(MatExpanFunc) (const cx_mat&);
+
+extern MatExpanFunc* FLAT;
+extern MatExpanFunc* SHARP;
+extern MatExpanFunc* CIRCLEC;
+
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ KronProd
 class KronProd
@@ -24,10 +33,7 @@ public:
     cx_mat full();
     DIM_LIST getDimList(){return _dim_list;};
 
-    friend KronProd Flat(const KronProd& kp);
-    friend KronProd Sharp(const KronProd& kp);
-    friend KronProd CircleC(const KronProd& kp);
-
+    friend KronProd Expand(const KronProd& kp, MatExpanFunc * exppan_func);
     friend ostream&  operator << (ostream& outs, const KronProd& kp);
 protected:
 private:
@@ -54,9 +60,7 @@ public:
     vector<KronProd> getKronProdList(){return _kron_prod_list;};
     DIM_LIST getDimList(){return _dim_list;};
     
-    friend SumKronProd Flat(const SumKronProd& skp);
-    friend SumKronProd Sharp(const SumKronProd& skp);
-    friend SumKronProd CircleC(const SumKronProd& skp);
+    friend SumKronProd Expand(const SumKronProd& skp, MatExpanFunc * exppan_func);
     friend SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp);
     friend ostream&  operator << (ostream& outs, SumKronProd& skp);
 protected:
@@ -67,15 +71,6 @@ private:
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
-SumKronProd Flat(const SumKronProd& skp);
-SumKronProd Sharp(const SumKronProd& skp);
-SumKronProd CircleC(const SumKronProd& skp);
-
-typedef SumKronProd(FUNC)(const SumKronProd&);
-
-extern FUNC* FlatOperation;
-extern FUNC* SharpOperation;
-extern FUNC* CircleCOperation;
 /// @}
 #endif
 

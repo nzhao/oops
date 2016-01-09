@@ -9,13 +9,14 @@ LiouvilleSpaceOperator::LiouvilleSpaceOperator()
 LiouvilleSpaceOperator::~LiouvilleSpaceOperator()
 { LOG(INFO) << "Default destructor: LiouvilleSpaceOperator";}
 
-LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, FUNC* func)
+LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, MatExpanFunc* func)
 {
     _is_expanded = true;
     _expan.op = op;
     _expan.func = func;
 
-    _kron_form = func( _expan.op.getKronProdForm() );
+//    _kron_form = func( _expan.op.getKronProdForm() );
+    _kron_form = Expand(_expan.op.getKronProdForm(), func);
     _dim_list = _kron_form.getDimList();
     _dimension = 1;
     for( auto d : _dim_list)

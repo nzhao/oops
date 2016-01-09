@@ -4,6 +4,27 @@
 
 using namespace std::placeholders;
 
+cx_mat Flat(const cx_mat& m)
+{
+    mat id; id.eye(size(m));
+    return  kron(id, m);
+}
+
+cx_mat Sharp(const cx_mat& m)
+{
+    mat id; id.eye(size(m));
+    return  kron(m.st(), id);
+}
+
+cx_mat CircleC(const cx_mat& m)
+{
+    mat id; id.eye(size(m));
+    return   kron(id,m) - kron(conj(m),id);
+}
+MatExpanFunc* FLAT = &Flat;
+MatExpanFunc* SHARP = &Sharp;
+MatExpanFunc* CIRCLEC = &CircleC;
+
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ KronProd
 
@@ -41,7 +62,7 @@ cx_mat KronProd::full()
     return _coeff*res;
 }
 
-KronProd Flat(const KronProd& kp)
+KronProd Expand(const KronProd& kp, MatExpanFunc* expan_func)
 {
     DIM_LIST new_dim;
     for (auto d : kp._dim_list)
@@ -52,45 +73,8 @@ KronProd Flat(const KronProd& kp)
     for(cx_mat A : kp._mat)
     {
         mat id; id.eye(size(A));
-        new_mat.push_back( kron(id, A) );
+        new_mat.push_back( expan_func(A) );
     }
-
-    res.fill(kp._spin_index, kp._coeff, new_mat);
-    return res;
-}
-
-KronProd Sharp(const KronProd& kp)
-{
-    DIM_LIST new_dim;
-    for (auto d : kp._dim_list)
-        new_dim.push_back( d*d );
-    KronProd res(new_dim);
-
-    TERM new_mat;
-    for(cx_mat B : kp._mat)
-    {
-        mat id; id.eye(size(B));
-        new_mat.push_back( kron(B.st(), id) );
-    }
-
-    res.fill(kp._spin_index, kp._coeff, new_mat);
-    return res;
-}
-
-KronProd CircleC(const KronProd& kp)
-{
-    DIM_LIST new_dim;
-    for (auto d : kp._dim_list)
-        new_dim.push_back( d*d );
-    KronProd res(new_dim);
-
-    TERM new_mat;
-    for(cx_mat H : kp._mat)
-    {
-        mat id; id.eye(size(H));
-        new_mat.push_back( kron(id,H) - kron(conj(H),id) );
-    }
-
     res.fill(kp._spin_index, kp._coeff, new_mat);
     return res;
 }
@@ -143,37 +127,12 @@ cx_mat SumKronProd::full()
     return res;
 }
 
-FUNC* FlatOperation = &Flat;
-SumKronProd Flat(const SumKronProd& skp)
+SumKronProd Expand(const SumKronProd& skp, MatExpanFunc* expan_func)
 {
     vector<KronProd> new_kp_list;
     new_kp_list.reserve( skp._kron_prod_list.size() );
     for( auto kp : skp._kron_prod_list)
-        new_kp_list.push_back( Flat(kp) );
-
-    SumKronProd res(new_kp_list);
-    return res;
-}
-
-FUNC* SharpOperation = &Sharp;
-SumKronProd Sharp(const SumKronProd& skp)
-{
-    vector<KronProd> new_kp_list;
-    new_kp_list.reserve( skp._kron_prod_list.size() );
-    for( auto kp : skp._kron_prod_list)
-        new_kp_list.push_back( Sharp(kp) );
-
-    SumKronProd res(new_kp_list);
-    return res;
-}
-
-FUNC* CircleCOperation = &CircleC;
-SumKronProd CircleC(const SumKronProd& skp)
-{
-    vector<KronProd> new_kp_list;
-    new_kp_list.reserve( skp._kron_prod_list.size() );
-    for( auto kp : skp._kron_prod_list)
-        new_kp_list.push_back( CircleC(kp) );
+        new_kp_list.push_back( Expand(kp, expan_func) );
 
     SumKronProd res(new_kp_list);
     return res;
