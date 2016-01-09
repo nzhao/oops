@@ -10,7 +10,12 @@
 /// \defgroup LiouvilleSpaceOperator LiouvilleSpaceOperator
 /// @{
 
-enum OperatorExapnsionMethod { SHARP = 0, FLATTEN = 1, CircleC = 2};
+struct EXPAN 
+{
+    HilbertSpaceOperator op;
+    FUNC * func;
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ LiouvilleSpaceOperator
@@ -21,19 +26,17 @@ public:
     ~LiouvilleSpaceOperator();
 
     LiouvilleSpaceOperator(const HilbertSpaceOperator& op, FUNC* func);
-    void makeKronForm(){};
 protected:
 private:
     bool _is_expanded;
-    HilbertSpaceOperator _hilbert_op;
-    FUNC * _func;
+    EXPAN _expan;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Liouvillian
-class Liouvillian
+class Liouvillian:public LiouvilleSpaceOperator
 {
 public:
     Liouvillian();

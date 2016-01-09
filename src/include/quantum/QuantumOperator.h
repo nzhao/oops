@@ -20,8 +20,6 @@ public:
     QuantumOperator();
     ~QuantumOperator();
 
-    virtual void makeKronForm()=0;
-    
     cx_mat       fullMatrix() {return _kron_form.full();};
     SumKronProd& getKronProdForm(){return _kron_form;};
 protected:
