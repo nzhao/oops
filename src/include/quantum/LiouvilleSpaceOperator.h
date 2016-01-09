@@ -10,7 +10,7 @@
 /// \defgroup LiouvilleSpaceOperator LiouvilleSpaceOperator
 /// @{
 
-enum OperatorExapnsionMethod { SHARP = 0, FLATTEN = 1, CircleC = 2};
+enum OperatorExapnsionMethod { SHARP = 0, FLAT = 1, CIRCLEC = 2};
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ LiouvilleSpaceOperator
@@ -24,7 +24,7 @@ public:
 protected:
 private:
     bool _is_expanded;
-    virtual HilbertSpaceOperator _hilbert_op;
+    //HilbertSpaceOperator _hilbert_op;
     OperatorExapnsionMethod _expansion_method;
 };
 //}}}

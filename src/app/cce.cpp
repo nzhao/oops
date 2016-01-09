@@ -81,8 +81,13 @@ int  main(int argc, char* argv[])
     hami.addInteraction(zee);
     hami.makeKronForm();
 
-//    SumKronProd skpp=hami.kronProdForm();
-//    cout << skpp << endl;
+    SumKronProd skpp=hami.getKronProdForm();
+    //cout << skpp << endl;
+
+    cout << "test" << endl;
+    SumKronProd flatKron=Flat(skpp);
+    cout << flatKron << endl;
+    cout << "full" << endl;
     cx_mat fmat=hami.fullMatrix();
     cout << fmat << endl;
 }

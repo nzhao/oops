@@ -12,7 +12,7 @@ LiouvilleSpaceOperator::~LiouvilleSpaceOperator()
 LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, const OperatorExapnsionMethod method)
 {
     _is_expanded = true;
-    _hilbert_op = op;
+    //_hilbert_op = op;
     _expansion_method = method;
 }
 //}}}

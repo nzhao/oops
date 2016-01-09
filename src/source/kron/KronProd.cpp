@@ -44,6 +44,7 @@ cx_mat KronProd::full()
 KronProd Flat(const KronProd& kp)
 {
     DIM_LIST new_dim;
+    new_dim.reserve( kp._dim_list.size() );
     transform(kp._dim_list.cbegin(), kp._dim_list.cend(),
               new_dim.begin(), bind(multiplies<int>(), _1, _1));
     KronProd res(new_dim);
@@ -145,9 +146,17 @@ cx_mat SumKronProd::full()
 SumKronProd Flat(const SumKronProd& skp)
 {
     vector<KronProd> new_kp_list;
-    transform(skp._kron_prod_list.cbegin(), skp._kron_prod_list.cend(),
-              new_kp_list.begin(),
-              [](KronProd kp) { return Flat(kp);});
+    new_kp_list.reserve( skp._kron_prod_list.size() );
+    for( auto kp : skp._kron_prod_list)
+    {
+        new_kp_list.push_back( Flat(kp) );
+    }
+//    transform(
+//            skp._kron_prod_list.cbegin(),
+//            skp._kron_prod_list.cend(),
+//            new_kp_list.begin(),
+//            [](KronProd kp) { return Flat(kp);}
+//            );
 
     SumKronProd res(new_kp_list);
     return res;
