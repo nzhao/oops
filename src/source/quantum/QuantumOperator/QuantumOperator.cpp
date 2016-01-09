@@ -8,9 +8,5 @@ QuantumOperator::QuantumOperator()
 QuantumOperator::~QuantumOperator()
 { LOG(INFO) << "Default destructor: QuantumOperator."; }
 
-cx_mat QuantumOperator::fullMatrix()
-{
-    return _kron_form.full();
-}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

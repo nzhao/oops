@@ -37,7 +37,8 @@ public:
     ~Hamiltonian();
 
     void addInteraction(cSpinInteraction& spin_interaction);
-    SumKronProd& kronProdForm();
+    void makeKronForm();
+
 private:
     vector<cSPIN> _spin_list;
     vector<cSpinInteraction> _interaction_list;

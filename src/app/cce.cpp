@@ -79,10 +79,10 @@ int  main(int argc, char* argv[])
     Hamiltonian hami(sl);
     hami.addInteraction(dip);
     hami.addInteraction(zee);
+    hami.makeKronForm();
 
 //    SumKronProd skpp=hami.kronProdForm();
 //    cout << skpp << endl;
-    hami.kronProdForm();
     cx_mat fmat=hami.fullMatrix();
     cout << fmat << endl;
 }

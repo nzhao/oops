@@ -35,12 +35,11 @@ void Hamiltonian::addInteraction(cSpinInteraction& spin_interaction)
     _interaction_list.push_back(spin_interaction);
 }
 
-SumKronProd& Hamiltonian::kronProdForm()
+void Hamiltonian::makeKronForm()
 {
     _kron_form = _interaction_list[0].getSumKronProd();
     for(int i=1; i<_interaction_list.size(); ++i)
         _kron_form = _kron_form + _interaction_list[i].getSumKronProd();
-    return _kron_form;
 }
 
 //}}}

@@ -8,6 +8,13 @@ LiouvilleSpaceOperator::LiouvilleSpaceOperator()
 
 LiouvilleSpaceOperator::~LiouvilleSpaceOperator()
 { LOG(INFO) << "Default destructor: LiouvilleSpaceOperator";}
+
+LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, const OperatorExapnsionMethod method)
+{
+    _is_expanded = true;
+    _hilbert_op = op;
+    _expansion_method = method;
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,5 +27,6 @@ Liouvillian::Liouvillian()
 
 Liouvillian::~Liouvillian()
 { LOG(INFO) << "Default destructor: Liouvillian";}
+
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

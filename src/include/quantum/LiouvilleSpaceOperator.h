@@ -10,7 +10,7 @@
 /// \defgroup LiouvilleSpaceOperator LiouvilleSpaceOperator
 /// @{
 
-enum OperatorExapnsionMethod { SHARP = 0, FLATTEN = 1};
+enum OperatorExapnsionMethod { SHARP = 0, FLATTEN = 1, CircleC = 2};
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ LiouvilleSpaceOperator
@@ -20,10 +20,12 @@ public:
     LiouvilleSpaceOperator();
     ~LiouvilleSpaceOperator();
 
-    LiouvilleSpaceOperator(const HilbertSpaceOperator& lOp, const OperatorExapnsionMethod method);
-    LiouvilleSpaceOperator(const HilbertSpaceOperator& lOp, const HilbertSpaceOperator& rOp);
+    LiouvilleSpaceOperator(const HilbertSpaceOperator& op, const OperatorExapnsionMethod method);
 protected:
 private:
+    bool _is_expanded;
+    virtual HilbertSpaceOperator _hilbert_op;
+    OperatorExapnsionMethod _expansion_method;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
