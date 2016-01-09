@@ -22,6 +22,7 @@ public:
 
     void   fill(INDICES idx, MULTIPLIER coeff, TERM mat);
     cx_mat full();
+    DIM_LIST getDimList(){return _dim_list;};
 
     friend KronProd Flat(const KronProd& kp);
     friend KronProd Sharp(const KronProd& kp);
@@ -51,6 +52,7 @@ public:
 
     cx_mat full();
     vector<KronProd> getKronProdList(){return _kron_prod_list;};
+    DIM_LIST getDimList(){return _dim_list;};
     
     friend SumKronProd Flat(const SumKronProd& skp);
     friend SumKronProd Sharp(const SumKronProd& skp);
@@ -58,12 +60,22 @@ public:
     friend SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp);
     friend ostream&  operator << (ostream& outs, SumKronProd& skp);
 protected:
+    DIM_LIST _dim_list;
     vector<KronProd> _kron_prod_list;
 private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
+SumKronProd Flat(const SumKronProd& skp);
+SumKronProd Sharp(const SumKronProd& skp);
+SumKronProd CircleC(const SumKronProd& skp);
+
+typedef SumKronProd(FUNC)(const SumKronProd&);
+
+extern FUNC* FlatOperation;
+extern FUNC* SharpOperation;
+extern FUNC* CircleCOperation;
 /// @}
 #endif
 

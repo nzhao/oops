@@ -14,6 +14,7 @@
 #include "include/easylogging++.h"
 #include "include/misc/misc.h"
 #include "include/quantum/HilbertSpaceOperator.h"
+#include "include/quantum/LiouvilleSpaceOperator.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -21,6 +22,8 @@ using namespace std;
 using namespace arma;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
+
+
 
 int  main(int argc, char* argv[])
 {
@@ -62,7 +65,7 @@ int  main(int argc, char* argv[])
 
     SpinDipolarInteraction dip(sl);
     dip.make();
-//    cout << dip << endl;
+    //cout << dip << endl;
 
     vec magB={0.0, 0.0, 1.0};
     SpinZeemanInteraction zee(sl, magB);
@@ -84,11 +87,17 @@ int  main(int argc, char* argv[])
     SumKronProd skpp=hami.getKronProdForm();
     cout << skpp << endl;
 
-    cout << "test" << endl;
-    SumKronProd flatKron=Flat(skpp);
-//    cout << flatKron << endl;
+
+    SumKronProd flatKron=FlatOperation(skpp);
     cx_mat fmat=hami.fullMatrix();
     cout << fmat << endl;
 
     cout << flatKron.full() << endl;
+
+
+
+
+    cout << "creating lv" << endl;
+
+    LiouvilleSpaceOperator lv(hami, CircleCOperation);
 }

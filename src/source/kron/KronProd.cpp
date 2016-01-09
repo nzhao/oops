@@ -44,17 +44,9 @@ cx_mat KronProd::full()
 KronProd Flat(const KronProd& kp)
 {
     DIM_LIST new_dim;
-//    new_dim.reserve( kp._dim_list.size() );
-//    transform(kp._dim_list.cbegin(), kp._dim_list.cend(),
-//              new_dim.begin(), bind(multiplies<int>(), _1, _1));
     for (auto d : kp._dim_list)
         new_dim.push_back( d*d );
-
     KronProd res(new_dim);
-
-//    for(auto d : new_dim )
-//        cout << "dim: " << d  << " ";
-//    cout << "end of dim" << kp._dim_list.size() << new_dim.size() <<  endl;
 
     TERM new_mat;
     for(cx_mat A : kp._mat)
@@ -70,8 +62,8 @@ KronProd Flat(const KronProd& kp)
 KronProd Sharp(const KronProd& kp)
 {
     DIM_LIST new_dim;
-    transform(kp._dim_list.cbegin(), kp._dim_list.cend(),
-              new_dim.begin(), bind(multiplies<int>(), _1, _1));
+    for (auto d : kp._dim_list)
+        new_dim.push_back( d*d );
     KronProd res(new_dim);
 
     TERM new_mat;
@@ -88,8 +80,8 @@ KronProd Sharp(const KronProd& kp)
 KronProd CircleC(const KronProd& kp)
 {
     DIM_LIST new_dim;
-    transform(kp._dim_list.cbegin(), kp._dim_list.cend(),
-              new_dim.begin(), bind(multiplies<int>(), _1, _1));
+    for (auto d : kp._dim_list)
+        new_dim.push_back( d*d );
     KronProd res(new_dim);
 
     TERM new_mat;
@@ -137,6 +129,7 @@ SumKronProd::SumKronProd(const vector<KronProd>& kp_lst)
 {
     cout << "SumKronProd constructor with kp_lst" << endl;
     _kron_prod_list = kp_lst;
+    _dim_list = _kron_prod_list[0].getDimList();
 }
 SumKronProd::~SumKronProd()
 {
@@ -150,42 +143,37 @@ cx_mat SumKronProd::full()
     return res;
 }
 
+FUNC* FlatOperation = &Flat;
 SumKronProd Flat(const SumKronProd& skp)
 {
     vector<KronProd> new_kp_list;
     new_kp_list.reserve( skp._kron_prod_list.size() );
     for( auto kp : skp._kron_prod_list)
-    {
         new_kp_list.push_back( Flat(kp) );
-    }
-//    transform(
-//            skp._kron_prod_list.cbegin(),
-//            skp._kron_prod_list.cend(),
-//            new_kp_list.begin(),
-//            [](KronProd kp) { return Flat(kp);}
-//            );
 
     SumKronProd res(new_kp_list);
     return res;
 }
 
+FUNC* SharpOperation = &Sharp;
 SumKronProd Sharp(const SumKronProd& skp)
 {
     vector<KronProd> new_kp_list;
-    transform(skp._kron_prod_list.cbegin(), skp._kron_prod_list.cend(),
-              new_kp_list.begin(),
-              [](KronProd kp) { return Sharp(kp);});
+    new_kp_list.reserve( skp._kron_prod_list.size() );
+    for( auto kp : skp._kron_prod_list)
+        new_kp_list.push_back( Sharp(kp) );
 
     SumKronProd res(new_kp_list);
     return res;
 }
 
+FUNC* CircleCOperation = &CircleC;
 SumKronProd CircleC(const SumKronProd& skp)
 {
     vector<KronProd> new_kp_list;
-    transform(skp._kron_prod_list.cbegin(), skp._kron_prod_list.cend(),
-              new_kp_list.begin(),
-              [](KronProd kp) { return CircleC(kp);});
+    new_kp_list.reserve( skp._kron_prod_list.size() );
+    for( auto kp : skp._kron_prod_list)
+        new_kp_list.push_back( CircleC(kp) );
 
     SumKronProd res(new_kp_list);
     return res;

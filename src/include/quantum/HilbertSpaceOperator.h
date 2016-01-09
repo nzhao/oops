@@ -20,10 +20,10 @@ public:
     HilbertSpaceOperator();
     ~HilbertSpaceOperator();
 
+    void makeKronForm(){};
 protected:
 private:
 };
-#endif
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -48,3 +48,4 @@ private:
 
 /// @}
 /// @}
+#endif
