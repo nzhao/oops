@@ -11,18 +11,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinSource
 cSpinSource::cSpinSource()
-{
-    vector<cSPIN> spin_list;
-//    cout << "spin_list is initialized in cSpinSource" << endl;
+{ LOG(INFO) << "Default constructor: cSpinSource.";
 }
 
 cSpinSource::~cSpinSource()
-{// cout << "destructor: cSpinSource is called" << endl;
-}
-
-vector<cSPIN>& cSpinSource::generate()
-{ //cout << "cSpinSource::generate is called" << endl;
-    return spin_list;
+{ LOG(INFO) << "Default destructor: cSpinSource.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,8 +23,7 @@ vector<cSPIN>& cSpinSource::generate()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinSourceFromFile
 cSpinSourceFromFile::cSpinSourceFromFile()
-{
-    cout << "Need a file name!" << endl;
+{ LOG(INFO) << "Default constructor: cSpinSourceFromFile.";
 }
 cSpinSourceFromFile::cSpinSourceFromFile(string filename)
 {
@@ -40,7 +32,7 @@ cSpinSourceFromFile::cSpinSourceFromFile(string filename)
 }
 
 cSpinSourceFromFile::~cSpinSourceFromFile()
-{// cout << "destructor: cSpinSourceFromFile is called" << endl;
+{ LOG(INFO) << "Default destructor: cSpinSourceFromFile.";
 }
 
 vector<cSPIN>& cSpinSourceFromFile::generate()

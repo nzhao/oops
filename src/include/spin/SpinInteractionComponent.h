@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <armadillo>
+#include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 #include "include/Spin/SpinInteractionDefine.h"
 

@@ -15,7 +15,6 @@ LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, M
     _expan.op = op;
     _expan.func = func;
 
-//    _kron_form = func( _expan.op.getKronProdForm() );
     _kron_form = Expand(_expan.op.getKronProdForm(), func);
     _dim_list = _kron_form.getDimList();
     _dimension = 1;

@@ -40,6 +40,7 @@ class Liouvillian:public LiouvilleSpaceOperator
 {
 public:
     Liouvillian();
+    Liouvillian(const Hamiltonian& hm):LiouvilleSpaceOperator(hm, CIRCLEC){};
     ~Liouvillian();
 protected:
 private:

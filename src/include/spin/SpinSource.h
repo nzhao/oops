@@ -2,6 +2,7 @@
 #define SPINSOURCE_H
 #include <vector>
 #include <string>
+#include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 
 using namespace std;

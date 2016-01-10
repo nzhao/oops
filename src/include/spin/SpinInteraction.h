@@ -2,6 +2,7 @@
 #define SPININTERACTION_H
 
 #include <vector>
+#include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 #include "include/spin/SpinInteractionComponent.h"
 #include "include/spin/SpinInteractionDefine.h"

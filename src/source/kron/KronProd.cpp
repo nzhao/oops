@@ -2,6 +2,9 @@
 #include "include/kron/KronProd.h"
 #include "include/easylogging++.h"
 
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ MatrixOperationFunctions
 using namespace std::placeholders;
 
 cx_mat Flat(const cx_mat& m)
@@ -24,6 +27,8 @@ cx_mat CircleC(const cx_mat& m)
 MatExpanFunc* FLAT = &Flat;
 MatExpanFunc* SHARP = &Sharp;
 MatExpanFunc* CIRCLEC = &CircleC;
+//}}}
+////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ KronProd
@@ -105,19 +110,16 @@ ostream&  operator << (ostream& outs, const KronProd& kp)
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SumKronProd
 SumKronProd::SumKronProd()
-{
-    cout << "Default SumKronProd constructor" << endl;
+{ LOG(INFO) << "Default constructor: SumKronProd.";
 }
 
 SumKronProd::SumKronProd(const vector<KronProd>& kp_lst)
-{
-    cout << "SumKronProd constructor with kp_lst" << endl;
+{ LOG(INFO) << "Constructor: SumKronProd with KronProd list.";
     _kron_prod_list = kp_lst;
     _dim_list = _kron_prod_list[0].getDimList();
 }
 SumKronProd::~SumKronProd()
-{
-    cout << "Destructor of SumKronProd" << endl;
+{ LOG(INFO) << "Default destructor: SumKronProd.";
 }
 cx_mat SumKronProd::full()
 {

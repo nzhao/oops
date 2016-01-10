@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <set>
+#include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 #include "include/spin/SpinClusterAlgorithm.h"
 

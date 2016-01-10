@@ -11,6 +11,8 @@ using namespace arma;
 /// \defgroup KronProd Kron
 ///@{
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Matrix Operation Functions
 cx_mat Flat(const cx_mat& m);
 cx_mat Sharp(const cx_mat& m);
 cx_mat CircleC(const cx_mat& m);
@@ -19,6 +21,10 @@ typedef cx_mat(MatExpanFunc) (const cx_mat&);
 extern MatExpanFunc* FLAT;
 extern MatExpanFunc* SHARP;
 extern MatExpanFunc* CIRCLEC;
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ KronProd

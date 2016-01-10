@@ -8,7 +8,6 @@
 #include "include/spin/SpinCluster.h"
 #include "include/spin/SpinClusterAlgorithm.h"
 #include "include/spin/SpinInteraction.h"
-#include "include/spin/SpinSystem.h"
 #include "include/kron/KronProd.h"
 
 #include "include/easylogging++.h"
@@ -70,31 +69,12 @@ int  main(int argc, char* argv[])
     vec magB={0.0, 0.0, 1.0};
     SpinZeemanInteraction zee(sl, magB);
     zee.make();
-//    cout << zee << endl;
-
-//    cSpinSystem ss(sl);
-//    ss.addSpinInteraction(dip);
-//    ss.addSpinInteraction(zee);
-//
-//    SumKronProd skpp=ss.getSumKronOperator();
-//    cout << skpp << endl;
 
     Hamiltonian hami(sl);
     hami.addInteraction(dip);
     hami.addInteraction(zee);
     hami.makeKronForm();
 
-    SumKronProd skpp=hami.getKronProdForm();
-    cout << skpp << endl;
-
-
-    SumKronProd flatKron=Expand(skpp, FLAT);
-    cx_mat fmat=hami.fullMatrix();
-    cout << fmat << endl;
-
-    cout << flatKron.full() << endl;
-
-    cout << "creating lv" << endl;
-
-    LiouvilleSpaceOperator lv(hami, CIRCLEC);
+    Liouvillian lv(hami);
+    cout << lv.getKronProdForm() << endl;
 }
