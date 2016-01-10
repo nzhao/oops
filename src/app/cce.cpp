@@ -77,4 +77,6 @@ int  main(int argc, char* argv[])
 
     Liouvillian lv(hami);
     cout << lv.getKronProdForm() << endl;
+
+    lv.saveMatrix();
 }

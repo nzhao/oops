@@ -1,5 +1,5 @@
 ../bin/cce: ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/KronProd.o ../obj/QuantumOperator.o ../obj/HilbertSpaceOperator.o ../obj/LiouvilleSpaceOperator.o ../obj/cce.o
-	g++ -g ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/KronProd.o ../obj/QuantumOperator.o ../obj/HilbertSpaceOperator.o ../obj/LiouvilleSpaceOperator.o -o  ../bin/cce -std=c++11 -larmadillo
+	g++ -g ../obj/cce.o ../obj/Spin.o ../obj/SpinData.o ../obj/SpinCollection.o ../obj/SpinSource.o ../obj/SpinClusterAlgorithm.o ../obj/SpinCluster.o ../obj/SpinInteraction.o ../obj/SpinInteractionComponent.o ../obj/KronProd.o ../obj/QuantumOperator.o ../obj/HilbertSpaceOperator.o ../obj/LiouvilleSpaceOperator.o -o  ../bin/cce -std=c++11 -larmadillo -L/Applications/MATLAB_R2014b.app/bin/maci64 -lmx -lmat
 
 ../obj/Spin.o: source/spin/Spin/Spin.cpp include/spin/Spin.h
 	g++ -g -c source/spin/Spin/Spin.cpp -o ../obj/Spin.o  -I. -std=c++11
@@ -29,16 +29,16 @@
 	g++ -g -c source/kron/KronProd.cpp -o ../obj/KronProd.o  -I. -std=c++11
 
 ../obj/QuantumOperator.o: source/quantum/QuantumOperator/QuantumOperator.cpp include/quantum/QuantumOperator.h
-	g++ -g -c source/quantum/QuantumOperator/QuantumOperator.cpp -o ../obj/QuantumOperator.o -I. -std=c++11
+	g++ -g -c source/quantum/QuantumOperator/QuantumOperator.cpp -o ../obj/QuantumOperator.o -I. -I/Applications/MATLAB_R2014b.app/extern/include/ -std=c++11
 
 ../obj/HilbertSpaceOperator.o: source/quantum/QuantumOperator/HilbertSpaceOperator.cpp include/quantum/HilbertSpaceOperator.h
-	g++ -g -c source/quantum/QuantumOperator/HilbertSpaceOperator.cpp -o ../obj/HilbertSpaceOperator.o -I. -std=c++11
+	g++ -g -c source/quantum/QuantumOperator/HilbertSpaceOperator.cpp -o ../obj/HilbertSpaceOperator.o -I. -I/Applications/MATLAB_R2014b.app/extern/include/ -std=c++11
 
 ../obj/LiouvilleSpaceOperator.o: source/quantum/QuantumOperator/LiouvilleSpaceOperator.cpp include/quantum/LiouvilleSpaceOperator.h
-	g++ -g -c source/quantum/QuantumOperator/LiouvilleSpaceOperator.cpp -o ../obj/LiouvilleSpaceOperator.o -I. -std=c++11
+	g++ -g -c source/quantum/QuantumOperator/LiouvilleSpaceOperator.cpp -o ../obj/LiouvilleSpaceOperator.o -I. -I/Applications/MATLAB_R2014b.app/extern/include/ -std=c++11
 
 ../obj/cce.o: app/cce.cpp
-	g++ -g -c app/cce.cpp -o ../obj/cce.o  -I. -std=c++11
+	g++ -g -c app/cce.cpp -o ../obj/cce.o  -I. -I/Applications/MATLAB_R2014b.app/extern/include/ -std=c++11
 
 clean: 
 	rm ../obj/*.o
