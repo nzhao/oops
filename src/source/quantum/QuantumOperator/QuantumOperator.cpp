@@ -12,7 +12,7 @@ void QuantumOperator::saveMatrix()
 {
     cx_mat m= this->fullMatrix();
     mat m_r = real(m).t();
-    mat m_i = imag(m).t();
+    mat m_i = -imag(m).t();
 
     const char *file = "../src/debug/Operator.mat";
     mxArray *pArray = mxCreateDoubleMatrix(_dimension,_dimension,mxCOMPLEX);
