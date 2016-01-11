@@ -8,11 +8,12 @@
 #include "include/spin/SpinCluster.h"
 #include "include/spin/SpinClusterAlgorithm.h"
 #include "include/spin/SpinInteraction.h"
-#include "include/spin/SpinSystem.h"
 #include "include/kron/KronProd.h"
 
 #include "include/easylogging++.h"
 #include "include/misc/misc.h"
+#include "include/quantum/HilbertSpaceOperator.h"
+#include "include/quantum/LiouvilleSpaceOperator.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -21,11 +22,17 @@ using namespace arma;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
+
+
 int  main(int argc, char* argv[])
 {
     START_EASYLOGGINGPP(argc, argv);
-    LOG(INFO) << "My first info log using default logger";
+    el::Configurations conf("/Users/nzhao/code/lib/active/oops/src/logs/log.conf");
+    el::Loggers::reconfigureAllLoggers(conf);
 
+    LOG(INFO) << endl;
+    LOG(INFO) << "###################################################";
+    LOG(INFO) << "Program begins."; 
     vector<double> coordinate {1.0, 2.0, 3.0};
     string isotope="13C";
 
@@ -57,17 +64,19 @@ int  main(int argc, char* argv[])
 
     SpinDipolarInteraction dip(sl);
     dip.make();
-//    cout << dip << endl;
+    //cout << dip << endl;
 
     vec magB={0.0, 0.0, 1.0};
     SpinZeemanInteraction zee(sl, magB);
     zee.make();
-//    cout << zee << endl;
 
-    cSpinSystem ss(sl);
-    ss.addSpinInteraction(dip);
-    ss.addSpinInteraction(zee);
+    Hamiltonian hami(sl);
+    hami.addInteraction(dip);
+    hami.addInteraction(zee);
+    hami.makeKronForm();
 
-    SumKronProd skpp=ss.getSumKronOperator();
-    cout << skpp << endl;
+    Liouvillian lv(hami);
+    //cout << lv.getKronProdForm() << endl;
+
+    lv.saveMatrix();
 }

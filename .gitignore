@@ -1,7 +1,9 @@
 bin/*
 obj/*
-doc/*
+doc/html/*
+doc/*.old
 src/logs
+src/debug
 *.o
 *.swp
 tags

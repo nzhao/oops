@@ -8,6 +8,8 @@
 
 using namespace std;
 using namespace arma;
+/// \addtogroup Spin
+/// @{
 
 /// \defgroup SpinList SpinList
 /// @{
@@ -44,5 +46,6 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 /// @}
 
+/// @}
 /// @}
 #endif

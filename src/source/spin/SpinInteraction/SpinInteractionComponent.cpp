@@ -6,12 +6,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteractionDomain
 cSpinInteractionDomain::cSpinInteractionDomain()
-{
-    cout << "cSpinInteractionDomain" << endl;
+{ LOG(INFO) << "Default constructor: cSpinInteractionDomain.";
 }
 cSpinInteractionDomain::~cSpinInteractionDomain()
-{
-    cout << "cSpinInteractionDomain, destructed." << endl;
+{ LOG(INFO) << "Default destructor: cSpinInteractionDomain.";
 }
 
 ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm)
@@ -33,8 +31,7 @@ ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm)
 //----------------------------------------------------------------------------//
 //{{{ SpinPair
 SpinPair::SpinPair(const vector<cSPIN>& spin_list)
-{
-    cout << "SpinPair constructor" << endl;
+{ LOG(INFO) << "Constructor: SpinPair with spin_list";
     int nspin=spin_list.size();
 
     _nbody = 2;
@@ -47,15 +44,13 @@ SpinPair::SpinPair(const vector<cSPIN>& spin_list)
         _spin_aggregate.push_back( vector<cSPIN> { spin_list[ idx[0] ] , spin_list[ idx[1] ] });
 }
 SpinPair::~SpinPair()
-{
-    cout << "SpinPair, destructed." << endl;
+{ LOG(INFO) << "Default destructor: SpinPair.";
 }
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ SingleSpin
 SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
-{
-    cout << "SingleSpin constructor" << endl;
+{ LOG(INFO) << "Constructor: SingleSpin with spin_list";
     int nspin=spin_list.size();
 
     _nbody = 1;
@@ -67,8 +62,7 @@ SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
         _spin_aggregate.push_back( vector<cSPIN> { spin_list[ idx[0] ] });
 }
 SingleSpin::~SingleSpin()
-{
-    cout << "SingleSpin, destructed." << endl;
+{ LOG(INFO) << "Default destructor: SingleSpin.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,12 +72,10 @@ SingleSpin::~SingleSpin()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteractionForm
 cSpinInteractionForm::cSpinInteractionForm()
-{
-    cout << "cSpinInteractionForm" << endl;
+{  LOG(INFO) << "Default constructor: cSpinInteractionForm.";
 }
 cSpinInteractionForm::~cSpinInteractionForm()
-{
-    cout << "cSpinInteractionForm, destructed." << endl;
+{ LOG(INFO) << "Default destructor: cSpinInteractionForm.";
 }
 ostream&  operator << (ostream& outs, cSpinInteractionForm& form)
 {
@@ -141,8 +133,7 @@ TwoSpinInteractionForm::TwoSpinInteractionForm(cSpinInteractionDomain& domain)
     }
 }
 TwoSpinInteractionForm::~TwoSpinInteractionForm()
-{
-    cout << "desctructor TwoSpinInteractionForm" << endl;
+{ LOG(INFO) << "Default destructor: TwoSpinInteractionForm.";
 }
 //}}}
 //----------------------------------------------------------------------------//
@@ -170,8 +161,7 @@ SingleSpinInteractionForm::SingleSpinInteractionForm(cSpinInteractionDomain& dom
     }
 }
 SingleSpinInteractionForm::~SingleSpinInteractionForm()
-{
-    cout << "desctructor SingleSpinInteractionForm" << endl;
+{ LOG(INFO) << "Default destructor: SingleSpinInteractionForm.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,12 +171,10 @@ SingleSpinInteractionForm::~SingleSpinInteractionForm()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteractionCoeff
 cSpinInteractionCoeff::cSpinInteractionCoeff()
-{
-    cout << "cSpinInteractionCoeff" << endl;
+{ LOG(INFO) << "Default constructor: cSpinInteractionCoeff.";
 }
 cSpinInteractionCoeff::~cSpinInteractionCoeff()
-{
-    cout << "cSpinInteractionCoeff, destructed." << endl;
+{ LOG(INFO) << "Default destructor: cSpinInteractionCoeff.";
 }
 ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef)
 {
@@ -219,8 +207,7 @@ DipolarInteractionCoeff::DipolarInteractionCoeff(cSpinInteractionDomain& domain)
     }
 }
 DipolarInteractionCoeff::~DipolarInteractionCoeff()
-{
-    cout << "Destructor: DipolarInteractionCoeff" << endl;
+{ LOG(INFO) << "Default destructor: DipolarInteractionCoeff.";
 }
 //}}}
 //----------------------------------------------------------------------------//
@@ -238,8 +225,7 @@ ZeemanInteractionCoeff::ZeemanInteractionCoeff(cSpinInteractionDomain& domain, c
     }
 }
 ZeemanInteractionCoeff::~ZeemanInteractionCoeff()
-{
-    cout << "Destructor: DipolarInteractionCoeff" << endl;
+{ LOG(INFO) << "Default destructor: ZeemanInteractionCoeff.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

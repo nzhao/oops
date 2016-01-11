@@ -1,18 +1,47 @@
 #include <armadillo>
 #include "include/kron/KronProd.h"
+#include "include/easylogging++.h"
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ MatrixOperationFunctions
+using namespace std::placeholders;
+
+cx_mat Flat(const cx_mat& m)
+{
+    mat id; id.eye(size(m));
+    return  kron(id, m);
+}
+
+cx_mat Sharp(const cx_mat& m)
+{
+    mat id; id.eye(size(m));
+    return  kron(m.st(), id);
+}
+
+cx_mat CircleC(const cx_mat& m)
+{
+    mat id; id.eye(size(m));
+    return   kron(id,m) - kron(conj(m),id);
+}
+MatExpanFunc* FLAT = &Flat;
+MatExpanFunc* SHARP = &Sharp;
+MatExpanFunc* CIRCLEC = &CircleC;
+//}}}
+////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ KronProd
+
 KronProd::KronProd()
-{
-    cout << "default KronProd constructor" << endl;
-}
+{ LOG(INFO) << "Default constructor: KronProd";}
+
+KronProd::~KronProd()
+{ LOG(INFO) << "Default destructor: KronProd";}
+
 KronProd::KronProd(DIM_LIST dim_list)
 {
     _dim_list = dim_list;
-}
-KronProd::~KronProd()
-{// cout << "desctructor: KronProd." << endl;
 }
 
 void KronProd::fill(INDICES idx, MULTIPLIER coeff, TERM mat)
@@ -36,6 +65,23 @@ cx_mat KronProd::full()
         res=kron(res, all_mat[i]);
 
     return _coeff*res;
+}
+
+KronProd Expand(const KronProd& kp, MatExpanFunc* expan_func)
+{
+    DIM_LIST new_dim;
+    for (auto d : kp._dim_list)
+        new_dim.push_back( d*d );
+    KronProd res(new_dim);
+
+    TERM new_mat;
+    for(cx_mat A : kp._mat)
+    {
+        mat id; id.eye(size(A));
+        new_mat.push_back( expan_func(A) );
+    }
+    res.fill(kp._spin_index, kp._coeff, new_mat);
+    return res;
 }
 
 ostream&  operator << (ostream& outs, const KronProd& kp)
@@ -64,18 +110,16 @@ ostream&  operator << (ostream& outs, const KronProd& kp)
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SumKronProd
 SumKronProd::SumKronProd()
-{
-    cout << "Default SumKronProd constructor" << endl;
+{ LOG(INFO) << "Default constructor: SumKronProd.";
 }
 
 SumKronProd::SumKronProd(const vector<KronProd>& kp_lst)
-{
-    cout << "SumKronProd constructor with kp_lst" << endl;
+{ LOG(INFO) << "Constructor: SumKronProd with KronProd list.";
     _kron_prod_list = kp_lst;
+    _dim_list = _kron_prod_list[0].getDimList();
 }
 SumKronProd::~SumKronProd()
-{
-    cout << "Destructor of SumKronProd" << endl;
+{ LOG(INFO) << "Default destructor: SumKronProd.";
 }
 cx_mat SumKronProd::full()
 {
@@ -84,6 +128,18 @@ cx_mat SumKronProd::full()
         res = res + _kron_prod_list[i].full();
     return res;
 }
+
+SumKronProd Expand(const SumKronProd& skp, MatExpanFunc* expan_func)
+{
+    vector<KronProd> new_kp_list;
+    new_kp_list.reserve( skp._kron_prod_list.size() );
+    for( auto kp : skp._kron_prod_list)
+        new_kp_list.push_back( Expand(kp, expan_func) );
+
+    SumKronProd res(new_kp_list);
+    return res;
+}
+
 SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp)
 {
     vector<KronProd> A = sum._kron_prod_list;

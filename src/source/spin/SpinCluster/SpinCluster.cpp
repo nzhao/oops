@@ -4,7 +4,7 @@
 ////////////////////////////////////////////////////////////////////
 //{{{ cClusterIndex
 cClusterIndex::cClusterIndex()
-{// cout << "cClusterIndex default constructor" << endl;
+{ LOG(INFO) << "Default constructor of cClusterIndex.";
 }
 
 cClusterIndex::cClusterIndex(const uvec& idx)
@@ -13,7 +13,7 @@ cClusterIndex::cClusterIndex(const uvec& idx)
     sort(_index.begin(), _index.end()); }
 
 cClusterIndex::~cClusterIndex()
-{ //cout << "cClusterIndex default destructor" << endl;
+{ LOG(INFO) << "Default destructor of cClusterIndex.";
 }
 
 mat cClusterIndex::get_array(size_t nspin)

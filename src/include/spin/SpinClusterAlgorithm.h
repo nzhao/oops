@@ -7,6 +7,7 @@
 #include <set>
 #include <string>
 #include <armadillo>
+#include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 //#include "include/spin/SpinCluster.h"
 

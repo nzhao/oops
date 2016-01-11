@@ -10,7 +10,6 @@ using namespace std;
 using namespace arma;
 
 extern cSPINDATA SPIN_DATABASE;
-
 /// \defgroup Spin Spin
 /// @{
 

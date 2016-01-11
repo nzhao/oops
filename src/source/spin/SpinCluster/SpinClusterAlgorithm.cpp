@@ -14,12 +14,12 @@ cSpinGrouping::cSpinGrouping()
     _cluster_index_list = CLST_IDX_LIST(MAX_CLUSTER_ORDER);
 }
 cSpinGrouping::cSpinGrouping(const sp_mat& connection_matrix)
-{// cout << "cSpinGrouping constructor is called." << endl;
+{ LOG(INFO) << "Constructor of cSpinGrouping with connextion_matrix.";
     _connection_matrix=connection_matrix;
 }
 
 cSpinGrouping::~cSpinGrouping()
-{// cout << "cSpinGrouping destructor is called." << endl;
+{ LOG(INFO) << "Default destructor of cSpinGrouping";
 }
 
 sp_mat cSpinGrouping::index2subgraph(int order)
@@ -56,8 +56,7 @@ void cSpinGrouping::subgraph2index(const sp_mat& subgraph)
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinDepthFirstPathTracing
 cDepthFirstPathTracing::cDepthFirstPathTracing()
-{
-    cout << "need a connection matrix." << endl;
+{ LOG(INFO) << "Default constructor: cDepthFirstPathTracing.";
 }
 
 cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder)
@@ -69,7 +68,7 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
 }
 
 cDepthFirstPathTracing::~cDepthFirstPathTracing()
-{// cout << "cSpinDepthFirstPathTracing destructor is called." << endl;
+{ LOG(INFO) << "Default destructor: cDepthFirstPathTracing.";
 }
 
 void cDepthFirstPathTracing::generate()

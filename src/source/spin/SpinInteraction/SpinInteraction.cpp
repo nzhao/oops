@@ -8,19 +8,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteraction
 cSpinInteraction::cSpinInteraction()
-{
-    cout << "default construction function of SpinInteraction." << endl;
+{ LOG(INFO) << "Defaut constructor: cSpinInteraction.";
 }
 
 cSpinInteraction::cSpinInteraction(const vector<cSPIN>& spin_list)
-{
-    cout << "construction function of SpinInteraction with spin_list." << endl;
+{ LOG(INFO) << "Constructor: cSpinInteraction with spin_list.";
     _spin_list=spin_list;
 }
 
 cSpinInteraction::~cSpinInteraction()
-{
-    cout << "default destruction function of SpinInteraction." << endl;
+{ LOG(INFO) << "Default destructor: cSpinInteraction.";
 }
 
 void cSpinInteraction::make()
@@ -68,29 +65,21 @@ ostream&  operator << (ostream& outs, cSpinInteraction& interaction)
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SpinDipolarInteraction 
 SpinDipolarInteraction::SpinDipolarInteraction()
-{
-    cout << "default SpinDipolarInteraction constructor. " << endl;
+{ LOG(INFO) << "Default constructor: SpinDipolarInteraction.";
 }
 
 SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
-{
-    cout << "constructor of SpinDipolarInteraction with spin_list." << endl;
-
+{ LOG(INFO) << "Constructor: SpinDipolarInteraction with spin_list";
     int nspin;
     _spin_list=spin_list;
 
     _domain=SpinPair(spin_list);
     _form=TwoSpinInteractionForm(_domain);
     _coeff=DipolarInteractionCoeff(_domain);
-
-//    cout << _domain << endl;
-//    cout << _form << endl;
-//    cout << _coeff << endl;
 }
 
 SpinDipolarInteraction::~SpinDipolarInteraction()
-{
-    cout << "default destruction function of SpinDipolarInteraction." << endl;
+{ LOG(INFO) << "Default destructor: SpinDipolarInteraction.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,13 +89,11 @@ SpinDipolarInteraction::~SpinDipolarInteraction()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SpinZeemanInteraction 
 SpinZeemanInteraction::SpinZeemanInteraction()
-{
-    cout << "default SpinZeemanInteraction constructor. " << endl;
+{ LOG(INFO) << "Default constructor: SpinZeemanInteraction.";
 }
 
 SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, const vec& magB)
-{
-    cout << "constructor of SpinZeemanInteraction with spin_list." << endl;
+{ LOG(INFO) << "Constructor: SpinZeemanInteraction with spin_list and magB";
 
     int nspin;
     _spin_list=spin_list;
@@ -114,15 +101,10 @@ SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, con
     _domain=SingleSpin(spin_list);
     _form=SingleSpinInteractionForm(_domain);
     _coeff=ZeemanInteractionCoeff(_domain, magB);
-
-//    cout << _domain << endl;
-//    cout << _form << endl;
-//    cout << _coeff << endl;
 }
 
 SpinZeemanInteraction::~SpinZeemanInteraction()
-{
-    cout << "default destruction function of SpinZeemanInteraction." << endl;
+{ LOG(INFO) << "Default destructor: SpinZeemanInteraction.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
