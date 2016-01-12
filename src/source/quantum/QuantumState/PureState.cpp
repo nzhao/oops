@@ -1,0 +1,14 @@
+#include "include/quantum/PureState.h"
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ PureState
+PureState::PureState()
+{ LOG(INFO) << "Default constructor: PureState";
+    _is_pure = true;
+}
+
+PureState::~PureState()
+{ LOG(INFO) << "Default destructor: PureState";}
+
+//}}}
+////////////////////////////////////////////////////////////////////////////////

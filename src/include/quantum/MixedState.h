@@ -1,0 +1,56 @@
+#ifndef MIXEDSTATE_H
+#define MIXEDSTATE_H
+#include <armadillo>
+#include "include/spin/Spin.h"
+#include "include/spin/SpinInteraction.h"
+#include "include/quantum/HilbertSpaceOperator.h"
+#include "include/quantum/QuantumState.h"
+
+/// \addtogroup QuantumState QuantumState
+/// @{
+
+/// \defgroup MixedState MixedState
+/// @{
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ MixedState 
+class MixedState:public QuantumState
+{
+public:
+    MixedState();
+    ~MixedState();
+
+    virtual void make()=0;
+    virtual void addStateComponent(cSpinInteraction& spin_interaction)=0;
+    virtual SumKronProd& getSumKronProd()=0;
+protected:
+private:
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ DensityOperator 
+class DensityOperator:public MixedState
+{
+public:
+    DensityOperator();
+    ~DensityOperator();
+
+    DensityOperator(const vector<cSPIN>& spin_list);
+
+    void make() {_op.makeKronForm();};
+    void addStateComponent(cSpinInteraction& spin_interaction){_op.addInteraction(spin_interaction);};
+    SumKronProd& getKronProdForm(){return _op.getKronProdForm();};
+protected:
+private:
+    HilbertSpaceOperator _op;
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+/// @}
+/// @}
+#endif
