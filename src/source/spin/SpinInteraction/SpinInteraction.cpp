@@ -22,10 +22,6 @@ cSpinInteraction::~cSpinInteraction()
 
 void cSpinInteraction::make()
 {
-    cout << "cSpinInteraction make is called." << endl;
-    cout << "domain size: " << _domain.getLength() << endl;
-    cout << "matlist nTerm: " << _form.get_nTerm() << endl;
-
     assert(_domain.getLength() == _form.getLength());
     assert(_domain.getLength() == _coeff.getLength());
     assert(_form.get_nTerm() == _coeff.get_nCoeff() );

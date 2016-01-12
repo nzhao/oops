@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <armadillo>
+#include "include/kron/KronProd.h"
 #include "include/spin/SpinInteractionDefine.h"
 
 using namespace std;

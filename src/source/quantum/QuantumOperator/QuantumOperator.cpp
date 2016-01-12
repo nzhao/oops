@@ -10,7 +10,7 @@ QuantumOperator::~QuantumOperator()
 
 void QuantumOperator::saveMatrix()
 {
-    cx_mat m= this->fullMatrix();
+    cx_mat m= this->getMatrix();
     mat m_r = real(m).t();
     mat m_i = -imag(m).t();
 

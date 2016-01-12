@@ -14,6 +14,8 @@
 #include "include/misc/misc.h"
 #include "include/quantum/HilbertSpaceOperator.h"
 #include "include/quantum/LiouvilleSpaceOperator.h"
+#include "include/quantum/MixedState.h"
+#include "include/quantum/PureState.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -79,4 +81,15 @@ int  main(int argc, char* argv[])
     //cout << lv.getKronProdForm() << endl;
 
     lv.saveMatrix();
+
+    DensityOperator ds(sl);
+    ds.addStateComponent(zee);
+    ds.make();
+    cout << ds.getMatrix() << endl;
+    ds.makeVector();
+    cout << ds.getVector() << endl;
+
+    PureState psi(16);
+    psi.setComponent(1 , 1);
+    cout << psi.getVector() << endl;
 }

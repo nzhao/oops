@@ -22,7 +22,6 @@ public:
 
     virtual void make()=0;
     virtual void addStateComponent(cSpinInteraction& spin_interaction)=0;
-    virtual SumKronProd& getSumKronProd()=0;
 protected:
 private:
 };
@@ -42,8 +41,11 @@ public:
     DensityOperator(const vector<cSPIN>& spin_list);
 
     void make() {_op.makeKronForm();};
+    void makeVector(){ _vector = vectorise( this->getKronProdForm().full() ); };
     void addStateComponent(cSpinInteraction& spin_interaction){_op.addInteraction(spin_interaction);};
+
     SumKronProd& getKronProdForm(){return _op.getKronProdForm();};
+    cx_mat getMatrix(){return _op.getMatrix();};
 protected:
 private:
     HilbertSpaceOperator _op;
