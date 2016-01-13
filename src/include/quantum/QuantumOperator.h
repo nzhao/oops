@@ -21,7 +21,7 @@ public:
     QuantumOperator();
     ~QuantumOperator();
 
-    cx_mat       fullMatrix() {return _kron_form.full();};
+    cx_mat       getMatrix() {return _kron_form.full();};
     SumKronProd& getKronProdForm(){return _kron_form;};
     void         saveMatrix();
 protected:

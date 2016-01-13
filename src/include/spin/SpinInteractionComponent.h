@@ -53,6 +53,7 @@ class SingleSpin:public cSpinInteractionDomain
 {
 public:
     SingleSpin(const vector<cSPIN>& spin_list);
+    SingleSpin(const vector<cSPIN>& spin_list, const vector<int>& pick_up_spins);
     ~SingleSpin();
 };
 //}}}
@@ -137,6 +138,15 @@ class ZeemanInteractionCoeff:public cSpinInteractionCoeff
 public:
     ZeemanInteractionCoeff(cSpinInteractionDomain& domain, const vec& magB);
     ~ZeemanInteractionCoeff();
+};
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ PolarizationCoeff
+class PolarizationCoeff:public cSpinInteractionCoeff
+{
+public:
+    PolarizationCoeff(cSpinInteractionDomain& domain, const vector<vec>& pol);
+    ~PolarizationCoeff();
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

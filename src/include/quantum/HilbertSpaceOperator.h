@@ -18,9 +18,14 @@ class HilbertSpaceOperator:public QuantumOperator
 {
 public:
     HilbertSpaceOperator();
+    HilbertSpaceOperator(const vector<cSPIN>& spin_list);
     ~HilbertSpaceOperator();
 
+    void addInteraction(cSpinInteraction& spin_interaction);
+    void make();
 protected:
+    vector<cSPIN> _spin_list;
+    vector<cSpinInteraction> _interaction_list;
 private:
 };
 //}}}
@@ -32,15 +37,11 @@ class Hamiltonian:public HilbertSpaceOperator
 {
 public:
     Hamiltonian();
-    Hamiltonian(const vector<cSPIN>& spin_list);
+    Hamiltonian(const vector<cSPIN>& spin_list):HilbertSpaceOperator(spin_list){};
     ~Hamiltonian();
 
-    void addInteraction(cSpinInteraction& spin_interaction);
-    void makeKronForm();
 
 private:
-    vector<cSPIN> _spin_list;
-    vector<cSpinInteraction> _interaction_list;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
