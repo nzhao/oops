@@ -90,4 +90,10 @@ int  main(int argc, char* argv[])
     PureState psi(16);
     psi.setComponent(1 , 1);
 
+    cx_mat h = hami.getMatrix();
+    cout << h << endl;
+
+    cx_double i = cx_double(0, 1);
+    cx_mat expH=expmat(0.1*i * h); 
+    cout << expH << endl;
 }
