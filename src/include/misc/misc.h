@@ -4,6 +4,8 @@
 
 using namespace arma;
 
+cx_double II = cx_double( 0.0, 1.0);
+
 template<class T> 
 double distance(T& obj1, T& obj2) {
     return norm(obj1.get_coordinate() - obj2.get_coordinate()); };
