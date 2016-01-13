@@ -38,10 +38,10 @@ protected:
     cSpinInteractionDomain _domain;
     cSpinInteractionForm   _form;
     cSpinInteractionCoeff  _coeff;
+    SumKronProd _sum_kron_prod;
 
 private:
     DIM_LIST _dim_list;    
-    SumKronProd _sum_kron_prod;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

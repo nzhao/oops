@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <armadillo>
+#include "include/kron/KronProd.h"
 #include "include/spin/SpinInteractionDefine.h"
 
 using namespace std;
@@ -65,6 +66,8 @@ public:
     cx_mat full();
     vector<KronProd> getKronProdList(){return _kron_prod_list;};
     DIM_LIST getDimList(){return _dim_list;};
+
+    void append(KronProd kp) {_kron_prod_list.push_back(kp);};
     
     friend SumKronProd Expand(const SumKronProd& skp, MatExpanFunc * exppan_func);
     friend SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp);
