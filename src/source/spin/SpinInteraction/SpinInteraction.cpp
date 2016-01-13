@@ -72,6 +72,8 @@ SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
     _domain=SpinPair(spin_list);
     _form=TwoSpinInteractionForm(_domain);
     _coeff=DipolarInteractionCoeff(_domain);
+    
+    make();
 }
 
 SpinDipolarInteraction::~SpinDipolarInteraction()
@@ -97,6 +99,8 @@ SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, con
     _domain=SingleSpin(spin_list);
     _form=SingleSpinInteractionForm(_domain);
     _coeff=ZeemanInteractionCoeff(_domain, magB);
+    
+    make();
 }
 
 SpinZeemanInteraction::~SpinZeemanInteraction()

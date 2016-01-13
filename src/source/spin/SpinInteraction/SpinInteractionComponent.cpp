@@ -61,23 +61,22 @@ SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
     for(auto idx:_index_list)
         _spin_aggregate.push_back( vector<cSPIN> { spin_list[ idx[0] ] });
 }
+
+SingleSpin::SingleSpin(const vector<cSPIN>& spin_list, const vector<int>& pick_up_spins)
+{ LOG(INFO) << "Constructor: SingleSpin with spin_list and pick_up list.";
+    int nspin=spin_list.size();
+    _nbody = 1;
+
+    for(int i : pick_up_spins)
+        _index_list.push_back( vector<int> {i} );
+
+    for(auto idx:_index_list)
+        _spin_aggregate.push_back( vector<cSPIN> { spin_list[ idx[0] ] });
+}
+
 SingleSpin::~SingleSpin()
 { LOG(INFO) << "Default destructor: SingleSpin.";
 }
-//}}}
-//----------------------------------------------------------------------------//
-//{{{ IndividualSpin 
-IndividualSpin::IndividualSpin(const vector<cSPIN>& spin_list, int i)
-{ LOG(INFO) << "Default constructor: IndividualSpin";
-
-    int nspin=spin_list.size();
-    _nbody = 1;
-    _index_list.push_back( vector<int> {i} );
-    _spin_aggregate.push_back( vector<cSPIN> { spin_list[i] });
-}
-
-IndividualSpin::~IndividualSpin()
-{ LOG(INFO) << "Default destructor: IndividualSpin";}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -177,30 +176,6 @@ SingleSpinInteractionForm::~SingleSpinInteractionForm()
 { LOG(INFO) << "Default destructor: SingleSpinInteractionForm.";
 }
 //}}}
-//----------------------------------------------------------------------------//
-//{{{ IndividualSpinForm
-IndividualSpinForm::IndividualSpinForm(cSpinInteractionDomain& domain)
-{
-    _nterm = 3;
-
-    auto sag = domain.getSpinAggregate();
-    for(auto it=sag.begin(); it!=sag.end(); ++it)
-    {
-        cSPIN spin0=(*it)[0];
-
-        vector<TERM> term_list;
-
-        term_list.push_back( TERM { spin0.sx() } );
-        term_list.push_back( TERM { spin0.sy() } );
-        term_list.push_back( TERM { spin0.sz() } );
-
-        _mat_list.push_back( term_list );
-    }
-}
-IndividualSpinForm::~IndividualSpinForm()
-{ LOG(INFO) << "Default destructor: IndividualSpinForm.";
-}
-//}}}
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -267,10 +242,14 @@ ZeemanInteractionCoeff::~ZeemanInteractionCoeff()
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ PolarizationCoeff
-PolarizationCoeff::PolarizationCoeff(cSpinInteractionDomain& domain, const vec& pol)
+PolarizationCoeff::PolarizationCoeff(cSpinInteractionDomain& domain, const vector<vec>& pol)
 {
-    _nCoeff = 3;
-    _coeff_list.push_back(pol);
+    _nCoeff = 6;
+    for(auto pol_i:pol)
+    {
+        vec coeffs = {pol_i[0], pol_i[1], pol_i[2], 0.0, 0.0, 0.0};
+        _coeff_list.push_back(coeffs);
+    }
 }
 PolarizationCoeff::~PolarizationCoeff()
 { LOG(INFO) << "Default destructor: PolarizationCoeff.";

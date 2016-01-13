@@ -16,6 +16,7 @@
 #include "include/quantum/LiouvilleSpaceOperator.h"
 #include "include/quantum/MixedState.h"
 #include "include/quantum/PureState.h"
+#include "include/spin/SpinState.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -65,31 +66,28 @@ int  main(int argc, char* argv[])
     cout << cluster << endl;
 
     SpinDipolarInteraction dip(sl);
-    dip.make();
-    //cout << dip << endl;
 
     vec magB={0.0, 0.0, 1.0};
     SpinZeemanInteraction zee(sl, magB);
-    zee.make();
 
     Hamiltonian hami(sl);
     hami.addInteraction(dip);
     hami.addInteraction(zee);
-    hami.makeKronForm();
+    hami.make();
 
     Liouvillian lv(hami);
-    //cout << lv.getKronProdForm() << endl;
-
     lv.saveMatrix();
 
+    vec pol = {0 , 0, 1};
+    SpinPolarization p(sl, vector<int> {1}, vector<vec> {pol});
+
     DensityOperator ds(sl);
-    ds.addStateComponent(zee);
+    ds.addStateComponent(p);
     ds.make();
-    cout << ds.getMatrix() << endl;
-    ds.makeVector();
-    cout << ds.getVector() << endl;
+
+    cx_mat rho=ds.getMatrix();
 
     PureState psi(16);
     psi.setComponent(1 , 1);
-    cout << psi.getVector() << endl;
+
 }

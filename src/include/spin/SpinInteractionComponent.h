@@ -53,18 +53,8 @@ class SingleSpin:public cSpinInteractionDomain
 {
 public:
     SingleSpin(const vector<cSPIN>& spin_list);
+    SingleSpin(const vector<cSPIN>& spin_list, const vector<int>& pick_up_spins);
     ~SingleSpin();
-};
-//}}}
-//----------------------------------------------------------------------------//
-//{{{ IndividualSpin
-class IndividualSpin:public cSpinInteractionDomain
-{
-public:
-    IndividualSpin(const vector<cSPIN>& spin_list, int i);
-    ~IndividualSpin();
-protected:
-private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,15 +96,6 @@ class SingleSpinInteractionForm:public cSpinInteractionForm
 public:
     SingleSpinInteractionForm(cSpinInteractionDomain& domain);
     ~SingleSpinInteractionForm();
-};
-//}}}
-//----------------------------------------------------------------------------//
-//{{{ IndividualSpinForm
-class IndividualSpinForm:public cSpinInteractionForm
-{
-public:
-    IndividualSpinForm(cSpinInteractionDomain& domain);
-    ~IndividualSpinForm();
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +145,7 @@ public:
 class PolarizationCoeff:public cSpinInteractionCoeff
 {
 public:
-    PolarizationCoeff(cSpinInteractionDomain& domain, const vec& pol);
+    PolarizationCoeff(cSpinInteractionDomain& domain, const vector<vec>& pol);
     ~PolarizationCoeff();
 };
 //}}}

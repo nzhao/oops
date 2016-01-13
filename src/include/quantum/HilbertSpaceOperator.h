@@ -22,7 +22,7 @@ public:
     ~HilbertSpaceOperator();
 
     void addInteraction(cSpinInteraction& spin_interaction);
-    void makeKronForm();
+    void make();
 protected:
     vector<cSPIN> _spin_list;
     vector<cSpinInteraction> _interaction_list;
