@@ -1,4 +1,4 @@
-#include "include/quantum/QuantumEvolution/QuantumEvolution.h"
+#include "include/quantum/QuantumEvolution.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolution 
@@ -7,5 +7,6 @@ QuantumEvolution::QuantumEvolution()
 
 QuantumEvolution::~QuantumEvolution()
 { LOG(INFO) << "Default destructor: QuantumEvolution";}
+
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

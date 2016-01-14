@@ -1,9 +1,16 @@
 #include "include/quantum/QuantumEvolutionAlgorithm.h"
 
+
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolutionAlgorithm
 QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm()
 { LOG(INFO) << "Default constructor: QuantumEvolutionAlgorithm";}
+
+QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm(QuantumOperator& op, QuantumState& st)
+{
+    _operator_ptr = &op;
+    _init_state_ptr = &st;
+}
 
 QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()
 { LOG(INFO) << "Default destructor: QuantumEvolutionAlgorithm";}
@@ -13,53 +20,36 @@ QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//{{{ MatrixVectorEvolution
-FullMatrixVectorEvolution::MatrixVectorEvolution()
-{ LOG(INFO) << "Default constructor: FullMatrixVectorEvolution";}
+//{{{ SimpleFullMatrixVectorEvolution
+SimpleFullMatrixVectorEvolution::SimpleFullMatrixVectorEvolution()
+{ LOG(INFO) << "Default constructor: SimpleFullMatrixVectorEvolution";}
 
-FullMatrixVectorEvolution::FullMatrixVectorEvolution(const QuantumOperator& op, const QuantumState& st)
+void SimpleFullMatrixVectorEvolution::perform()
 {
-    _matrix = op.getMatrix();
-
-    _vector_list.reserve( _time_list.size() );
-    _vector_list.push_back(st.getVector());
-
-    if( _is_equidistant )
-    {
-        dt = _time_list[1] - _time_list[0];
-        _U0 = expmat( -1.0 * dt * II * _matrix);
-    }
-}
-
-cx_vec FullMatrixVectorEvolution::step(const cx_vec& vec_old, double dt)
-{ return expmat(-1.0 *  dt * II * _matrix) * vec_old; }`
-
-cx_vec FullMatrixVectorEvolution::step(const cx_vec& vec_old)
-{ return _U0 * vec_old; }`
-
-void FullMatrixVectorEvolution::perform()
-{
-    double t_now = _time_list[0];
+    _matrix = _operator_ptr->getMatrix();
+    _vector_list.push_back(_init_state_ptr->getVector());
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    //begin evolution
+    double dt;
+    double t_now     = _time_list[0];
     cx_vec state_now = _vector_list[0];
-    cx_vec state_new;
+    cx_vec state_next;
 
-    for(int i=1; i<_time_list.size(); ++i)
+    for(double t_next: _time_list)
     {
-        if( _is_equidistant)
-            state_new = step(state_now);
-        else
-        {
-            dt = _time_list[i] - t_now;
-            state_new = step(state_now, dt);
-        }
-        _vector_list.push_back( state_new );
+        cout << "Evolving form t=" << t_now << " to t=" << t_next << " ... " << endl;
+        dt = t_next - t_now;
+        state_next = expmat( -1.0*dt*II*_matrix ) * state_now;
 
-        t_now = _time_list[i];
-        state_now = state_new;
+        _vector_list.push_back( state_next );
+
+        t_now = t_next;
+        state_now = state_next;
     }
 }
 
-FullMatrixVectorEvolution::~FullMatrixVectorEvolution()
-{ LOG(INFO) << "Default destructor: FullMatrixVectorEvolution";}
+SimpleFullMatrixVectorEvolution::~SimpleFullMatrixVectorEvolution()
+{ LOG(INFO) << "Default destructor: SimpleFullMatrixVectorEvolution";}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

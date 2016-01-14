@@ -1,8 +1,8 @@
 #ifndef QUANTUMEVOLUTIONALGORITHM_H
 #define QUANTUMEVOLUTIONALGORITHM_H
 #include "include/misc/misc.h"
-#include "include/quantum/QuantumOperator/QuantumOperator.h"
-#include "include/quantum/QuantumState/QuantumState.h"
+#include "include/quantum/QuantumOperator.h"
+#include "include/quantum/QuantumState.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolutionAlgorithm
@@ -10,10 +10,16 @@ class QuantumEvolutionAlgorithm
 {
 public:
     QuantumEvolutionAlgorithm();
+    QuantumEvolutionAlgorithm(QuantumOperator& op, QuantumState& st);
     ~QuantumEvolutionAlgorithm();
+
+    void setTimeSequence(const vec& tlist){_time_list = tlist;};
+
+    virtual void perform()=0;
 protected:
-    bool _is_equidistant;
-    vector<double> _time_list;
+    vec              _time_list;
+    QuantumOperator* _operator_ptr;
+    QuantumState*    _init_state_ptr;
 private:
 };
 //}}}
@@ -22,23 +28,19 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//{{{ FullMatrixVectorEvolution
-class FullMatrixVectorEvolution:public QuantumEvolutionAlgorithm
+//{{{ SimpleFullMatrixVectorEvolution
+class SimpleFullMatrixVectorEvolution:public QuantumEvolutionAlgorithm
 {
 public:
-    FullMatrixVectorEvolution();
-    FullMatrixVectorEvolution(const QuantumOperator& op, const QuantumState& st);
-    ~FullMatrixVectorEvolution();
+    SimpleFullMatrixVectorEvolution();
+    SimpleFullMatrixVectorEvolution(QuantumOperator& op, QuantumState& st):QuantumEvolutionAlgorithm(op, st){};
+    ~SimpleFullMatrixVectorEvolution();
 
     void perform();
 protected:
 private:
-    cx_mat         _U0;
     cx_mat         _matrix;
     vector<cx_vec> _vector_list;
-
-    cx_vec step(const cx_vec& vec_old, double dt);
-    cx_vec step(const cx_vec& vec_old);
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
