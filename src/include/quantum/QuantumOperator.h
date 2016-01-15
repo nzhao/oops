@@ -1,7 +1,7 @@
 #ifndef QUANTUMOPERATOR_H
 #define QUANTUMOPERATOR_H
 #include <armadillo>
-#include "mat.h"
+//#include "mat.h"
 #include "include/easylogging++.h"
 #include "include/kron/KronProd.h"
 
