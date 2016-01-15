@@ -4,6 +4,8 @@
 
 using namespace arma;
 
+extern cx_double II;
+
 template<class T> 
 double distance(T& obj1, T& obj2) {
     return norm(obj1.get_coordinate() - obj2.get_coordinate()); };
@@ -28,9 +30,10 @@ vec dipole(T& spin1, T& spin2)
     double g2=spin2.get_gamma();
     double prefactor = datum::h_bar * (datum::mu_0)/(4.0 * datum::pi) * (g1*g2)/(d0*d0*d0);
 
-    vec res={1.0-3.0*nx*nx,    -3.0*nx*ny,    -3.0*nx*nz,
-                -3.0*ny*nx, 1.0-3.0*ny*ny,    -3.0*ny*nz,
-                -3.0*nz*nx,    -3.0*nz*ny, 1.0-3.0*nz*nz };
+    vec res;
+    res << 1.0-3.0*nx*nx <<     -3.0*nx*ny <<     -3.0*nx*nz
+        <<    -3.0*ny*nx <<  1.0-3.0*ny*ny <<     -3.0*ny*nz
+        <<    -3.0*nz*nx <<     -3.0*nz*ny <<  1.0-3.0*nz*nz;
     return prefactor*res;
 };
 template<class T>
@@ -41,7 +44,8 @@ vec zeeman(T&spin, const vec& magB)
     double q=spin.get_omegaQ();
     double e=spin.get_eta();
 
-    vec res={-g*bx,  -g*by, -g*bz,   e/3.0, -e/3.0,     q};
+    vec res;
+    res << -g*bx <<  -g*by <<  -g*bz <<   e/3.0 <<  -e/3.0 << q;
     return res;
 };
 #endif

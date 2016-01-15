@@ -17,6 +17,8 @@
 #include "include/quantum/MixedState.h"
 #include "include/quantum/PureState.h"
 #include "include/spin/SpinState.h"
+#include "include/quantum/QuantumEvolutionAlgorithm.h"
+#include "include/quantum/QuantumEvolution.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -87,7 +89,20 @@ int  main(int argc, char* argv[])
 
     cx_mat rho=ds.getMatrix();
 
-    PureState psi(16);
+    PureState psi(8);
     psi.setComponent(1 , 1);
 
+    cx_mat h = hami.getMatrix();
+    cout << h << endl;
+
+    cx_double i = cx_double(0, 1);
+    cx_mat expH=expmat(0.1*i * h); 
+    cx_vec res = expH*psi.getVector();
+    cout << expH << res  << endl;
+
+    SimpleFullMatrixVectorEvolution kernel(hami, psi);
+    kernel.setTimeSequence( linspace<vec>(0.0, 1.0, 101) );
+
+    QuantumEvolution dynamics(&kernel);
+    dynamics.run();
 }

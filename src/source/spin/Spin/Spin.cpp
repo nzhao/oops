@@ -10,7 +10,7 @@ using namespace arma;
 //{{{ cSPIN
 cSPIN::cSPIN()
 {
-    coordinate = arma::vec {0, 0, 0};
+    coordinate.zeros(3);
     isotope = "None";
 }
 
