@@ -28,7 +28,7 @@ void cSpinCollection::make()
     {
         for (int j=i; j<spin_list.size(); ++j)
         {
-            d(i,j)=distance(spin_list[i],spin_list[j]);
+            d(i,j)=1.0;//distance(spin_list[i],spin_list[j]);
         }
     }
     d =d+d.t();

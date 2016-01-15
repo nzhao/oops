@@ -27,8 +27,14 @@ void cSpinInteraction::make()
     assert(_form.get_nTerm() == _coeff.get_nCoeff() );
 
     if( !_spin_list.empty() )
-        for(auto spin: _spin_list)
+        for(int i=0; i<_spin_list.size(); ++i)
+        {
+            cSPIN spin=_spin_list[i];
             _dim_list.push_back( spin.get_dimension() );
+        }
+    //if( !_spin_list.empty() )
+    //    for(auto spin: _spin_list)
+    //        _dim_list.push_back( spin.get_dimension() );
 
     INDEX_LIST  idxList=_domain.getIndexList();
     MAT_LIST    matList=_form.getMatList();

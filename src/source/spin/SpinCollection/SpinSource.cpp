@@ -41,14 +41,15 @@ vector<cSPIN>& cSpinSourceFromFile::generate()
     string atom_type;
     double x, y, z;
 
-    ifstream coord(_filename);
+    ifstream coord(_filename.c_str());
     if(!coord) assert(0);
 
     coord >> nbath;
     for (int i = 0; i < nbath; ++i)
     {
         coord >> atom_type >> x >> y >> z; 
-        spin_list.push_back( cSPIN(vector<double> {x, y, z}, atom_type) );
+        vector<double> xyz; xyz.push_back(x); xyz.push_back(y); xyz.push_back(z);
+        spin_list.push_back( cSPIN(xyz, atom_type) );
     }
 
     coord.close();

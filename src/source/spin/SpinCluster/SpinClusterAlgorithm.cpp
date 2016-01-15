@@ -27,9 +27,17 @@ sp_mat cSpinGrouping::index2subgraph(int order)
     int nClst=_cluster_index_list[order].size();
     mat res=zeros(nClst, _nspin);
 
+//    int i=0;
+//    for(cClusterIndex vIdx:_cluster_index_list[order])
+//    {
+//        res.row(i) = vIdx.get_array(_nspin);
+//        i++;
+//    }
     int i=0;
-    for(cClusterIndex vIdx:_cluster_index_list[order])
+    FIX_ORDER_INDEX_SET clst_set = _cluster_index_list[order];
+    for(set<cClusterIndex>::iterator pos=clst_set.begin(); pos!=clst_set.end(); ++pos)
     {
+        cClusterIndex vIdx = *pos;
         res.row(i) = vIdx.get_array(_nspin);
         i++;
     }

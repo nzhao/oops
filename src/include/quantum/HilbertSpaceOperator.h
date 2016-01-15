@@ -1,7 +1,7 @@
 #ifndef HILBERTSPACEOPERATOR_H
 #define HILBERTSPACEOPERATOR_H
 #include <armadillo>
-#include "include/spin/spin.h"
+#include "include/spin/Spin.h"
 #include "include/easylogging++.h"
 #include "include/quantum/QuantumOperator.h"
 #include "include/spin/SpinInteraction.h"

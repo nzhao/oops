@@ -11,9 +11,11 @@ void cSpinState::make()
 
     DIM_LIST dim_list = _sum_kron_prod.getKronProdList()[0].getDimList();
     MULTIPLIER c = 1.0;
-    for(auto d:dim_list) c*=d;
+    //for(auto d:dim_list) c*=d;
+    for(int i=0; i<dim_list.size(); ++i) c*=dim_list[i];
     KronProd identity = KronProd(dim_list);
-    identity.fill( INDICES {}, 1.0/c, TERM {});
+    INDICES emptyIdx; TERM emptyTERM;
+    identity.fill(emptyIdx, 1.0/c, emptyTERM);
 
     _sum_kron_prod.append(identity);
 }

@@ -12,8 +12,10 @@ HilbertSpaceOperator::~HilbertSpaceOperator()
 HilbertSpaceOperator::HilbertSpaceOperator(const vector<cSPIN>& spin_list)
 { LOG(INFO) << "constructor of HilbertSpaceOperator with spin_list.";
     _spin_list = spin_list;
-    for(auto spin: _spin_list)
-        _dim_list.push_back( spin.get_dimension() );
+    //for(auto spin: _spin_list)
+    //    _dim_list.push_back( spin.get_dimension() );
+    for(int i=0; i<_spin_list.size(); ++i)
+        _dim_list.push_back( _spin_list[i].get_dimension() );
 }
 
 void HilbertSpaceOperator::addInteraction(cSpinInteraction& spin_interaction)

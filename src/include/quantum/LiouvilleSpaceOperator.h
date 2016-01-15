@@ -2,7 +2,7 @@
 #define LIOUVILLESPACEOPERATOR_H
 
 #include "include/quantum/QuantumOperator.h"
-#include "Include/quantum/HilbertSpaceOperator.h"
+#include "include/quantum/HilbertSpaceOperator.h"
 
 /// \addtogroup QuantumOperator 
 /// @{
