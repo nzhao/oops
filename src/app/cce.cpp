@@ -32,7 +32,7 @@ cSPINDATA SPIN_DATABASE=cSPINDATA();
 int  main(int argc, char* argv[])
 {
     _START_EASYLOGGINGPP(argc, argv);
-    easyloggingpp::Configurations confFromFile("/home/nzhao/code/oops/src/logs/log.conf");  // Load configuration from file
+    easyloggingpp::Configurations confFromFile("../src/logs/log.conf");  // Load configuration from file
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
 
     LOG(INFO) << "###################################################";
