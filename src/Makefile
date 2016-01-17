@@ -10,7 +10,7 @@ PS=cpp
 CC=g++
 CPPFLAGS = -g# -Wall -O3 -march=i486
 CPPFLAGS += $(addprefix -I,$(INCLUDES))
-CPPFLAGS += -MMD
+#CPPFLAGS += -MMD
 
 # #以下部分无需修改
 #SOURCE := $(wildcard *.$(PS))
