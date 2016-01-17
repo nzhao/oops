@@ -1,4 +1,4 @@
-#include "armadillo"
+#include <armadillo>
 #include "include/spin/SpinCollection.h"
 #include "include/misc/misc.h"
 
@@ -28,7 +28,9 @@ void cSpinCollection::make()
     {
         for (int j=i; j<spin_list.size(); ++j)
         {
-            d(i,j)=distance(spin_list[i],spin_list[j]);
+            //d(i,j)=distance(spin_list[i].get_coordinate(),
+            //                spin_list[j].get_coordinate() );
+            d(i,j)=spin_distance(spin_list[i], spin_list[j]);
         }
     }
     d =d+d.t();
