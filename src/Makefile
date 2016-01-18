@@ -16,7 +16,7 @@ DEPS := $(patsubst %.o,%.d,$(OBJS))
 OBJPATH := ../obj
 vpath %.cpp $(sort $(dir $(SOURCE)))
 
-.PHONY : all deps clean rebuild
+.PHONY : all clean
 
 all : $(DESTINATION)
 
@@ -25,11 +25,9 @@ clean :
 	@$(RM) $(OBJPATH)/*.d
 	@$(RM) $(DESTINATION)
 
-rebuild: clean all 
-
 $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp 
-	@$(CC) -MM -MMD $< -o $(OBJPATH)/$@ -I.
-	@sed -i '1s/^/..\/obj\//g' $(OBJPATH)/$@ 
+	@$(CC) -MM -MMD $< -o $@ -I.
+	@sed -i '1s/^/..\/obj\//g' $@ 
 
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
