@@ -28,30 +28,24 @@ MISSING_DEPS_SOURCES := $(wildcard $(patsubst %.d,%.$(PS),$(MISSING_DEPS)))
 
 all : $(DESTINATION)
 
-#deps : $(DEPS)
-	#$(CC) -MM -MMD $(SOURCE) -I.
-
 objs : $(OBJS)
 
 clean :
-	@$(RM) *.o
-	@$(RM) *.d
+	@$(RM) ../obj/*.o
+	@$(RM) ../obj/*.d
 	@$(RM) $(DESTINATION)
 
 rebuild: clean all 
 
-#ifneq ($(MISSING_DEPS),) 
-#$(MISSING_DEPS) : 
-#	@$(RM) $(patsubst %.d,%.o,$@)
-#endif
+$(addprefix ../obj/, $(DEPS)) : ../obj/%.d : %.cpp 
+	@$(CC) -MM -MMD $< -o ../obj/$@ -I.
+	@sed -i '1s/^/..\/obj\//g' ../obj/$@ 
 
-$(DEPS) : %.d : %.cpp 
-	$(CC) -MM -MMD $< -o ../obj/$@ -I.
+include $(addprefix ../obj/, $(DEPS))
+#include $(DEPS)
 
-include $(DEPS)
+$(DESTINATION) : $(addprefix ../obj/, $(OBJS))
+	$(CC) -o $(DESTINATION) $(addprefix ../obj/, $(OBJS)) $(addprefix -l,$(LIBS))
 
-$(DESTINATION) : $(OBJS)
-	$(CC) -o $(DESTINATION) $(OBJS) $(addprefix -l,$(LIBS))
-
-$(OBJS) : %.o : %.cpp
+$(addprefix ../obj/, %.o) : %.cpp
 	$(CC) -c $< -o $@ $(CPPFLAGS)
