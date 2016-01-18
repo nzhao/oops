@@ -27,7 +27,7 @@ clean :
 	@$(RM) $(DESTINATION)
 
 $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp 
-	@$(CC) -MM $< -I. > $@
+	@$(CC) -MM $< -I. -I$(MATLAB_INC_PATH) > $@
 	@sed -i="" '1s/^/..\/obj\//g' $@
 
 -include $(addprefix $(OBJPATH)/, $(DEPS))
