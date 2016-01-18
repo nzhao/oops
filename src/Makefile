@@ -1,51 +1,40 @@
 DESTINATION := ../bin/cce
 LIBS :=  blas lapack
-INCLUDES := . /home/nzhao/code/armadillo-6.400.3/include
+INCLUDES := . $(ARMA_PATH)
 
 RM := rm -f
-#C,CC或CPP文件的后缀
-PS=cpp
+PS = cpp
 
-# GNU Make的隐含变量定义
 CC=g++
-CPPFLAGS = -g# -Wall -O3 -march=i486
+CPPFLAGS = -g
 CPPFLAGS += $(addprefix -I,$(INCLUDES))
-#CPPFLAGS += -MMD
 
-# #以下部分无需修改
-#SOURCE := $(wildcard *.$(PS))
-#OBJS := $(patsubst %.$(PS),%.o,$(SOURCE))
 SOURCE := $(wildcard app/*.$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
 OBJS := $(patsubst %.$(PS),%.o,$(notdir $(SOURCE)))
+DEPS := $(patsubst %.o,%.d,$(OBJS))
 
+OBJPATH := ../obj
 vpath %.cpp $(sort $(dir $(SOURCE)))
 
-DEPS := $(patsubst %.o,%.d,$(OBJS))
-MISSING_DEPS := $(filter-out $(wildcard $(DEPS)),$(DEPS))
-MISSING_DEPS_SOURCES := $(wildcard $(patsubst %.d,%.$(PS),$(MISSING_DEPS)))
-
-.PHONY : all deps objs clean rebuild
+.PHONY : all deps clean rebuild
 
 all : $(DESTINATION)
 
-objs : $(OBJS)
-
 clean :
-	@$(RM) ../obj/*.o
-	@$(RM) ../obj/*.d
+	@$(RM) $(OBJPATH)/*.o
+	@$(RM) $(OBJPATH)/*.d
 	@$(RM) $(DESTINATION)
 
 rebuild: clean all 
 
-$(addprefix ../obj/, $(DEPS)) : ../obj/%.d : %.cpp 
-	@$(CC) -MM -MMD $< -o ../obj/$@ -I.
-	@sed -i '1s/^/..\/obj\//g' ../obj/$@ 
+$(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp 
+	@$(CC) -MM -MMD $< -o $(OBJPATH)/$@ -I.
+	@sed -i '1s/^/..\/obj\//g' $(OBJPATH)/$@ 
 
-include $(addprefix ../obj/, $(DEPS))
-#include $(DEPS)
+-include $(addprefix $(OBJPATH)/, $(DEPS))
 
-$(DESTINATION) : $(addprefix ../obj/, $(OBJS))
-	$(CC) -o $(DESTINATION) $(addprefix ../obj/, $(OBJS)) $(addprefix -l,$(LIBS))
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS))
+	$(CC) -o $(DESTINATION) $(addprefix $(OBJPATH)/, $(OBJS)) $(addprefix -l,$(LIBS))
 
-$(addprefix ../obj/, %.o) : %.cpp
+$(addprefix $(OBJPATH)/, %.o) : %.cpp
 	$(CC) -c $< -o $@ $(CPPFLAGS)
