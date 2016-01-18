@@ -26,8 +26,8 @@ clean :
 	@$(RM) $(DESTINATION)
 
 $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp 
-	@$(CC) -MM -MMD $< -o $@ -I.
-	@sed -i '1s/^/..\/obj\//g' $@ 
+	@$(CC) -MM $< -I. > $@
+	@sed -e '1s/^/..\/obj\//g' $@ > $@
 
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
