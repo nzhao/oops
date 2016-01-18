@@ -1,5 +1,5 @@
 DESTINATION := ../bin/cce
-LIBS :=  blas lapack
+LIBS :=  $(ARMA_LIB)
 INCLUDES := . $(ARMA_PATH)
 
 RM := rm -f
