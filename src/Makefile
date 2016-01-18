@@ -1,6 +1,7 @@
 DESTINATION := ../bin/cce
-LIBS :=  $(ARMA_LIB)
-INCLUDES := . $(ARMA_PATH)
+LIBS :=  $(ARMA_LIB) mx mat eng
+LIBPATH := $(MATLAB_LIB_PATH) 
+INCLUDES := . $(ARMA_INC_PATH) $(MATLAB_INC_PATH) 
 
 RM := rm -f
 PS = cpp
@@ -32,7 +33,7 @@ $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
 $(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS))
-	$(CC) -o $(DESTINATION) $(addprefix $(OBJPATH)/, $(OBJS)) $(addprefix -l,$(LIBS))
+	$(CC) -o $(DESTINATION) $(addprefix $(OBJPATH)/, $(OBJS)) -L$(LIBPATH) $(addprefix -l,$(LIBS))
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp
 	$(CC) -c $< -o $@ $(CPPFLAGS)

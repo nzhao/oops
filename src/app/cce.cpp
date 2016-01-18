@@ -75,7 +75,7 @@ int  main(int argc, char* argv[])
     hami.make();
 
     Liouvillian lv(hami);
-    //lv.saveMatrix();
+    lv.saveMatrix();
 
     vec pol; pol << 0 << 0 << 1;
     vector<int> idx; idx.push_back(1); vector<vec> v_pol; v_pol.push_back(pol);
