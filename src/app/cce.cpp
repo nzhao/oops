@@ -66,7 +66,7 @@ int  main(int argc, char* argv[])
 
     SpinDipolarInteraction dip(sl);
 
-    vec magB; magB << 0.0 << 0.0 << 1.0;
+    vec magB; magB << 3.0e-4 << 2.0e-4 << 1.0e-4;
     SpinZeemanInteraction zee(sl, magB);
 
     Hamiltonian hami(sl);
@@ -74,8 +74,12 @@ int  main(int argc, char* argv[])
     hami.addInteraction(zee);
     hami.make();
 
-    Liouvillian lv(hami);
-    lv.saveMatrix();
+    cx_mat h = hami.getMatrix();
+    cout << h << endl;
+    hami.saveMatrix();
+
+    //Liouvillian lv(hami);
+    //lv.saveMatrix();
 
     vec pol; pol << 0 << 0 << 1;
     vector<int> idx; idx.push_back(1); vector<vec> v_pol; v_pol.push_back(pol);
@@ -90,8 +94,6 @@ int  main(int argc, char* argv[])
     PureState psi(8);
     psi.setComponent(1 , 1);
 
-    cx_mat h = hami.getMatrix();
-    cout << h << endl;
 
     cx_double i = cx_double(0, 1);
     cx_mat expH=expmat(0.1*i * h); 

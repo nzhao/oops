@@ -31,7 +31,7 @@ cx_mat cSPIN::sx()
     cx_mat res(2, 2);
     res(0, 0) = 0.0; res(0, 1) = 1.0;
     res(1, 0) = 1.0; res(1, 1) = 0.0;
-    return res;
+    return 0.5*res;
 }
 
 cx_mat cSPIN::sy()
@@ -41,7 +41,7 @@ cx_mat cSPIN::sy()
     cx_mat res(2, 2);
     res(0, 0) = 0.0;                 res(0, 1) = cx_double(0.0, -1.0);
     res(1, 0) = cx_double(0.0, 1.0); res(1, 1) = 0.0;
-    return res;
+    return 0.5*res;
 }
 
 cx_mat cSPIN::sz()
@@ -51,7 +51,7 @@ cx_mat cSPIN::sz()
     cx_mat res(2, 2);
     res(0, 0) = 1.0; res(0, 1) = 0.0;
     res(1, 0) = 0.0; res(1, 1) = -1.0;
-    return res;
+    return 0.5*res;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

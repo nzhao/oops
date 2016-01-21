@@ -215,16 +215,16 @@ TwoSpinInteractionForm::TwoSpinInteractionForm(cSpinInteractionDomain& domain)
 
         vector<TERM> term_list;
 
-        TERM t; 
-        t.push_back( spin0.sx() ); t.push_back( spin1.sx() ); term_list.push_back( t );
-        t.push_back( spin0.sx() ); t.push_back( spin1.sy() ); term_list.push_back( t );
-        t.push_back( spin0.sx() ); t.push_back( spin1.sz() ); term_list.push_back( t );
-        t.push_back( spin0.sy() ); t.push_back( spin1.sx() ); term_list.push_back( t );
-        t.push_back( spin0.sy() ); t.push_back( spin1.sy() ); term_list.push_back( t );
-        t.push_back( spin0.sy() ); t.push_back( spin1.sz() ); term_list.push_back( t );
-        t.push_back( spin0.sz() ); t.push_back( spin1.sx() ); term_list.push_back( t );
-        t.push_back( spin0.sz() ); t.push_back( spin1.sy() ); term_list.push_back( t );
-        t.push_back( spin0.sz() ); t.push_back( spin1.sz() ); term_list.push_back( t );
+        TERM t;  t.reserve(2);
+        t.push_back( spin0.sx() ); t.push_back( spin1.sx() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sx() ); t.push_back( spin1.sy() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sx() ); t.push_back( spin1.sz() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sy() ); t.push_back( spin1.sx() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sy() ); t.push_back( spin1.sy() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sy() ); t.push_back( spin1.sz() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sz() ); t.push_back( spin1.sx() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sz() ); t.push_back( spin1.sy() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sz() ); t.push_back( spin1.sz() ); term_list.push_back( t ); t.clear();
 
         _mat_list.push_back( term_list );
     }
@@ -265,13 +265,13 @@ SingleSpinInteractionForm::SingleSpinInteractionForm(cSpinInteractionDomain& dom
 
         vector<TERM> term_list;
 
-        TERM t; 
-        t.push_back( spin0.sx() ); term_list.push_back( t );
-        t.push_back( spin0.sy() ); term_list.push_back( t );
-        t.push_back( spin0.sz() ); term_list.push_back( t );
-        t.push_back( spin0.sx()*spin0.sx() ); term_list.push_back( t );
-        t.push_back( spin0.sy()*spin0.sy() ); term_list.push_back( t );
-        t.push_back( spin0.sz()*spin0.sz() ); term_list.push_back( t );
+        TERM t;  t.reserve(1);
+        t.push_back( spin0.sx() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sy() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sz() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sx()*spin0.sx() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sy()*spin0.sy() ); term_list.push_back( t ); t.clear();
+        t.push_back( spin0.sz()*spin0.sz() ); term_list.push_back( t ); t.clear();
 
         _mat_list.push_back( term_list );
     }

@@ -26,6 +26,9 @@ clean :
 	@$(RM) $(OBJPATH)/*.d
 	@$(RM) $(DESTINATION)
 
+doc :
+	/Applications/Doxygen.app/Contents/Resources/doxygen ../doc/DocGen 
+
 $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp 
 	@$(CC) -MM $< -I. -I$(MATLAB_INC_PATH) > $@
 	@sed -i="" '1s/^/..\/obj\//g' $@
