@@ -6,7 +6,7 @@
 #include "include/spin/Spin.h"
 #include "include/spin/SpinInteractionComponent.h"
 #include "include/spin/SpinInteractionDefine.h"
-#include "include/Kron/KronProd.h"
+#include "include/kron/KronProd.h"
 
 /// \addtogroup Spin
 /// @{

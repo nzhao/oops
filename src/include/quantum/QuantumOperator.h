@@ -1,7 +1,7 @@
 #ifndef QUANTUMOPERATOR_H
 #define QUANTUMOPERATOR_H
 #include <armadillo>
-#include "mat.h"
+#include <mat.h>
 #include "include/easylogging++.h"
 #include "include/kron/KronProd.h"
 
@@ -23,6 +23,8 @@ public:
 
     cx_mat       getMatrix() {return _kron_form.full();};
     SumKronProd& getKronProdForm(){return _kron_form;};
+    DIM_LIST     getDimList() {return _kron_form.getDimList();};
+    int          getDimension() {return _dimension;};
     void         saveMatrix();
 protected:
     int         _dimension;

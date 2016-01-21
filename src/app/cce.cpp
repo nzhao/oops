@@ -20,7 +20,7 @@
 #include "include/quantum/QuantumEvolutionAlgorithm.h"
 #include "include/quantum/QuantumEvolution.h"
 
-INITIALIZE_EASYLOGGINGPP
+_INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
 using namespace arma;
@@ -31,14 +31,13 @@ cSPINDATA SPIN_DATABASE=cSPINDATA();
 
 int  main(int argc, char* argv[])
 {
-    START_EASYLOGGINGPP(argc, argv);
-    el::Configurations conf("/Users/nzhao/code/lib/active/oops/src/logs/log.conf");
-    el::Loggers::reconfigureAllLoggers(conf);
+    _START_EASYLOGGINGPP(argc, argv);
+    easyloggingpp::Configurations confFromFile("../src/logs/log.conf");  // Load configuration from file
+    easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
 
-    LOG(INFO) << endl;
     LOG(INFO) << "###################################################";
     LOG(INFO) << "Program begins."; 
-    vector<double> coordinate {1.0, 2.0, 3.0};
+    vector<double> coordinate; coordinate.push_back(1.0);coordinate.push_back(2.0);coordinate.push_back(3.0);
     string isotope="13C";
 
     cSPIN s1=cSPIN(coordinate, isotope);
@@ -53,10 +52,8 @@ int  main(int argc, char* argv[])
 
     vector<cSPIN> sl=sc.getSpinList();
 
-    for ( cSPIN s:sl)
-    {
-        s.get_coordinate().t().print();
-    }
+    for ( int i=0; i<sl.size(); ++i)
+        sl[i].get_coordinate().t().print();
 
     mat m=sc.getDistanceMatrix();// m.print("m=:");
     sp_mat c=sc.getConnectionMatrix(8.0);
@@ -69,7 +66,7 @@ int  main(int argc, char* argv[])
 
     SpinDipolarInteraction dip(sl);
 
-    vec magB={0.0, 0.0, 1.0};
+    vec magB; magB << 3.0e-4 << 2.0e-4 << 1.0e-4;
     SpinZeemanInteraction zee(sl, magB);
 
     Hamiltonian hami(sl);
@@ -77,11 +74,16 @@ int  main(int argc, char* argv[])
     hami.addInteraction(zee);
     hami.make();
 
-    Liouvillian lv(hami);
-    lv.saveMatrix();
+    cx_mat h = hami.getMatrix();
+    cout << h << endl;
+    hami.saveMatrix();
 
-    vec pol = {0 , 0, 1};
-    SpinPolarization p(sl, vector<int> {1}, vector<vec> {pol});
+    //Liouvillian lv(hami);
+    //lv.saveMatrix();
+
+    vec pol; pol << 0 << 0 << 1;
+    vector<int> idx; idx.push_back(1); vector<vec> v_pol; v_pol.push_back(pol);
+    SpinPolarization p(sl, idx, v_pol);
 
     DensityOperator ds(sl);
     ds.addStateComponent(p);
@@ -92,8 +94,6 @@ int  main(int argc, char* argv[])
     PureState psi(8);
     psi.setComponent(1 , 1);
 
-    cx_mat h = hami.getMatrix();
-    cout << h << endl;
 
     cx_double i = cx_double(0, 1);
     cx_mat expH=expmat(0.1*i * h); 

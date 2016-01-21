@@ -5,7 +5,7 @@
 #include <armadillo>
 #include "include/easylogging++.h"
 #include "include/spin/Spin.h"
-#include "include/Spin/SpinInteractionDefine.h"
+#include "include/spin/SpinInteractionDefine.h"
 
 using namespace std;
 using namespace arma;

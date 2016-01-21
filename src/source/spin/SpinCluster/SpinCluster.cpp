@@ -50,11 +50,17 @@ bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2)
 
 ostream&  operator << (ostream& outs, const cClusterIndex& idx)
 {
-    for(auto it=idx._index.begin(); it !=idx._index.end(); ++it)
+    //for(auto it=idx._index.begin(); it !=idx._index.end(); ++it)
+    //{
+    //    outs << *it;
+    //    if(next(it) != idx._index.end())
+    //        outs << ", ";
+    //}
+    for(int i=0; i<idx._index.size(); ++i)
     {
-        outs << *it;
-        if(next(it) != idx._index.end())
-            outs << ", ";
+        outs << idx._index(i);
+        if(i<idx._index.size()-1)
+            outs <<", ";
     }
     return outs;
 }
@@ -88,15 +94,33 @@ ostream&  operator << (ostream& outs, const cSpinCluster& clst)
     int i, j, tot; i=1; j=1; tot=0;
     
     outs << "Total Order = " << clst._cluster_index_list.size() << endl;
-    for(auto clst_set: clst._cluster_index_list)
+//    for(auto clst_set: clst._cluster_index_list)
+//    {
+//        j=1; tot += clst_set.size();
+//        if(clst_set.size() > 0)
+//        {
+//            outs << "Cluster Order = " << i << ": Number = " << clst_set.size() << ": " << endl;
+//            for(auto idx: clst_set)
+//            {
+//                outs << j << ": " <<  idx << endl;
+//                j++;
+//            }
+//            outs << endl;
+//        }
+//        i++;
+//    }
+    for(int order=0; order<clst._cluster_index_list.size(); ++order)
     {
+        FIX_ORDER_INDEX_SET clst_set = clst._cluster_index_list[order];
+
         j=1; tot += clst_set.size();
         if(clst_set.size() > 0)
         {
             outs << "Cluster Order = " << i << ": Number = " << clst_set.size() << ": " << endl;
-            for(auto idx: clst_set)
+            for(set<cClusterIndex>::iterator pos=clst_set.begin(); pos!=clst_set.end(); ++pos)
             {
-                outs << j << ": " <<  idx << endl;
+                cClusterIndex vIdx = *pos;
+                outs << j << ": " <<  vIdx << endl;
                 j++;
             }
             outs << endl;

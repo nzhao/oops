@@ -25,13 +25,13 @@ public:
     cSPIN();///< default constructor: create a spin at [0, 0, 0], with name "None".
 
     //@{ 
-    vec get_coordinate() { return coordinate; };
-    string get_isotope() { return isotope; };
-    int get_multiplicity() { return multiplicity; };
-    int get_dimension() {return multiplicity; };
-    double get_gamma() { return gamma; };
-    double get_omegaQ() { return omegaQ; };
-    double get_eta() { return eta; };
+    vec get_coordinate() const { return coordinate; };
+    string get_isotope() const { return isotope; };
+    int get_multiplicity() const { return multiplicity; };
+    int get_dimension() const {return multiplicity; };
+    double get_gamma() const { return gamma; };
+    double get_omegaQ() const { return omegaQ; };
+    double get_eta() const { return eta; };
     //@}
 
     //@{

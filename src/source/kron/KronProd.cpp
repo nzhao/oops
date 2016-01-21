@@ -5,7 +5,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ MatrixOperationFunctions
-using namespace std::placeholders;
+//using namespace std::placeholders;
 
 cx_mat Flat(const cx_mat& m)
 {
@@ -70,13 +70,21 @@ cx_mat KronProd::full()
 KronProd Expand(const KronProd& kp, MatExpanFunc* expan_func)
 {
     DIM_LIST new_dim;
-    for (auto d : kp._dim_list)
-        new_dim.push_back( d*d );
+    //for (auto d : kp._dim_list)
+    //    new_dim.push_back( d*d );
+    for (int i=0; i<kp._dim_list.size(); ++i)
+        new_dim.push_back( kp._dim_list[i]*kp._dim_list[i] );
     KronProd res(new_dim);
 
     TERM new_mat;
-    for(cx_mat A : kp._mat)
+    //for(cx_mat A : kp._mat)
+    //{
+    //    mat id; id.eye(size(A));
+    //    new_mat.push_back( expan_func(A) );
+    //}
+    for(int i=0; i<kp._mat.size(); ++i)
     {
+        cx_mat A( kp._mat[i] );
         mat id; id.eye(size(A));
         new_mat.push_back( expan_func(A) );
     }
@@ -88,8 +96,10 @@ ostream&  operator << (ostream& outs, const KronProd& kp)
 {
     outs << "=======================================================================================================================================================================================" << endl;
     outs << "DIM_LIST= ";
-    for(auto dim:kp._dim_list)
-        outs << dim << ", ";
+    //for(auto dim:kp._dim_list)
+    //    outs << dim << ", ";
+    for(int i=0; i<kp._dim_list.size(); ++i)
+        outs << kp._dim_list[i] << ", ";
     outs << endl;
 
     outs << "COEFF= " << kp._coeff << endl;
@@ -133,8 +143,10 @@ SumKronProd Expand(const SumKronProd& skp, MatExpanFunc* expan_func)
 {
     vector<KronProd> new_kp_list;
     new_kp_list.reserve( skp._kron_prod_list.size() );
-    for( auto kp : skp._kron_prod_list)
-        new_kp_list.push_back( Expand(kp, expan_func) );
+    //for( auto kp : skp._kron_prod_list)
+    //    new_kp_list.push_back( Expand(kp, expan_func) );
+    for(int i=0; i<skp._kron_prod_list.size(); ++i)
+        new_kp_list.push_back( Expand(skp._kron_prod_list[i], expan_func) );
 
     SumKronProd res(new_kp_list);
     return res;
@@ -155,11 +167,18 @@ SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp)
 }
 ostream&  operator << (ostream& outs, SumKronProd& skp)
 {
-    for(auto kp:skp._kron_prod_list)
+    //for(auto kp:skp._kron_prod_list)
+    //{
+    //    outs << kp << endl;
+    //    outs << "KronProd.full() = " <<  endl;
+    //    outs << kp.full() << endl;
+    //    outs << endl;
+    //}
+    for(int i=0; i<skp._kron_prod_list.size(); ++i)
     {
-        outs << kp << endl;
+        outs << skp._kron_prod_list[i] << endl;
         outs << "KronProd.full() = " <<  endl;
-        outs << kp.full() << endl;
+        outs << skp._kron_prod_list[i].full() << endl;
         outs << endl;
     }
     outs << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
