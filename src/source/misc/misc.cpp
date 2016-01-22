@@ -41,3 +41,11 @@ vec zeeman(const cSPIN&spin, const vec& magB)
     return res;
 };
 
+vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_mat& source_state_vect)
+{
+    vec dip=dipole(spin, source_spin);
+    mat dip_m = reshape(dip, 3, 3);
+    vec s_vec = source_spin.get_spin_vector(source_state_vect);
+    vec res = dip_m * s_vec;
+    return res;
+};

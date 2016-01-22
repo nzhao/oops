@@ -69,9 +69,13 @@ int  main(int argc, char* argv[])
     vec magB; magB << 3.0e-4 << 2.0e-4 << 1.0e-4;
     SpinZeemanInteraction zee(sl, magB);
 
+    cx_vec center_spin_state; center_spin_state << 1 << 0;
+    DipolarField hf_field(sl, s1, center_spin_state);
+
     Hamiltonian hami(sl);
     hami.addInteraction(dip);
     hami.addInteraction(zee);
+    hami.addInteraction(hf_field);
     hami.make();
 
     cx_mat h = hami.getMatrix();
@@ -105,4 +109,9 @@ int  main(int argc, char* argv[])
 
     QuantumEvolution dynamics(&kernel);
     dynamics.run();
+
+    cx_vec st; st << 1 << 0;
+    cout << dipole_field(sl[0], sl[1], st); 
+    cx_vec st1; st1 << 0 << 1;
+    cout << dipole_field(sl[0], sl[1], st1); 
 }

@@ -32,6 +32,7 @@ public:
     double get_gamma() const { return gamma; };
     double get_omegaQ() const { return omegaQ; };
     double get_eta() const { return eta; };
+    vec get_spin_vector(const cx_vec& state) const;
     //@}
 
     //@{
@@ -44,11 +45,11 @@ public:
     //@}
     
     //@{
-    double S() {return 0.5*(multiplicity-1);}
-    double S2() {return S()*(S()+1.0);}
-    cx_mat sx();
-    cx_mat sy();
-    cx_mat sz();
+    double S() const {return 0.5*(multiplicity-1);};
+    double S2() const {return S()*(S()+1.0);};
+    cx_mat sx() const;
+    cx_mat sy() const;
+    cx_mat sz() const;
     //@}
 private:
     vec coordinate;
