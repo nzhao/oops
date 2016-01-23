@@ -6,6 +6,7 @@
 #include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 #include "include/spin/SpinInteractionDefine.h"
+#include "include/quantum/PureState.h"
 
 using namespace std;
 using namespace arma;
@@ -146,7 +147,8 @@ public:
 class DipolarFieldInteractionCoeff:public cSpinInteractionCoeff
 {
 public:
-    DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const cSPIN& center_spin, const cx_vec& state);
+    DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const cSPIN& center_spin, const PureState& state);
+    DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const vector<cSPIN>& spin_list, const vector<PureState>& state_list);
     ~DipolarFieldInteractionCoeff();
 protected:
 private:

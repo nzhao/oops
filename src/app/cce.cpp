@@ -69,7 +69,8 @@ int  main(int argc, char* argv[])
     vec magB; magB << 3.0e-4 << 2.0e-4 << 1.0e-4;
     SpinZeemanInteraction zee(sl, magB);
 
-    cx_vec center_spin_state; center_spin_state << 1 << 0;
+    //cx_vec center_spin_state; center_spin_state << 1 << 0;
+    PureState center_spin_state(s1); center_spin_state.setComponent(0, 1);
     DipolarField hf_field(sl, s1, center_spin_state);
 
     Hamiltonian hami(sl);

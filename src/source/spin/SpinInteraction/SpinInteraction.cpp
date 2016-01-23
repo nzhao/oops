@@ -120,14 +120,26 @@ SpinZeemanInteraction::~SpinZeemanInteraction()
 DipolarField::DipolarField()
 { LOG(INFO) << "Default constructor: DipolarField";}
 
-DipolarField::DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const cx_vec& state)
+DipolarField::DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const PureState& state)
 { LOG(INFO) << "Constructor: DipolarField with center spin and spin state";
 
+    cout << "####################" << endl;
+    cout << state.getVector() << endl; 
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);
     _form=SingleSpinInteractionForm(_domain);
     _coeff=DipolarFieldInteractionCoeff(_domain, center_spin, state);
+
+    make();
+}
+DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list)
+{
+    _spin_list=spin_list;
+
+    _domain=SingleSpin(spin_list);
+    _form=SingleSpinInteractionForm(_domain);
+    _coeff=DipolarFieldInteractionCoeff(_domain, source_list, state_list);
 
     make();
 }

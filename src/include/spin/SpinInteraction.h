@@ -7,6 +7,7 @@
 #include "include/spin/SpinInteractionComponent.h"
 #include "include/spin/SpinInteractionDefine.h"
 #include "include/kron/KronProd.h"
+#include "include/quantum/PureState.h"
 
 /// \addtogroup Spin
 /// @{
@@ -86,7 +87,8 @@ class DipolarField:public cSpinInteraction
 {
 public:
     DipolarField();
-    DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const cx_vec& state);
+    DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const PureState& state);
+    DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list);
     ~DipolarField();
 protected:
 private:
