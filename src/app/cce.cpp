@@ -27,62 +27,31 @@ using namespace arma;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
-
+cSPIN            create_e_spin();
+cSpinCollection  create_bath_spins_from_file();
+cSpinCluster     create_spin_clusters(const cSpinCollection& sc);
+Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const vector<cSPIN>& spin_list);
 
 int  main(int argc, char* argv[])
 {
     _START_EASYLOGGINGPP(argc, argv);
     easyloggingpp::Configurations confFromFile("../src/logs/log.conf");  // Load configuration from file
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
+    LOG(INFO) << "################################################### Program begins ###################################################"; 
 
-    LOG(INFO) << "###################################################";
-    LOG(INFO) << "Program begins."; 
-    vector<double> coordinate; coordinate.push_back(1.0);coordinate.push_back(2.0);coordinate.push_back(3.0);
-    string isotope="13C";
+    cSPIN espin = create_e_spin();
 
-    cSPIN s1=cSPIN(coordinate, isotope);
+    cSpinCollection spin_collection = create_bath_spins_from_file();
 
-    cout << s1.get_coordinate()[1] << "\t" << s1.get_isotope() << endl;
-    cout << s1.get_multiplicity() << "\t" << s1.get_gamma() << "\t"  << s1.get_omegaQ() << "\t" << s1.get_eta() << endl;
+    cSpinCluster spin_cluster = create_spin_clusters(spin_collection);
 
-    cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
-    cSpinCollection sc(&spin_file);
+    cClusterIndex clst = spin_cluster.getCluster(2, 4);
 
-    sc.make();
+    vector<cSPIN> spin_list = spin_collection.getSpinList(clst);
 
-    vector<cSPIN> sl=sc.getSpinList();
+    Hamiltonian hami = create_spin_hamiltonian(espin, spin_list);
 
-    for ( int i=0; i<sl.size(); ++i)
-        sl[i].get_coordinate().t().print();
-
-    mat m=sc.getDistanceMatrix();// m.print("m=:");
-    sp_mat c=sc.getConnectionMatrix(8.0);
-
-    cDepthFirstPathTracing dfpt(c, 1);
-    cSpinCluster cluster(&dfpt);
-
-    cluster.make();
-    cout << cluster << endl;
-
-    SpinDipolarInteraction dip(sl);
-
-    vec magB; magB << 3.0e-4 << 2.0e-4 << 1.0e-4;
-    SpinZeemanInteraction zee(sl, magB);
-
-    //cx_vec center_spin_state; center_spin_state << 1 << 0;
-    PureState center_spin_state(s1); center_spin_state.setComponent(0, 1);
-    DipolarField hf_field(sl, s1, center_spin_state);
-
-    Hamiltonian hami(sl);
-    hami.addInteraction(dip);
-    hami.addInteraction(zee);
-    hami.addInteraction(hf_field);
-    hami.make();
-
-    cx_mat h = hami.getMatrix();
-    cout << h << endl;
-    hami.saveMatrix();
-
+/*
     //Liouvillian lv(hami);
     //lv.saveMatrix();
 
@@ -115,4 +84,81 @@ int  main(int argc, char* argv[])
     cout << dipole_field(sl[0], sl[1], st); 
     cx_vec st1; st1 << 0 << 1;
     cout << dipole_field(sl[0], sl[1], st1); 
+    */
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Create an electrion spin
+cSPIN create_e_spin()
+{
+    string isotope="E";
+
+    double coord[] = {0.0, 0.0, 0.0};
+    vector<double> coordinate(coord, coord+3);
+
+    cSPIN espin=cSPIN(coordinate, isotope);
+    return espin;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Create bath spin list from xyz file
+cSpinCollection create_bath_spins_from_file()
+{
+    cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
+    cSpinCollection sc(&spin_file);
+    sc.make();
+    return sc;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Create spin clusters from a given spin list
+cSpinCluster create_spin_clusters(const cSpinCollection& sc)
+{
+    sp_mat c=sc.getConnectionMatrix(8.0);
+
+    cDepthFirstPathTracing dfpt(c, 3);
+    cSpinCluster cluster(&dfpt);
+
+    cluster.make();
+    return cluster;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Create spin Hamiltonian for a given cluster
+Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const vector<cSPIN>& spin_list)
+{
+    SpinDipolarInteraction dip(spin_list);
+
+    vec magB; 
+    magB << 3.0e-4 << 2.0e-4 << 1.0e-4;
+    SpinZeemanInteraction zee(spin_list, magB);
+
+    PureState center_spin_state(espin); 
+    center_spin_state.setComponent(0, 1.0);
+    DipolarField hf_field(spin_list, espin, center_spin_state);
+
+    Hamiltonian hami(spin_list);
+    hami.addInteraction(dip);
+    hami.addInteraction(zee);
+    hami.addInteraction(hf_field);
+    hami.make();
+
+    cx_mat h = hami.getMatrix();
+    cout << h << endl;
+    hami.saveMatrix();
+    return hami;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////

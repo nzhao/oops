@@ -20,11 +20,13 @@
 class cSpinCluster
 {
 public:
+    cSpinCluster();
     cSpinCluster(cSpinGrouping * grouping);
     ~cSpinCluster();
 
     void make();
     CLST_IDX_LIST getClusterIndex(){return _cluster_index_list;};
+    cClusterIndex getCluster(int order, int index) const ;
 
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
 private:

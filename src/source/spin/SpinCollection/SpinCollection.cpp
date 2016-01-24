@@ -17,27 +17,35 @@ cSpinCollection::~cSpinCollection()
     if (!_source) delete _source;
 }
 
+vector<cSPIN> cSpinCollection::getSpinList(const cClusterIndex& clst) const
+{
+    vector<cSPIN> sl;
+    uvec id = clst.getIndex();
+    for(int i=0; i<id.size(); ++i)
+        sl.push_back(_spin_list[ id[i] ]);
+    return sl;
+}
 void cSpinCollection::make()
 {
-/// call the 'generate' method of the cSpinSource to generate spin_list.
-    spin_list= _source->generate();
+/// call the 'generate' method of the cSpinSource to generate _spin_list.
+    _spin_list= _source->generate();
 
-    int nspin=spin_list.size();
+    int nspin=_spin_list.size();
     mat d(nspin, nspin); d.zeros();
-    for (int i=0; i<spin_list.size(); ++i)
+    for (int i=0; i<_spin_list.size(); ++i)
     {
-        for (int j=i; j<spin_list.size(); ++j)
+        for (int j=i; j<_spin_list.size(); ++j)
         {
-            //d(i,j)=distance(spin_list[i].get_coordinate(),
-            //                spin_list[j].get_coordinate() );
-            d(i,j)=spin_distance(spin_list[i], spin_list[j]);
+            //d(i,j)=distance(_spin_list[i].get_coordinate(),
+            //                _spin_list[j].get_coordinate() );
+            d(i,j)=spin_distance(_spin_list[i], _spin_list[j]);
         }
     }
     d =d+d.t();
     dist_mat=d;
 }
 
-sp_mat cSpinCollection::getConnectionMatrix(double threshold)
+sp_mat cSpinCollection::getConnectionMatrix(double threshold) const
 { 
     umat u = (dist_mat<=threshold);
     sp_mat res( conv_to< mat >::from(u) );

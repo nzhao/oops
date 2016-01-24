@@ -34,6 +34,7 @@ public:
     ~cClusterIndex();
 
     mat get_array(size_t nspin);
+    uvec getIndex() const {return _index;};
 
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);

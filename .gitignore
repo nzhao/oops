@@ -5,5 +5,5 @@ doc/*.old
 src/logs
 src/debug
 *.o
-*.swp
+.*.sw*
 tags
