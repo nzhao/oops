@@ -56,6 +56,8 @@ int  main(int argc, char* argv[])
 
     DensityOperator ds = create_spin_density_state(spin_list);
 
+    cSpinState identity(spin_list);
+
 /*
     //Liouvillian lv(hami);
     //lv.saveMatrix();
@@ -152,10 +154,8 @@ Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, co
 //{{{ Create spin density matrix
 DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
 {
-    vector<int> idx; idx.push_back(1); 
-    vec pol; pol << 0 << 0 << 1;
-    vector<vec> v_pol; v_pol.push_back(pol);
-    SpinPolarization p(spin_list, idx, v_pol);
+    vec pol = zeros<vec>(3);
+    SpinPolarization p(spin_list, pol);
 
     DensityOperator ds(spin_list);
     ds.addStateComponent(p);

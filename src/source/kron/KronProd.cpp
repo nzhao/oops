@@ -126,7 +126,8 @@ SumKronProd::SumKronProd()
 SumKronProd::SumKronProd(const vector<KronProd>& kp_lst)
 { LOG(INFO) << "Constructor: SumKronProd with KronProd list.";
     _kron_prod_list = kp_lst;
-    _dim_list = _kron_prod_list[0].getDimList();
+    if( !_kron_prod_list.empty() )
+        _dim_list = _kron_prod_list[0].getDimList();
 }
 SumKronProd::~SumKronProd()
 { LOG(INFO) << "Default destructor: SumKronProd.";
