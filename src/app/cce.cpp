@@ -30,7 +30,8 @@ cSPINDATA SPIN_DATABASE=cSPINDATA();
 cSPIN            create_e_spin();
 cSpinCollection  create_bath_spins_from_file();
 cSpinCluster     create_spin_clusters(const cSpinCollection& sc);
-Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const vector<cSPIN>& spin_list);
+Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
+DensityOperator  create_spin_density_state(const vector<cSPIN>& spin_list);
 
 int  main(int argc, char* argv[])
 {
@@ -49,30 +50,16 @@ int  main(int argc, char* argv[])
 
     vector<cSPIN> spin_list = spin_collection.getSpinList(clst);
 
-    Hamiltonian hami = create_spin_hamiltonian(espin, spin_list);
+    int spin_up = 0, spin_down = 1;
+    Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
+    Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
+
+    DensityOperator ds = create_spin_density_state(spin_list);
 
 /*
     //Liouvillian lv(hami);
     //lv.saveMatrix();
 
-    vec pol; pol << 0 << 0 << 1;
-    vector<int> idx; idx.push_back(1); vector<vec> v_pol; v_pol.push_back(pol);
-    SpinPolarization p(sl, idx, v_pol);
-
-    DensityOperator ds(sl);
-    ds.addStateComponent(p);
-    ds.make();
-
-    cx_mat rho=ds.getMatrix();
-
-    PureState psi(8);
-    psi.setComponent(1 , 1);
-
-
-    cx_double i = cx_double(0, 1);
-    cx_mat expH=expmat(0.1*i * h); 
-    cx_vec res = expH*psi.getVector();
-    cout << expH << res  << endl;
 
     SimpleFullMatrixVectorEvolution kernel(hami, psi);
     kernel.setTimeSequence( linspace<vec>(0.0, 1.0, 101) );
@@ -137,7 +124,7 @@ cSpinCluster create_spin_clusters(const cSpinCollection& sc)
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin Hamiltonian for a given cluster
-Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const vector<cSPIN>& spin_list)
+Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list)
 {
     SpinDipolarInteraction dip(spin_list);
 
@@ -146,7 +133,7 @@ Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const vector<cSPIN>& spi
     SpinZeemanInteraction zee(spin_list, magB);
 
     PureState center_spin_state(espin); 
-    center_spin_state.setComponent(0, 1.0);
+    center_spin_state.setComponent(spin_state, 1.0);
     DipolarField hf_field(spin_list, espin, center_spin_state);
 
     Hamiltonian hami(spin_list);
@@ -154,11 +141,28 @@ Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const vector<cSPIN>& spi
     hami.addInteraction(zee);
     hami.addInteraction(hf_field);
     hami.make();
-
-    cx_mat h = hami.getMatrix();
-    cout << h << endl;
-    hami.saveMatrix();
     return hami;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Create spin density matrix
+DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
+{
+    vector<int> idx; idx.push_back(1); 
+    vec pol; pol << 0 << 0 << 1;
+    vector<vec> v_pol; v_pol.push_back(pol);
+    SpinPolarization p(spin_list, idx, v_pol);
+
+    DensityOperator ds(spin_list);
+    ds.addStateComponent(p);
+    ds.make();
+    cx_mat dsMat= ds.getMatrix();
+    cout << dsMat << endl;
+    return ds;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
