@@ -123,8 +123,6 @@ DipolarField::DipolarField()
 DipolarField::DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const PureState& state)
 { LOG(INFO) << "Constructor: DipolarField with center spin and spin state";
 
-    cout << "####################" << endl;
-    cout << state.getVector() << endl; 
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);

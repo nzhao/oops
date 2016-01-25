@@ -1,3 +1,4 @@
+#include "include/spin/SpinCollection.h"
 #include "include/spin/SpinCluster.h"
 //#include "include/spin/SpinClusterAlgorithm.h"
 
@@ -8,9 +9,10 @@
 cSpinCluster::cSpinCluster()
 { LOG(INFO) << "Defaul constructor: cSpinCluster.";
 }
-cSpinCluster::cSpinCluster(cSpinGrouping * grouping)
+cSpinCluster::cSpinCluster(const cSpinCollection& sc, cSpinGrouping * grouping)
 {
     _grouping = grouping;
+    _spin_collection = sc;
 }
 
 cSpinCluster::~cSpinCluster()
@@ -25,11 +27,17 @@ void cSpinCluster::make()
     _cluster_index_list = _grouping->get_cluster_index();
 }
 
-cClusterIndex cSpinCluster::getCluster(int order, int index) const
+cClusterIndex cSpinCluster::getClusterIndex(int order, int index) const
 {
     FIX_ORDER_INDEX_SET::iterator it = _cluster_index_list[order].begin();
     advance(it, index);
     return *it;
+}
+
+vector<cSPIN> cSpinCluster::getCluster(int order, int index) const
+{
+    cClusterIndex clst = getClusterIndex(order, index);
+    return _spin_collection.getSpinList(clst);
 }
 
 ostream&  operator << (ostream& outs, const cSpinCluster& clst)

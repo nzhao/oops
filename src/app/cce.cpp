@@ -31,6 +31,7 @@ cSPIN            create_e_spin();
 cSpinCollection  create_bath_spins_from_file();
 cSpinCluster     create_spin_clusters(const cSpinCollection& sc);
 Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
+Liouvillian      create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
 DensityOperator  create_spin_density_state(const vector<cSPIN>& spin_list);
 
 int  main(int argc, char* argv[])
@@ -44,36 +45,23 @@ int  main(int argc, char* argv[])
 
     cSpinCollection spin_collection = create_bath_spins_from_file();
 
-    cSpinCluster spin_cluster = create_spin_clusters(spin_collection);
+    cSpinCluster spin_clusters = create_spin_clusters(spin_collection);
 
-    cClusterIndex clst = spin_cluster.getCluster(2, 4);
-
-    vector<cSPIN> spin_list = spin_collection.getSpinList(clst);
+    vector<cSPIN> spin_list = spin_clusters.getCluster(2, 4);
 
     int spin_up = 0, spin_down = 1;
     Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
     Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
 
+    Liouvillian lv = create_spin_liouvillian(hami0, hami1);
+
     DensityOperator ds = create_spin_density_state(spin_list);
 
-    cSpinState identity(spin_list);
-
-/*
-    //Liouvillian lv(hami);
-    //lv.saveMatrix();
-
-
-    SimpleFullMatrixVectorEvolution kernel(hami, psi);
+    SimpleFullMatrixVectorEvolution kernel(lv, ds);
     kernel.setTimeSequence( linspace<vec>(0.0, 1.0, 101) );
 
     QuantumEvolution dynamics(&kernel);
     dynamics.run();
-
-    cx_vec st; st << 1 << 0;
-    cout << dipole_field(sl[0], sl[1], st); 
-    cx_vec st1; st1 << 0 << 1;
-    cout << dipole_field(sl[0], sl[1], st1); 
-    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +102,7 @@ cSpinCluster create_spin_clusters(const cSpinCollection& sc)
     sp_mat c=sc.getConnectionMatrix(8.0);
 
     cDepthFirstPathTracing dfpt(c, 3);
-    cSpinCluster cluster(&dfpt);
+    cSpinCluster cluster(sc, &dfpt);
 
     cluster.make();
     return cluster;
@@ -151,6 +139,23 @@ Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, co
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//{{{ Create Liouvillian operator from given Hamiltonians
+Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1)
+{
+    Liouvillian lv0(hami0, SHARP);
+    Liouvillian lv1(hami1, FLAT);
+
+    Liouvillian lv = lv0 - lv1;
+    cx_mat lvMat = lv.getMatrix();
+    cout << lvMat << endl;
+    return lv;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin density matrix
 DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
 {
@@ -160,9 +165,12 @@ DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
     DensityOperator ds(spin_list);
     ds.addStateComponent(p);
     ds.make();
-    cx_mat dsMat= ds.getMatrix();
-    cout << dsMat << endl;
+    ds.makeVector();
+    cout << ds.getVector() << endl;
+    cout << ds.getMatrix() << endl;
     return ds;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+

@@ -153,6 +153,12 @@ SumKronProd Expand(const SumKronProd& skp, MatExpanFunc* expan_func)
     return res;
 }
 
+SumKronProd& SumKronProd::scale(double factor)
+{
+    for(vector<KronProd>::iterator it=_kron_prod_list.begin(); it != _kron_prod_list.end(); ++it)
+        it->scale(factor);
+    return *this;
+}
 SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp)
 {
     vector<KronProd> A = sum._kron_prod_list;

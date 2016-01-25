@@ -25,6 +25,7 @@ using namespace arma;
 class cSpinCollection
 {
 public:
+    cSpinCollection();
     cSpinCollection(cSpinSource * source);
     ~cSpinCollection();
 

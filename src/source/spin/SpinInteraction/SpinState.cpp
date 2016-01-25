@@ -8,7 +8,6 @@ cSpinState::cSpinState()
 void cSpinState::make()
 {
     this->cSpinInteraction::make();
-    cout <<"empty make" <<endl;
 
     //DIM_LIST dim_list = _sum_kron_prod.getKronProdList()[0].getDimList();
     MULTIPLIER c = 1.0;
@@ -18,7 +17,6 @@ void cSpinState::make()
     INDICES emptyIdx; TERM emptyTERM;
     identity.fill(emptyIdx, 1.0/c, emptyTERM);
 
-    cout <<"identity" <<endl;
     _sum_kron_prod.append(identity);
 }
 

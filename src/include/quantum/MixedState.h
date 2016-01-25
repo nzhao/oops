@@ -44,7 +44,7 @@ public:
     void makeVector(){ _vector = vectorise( this->getKronProdForm().full() ); };
     void addStateComponent(cSpinInteraction& spin_interaction){_op.addInteraction(spin_interaction);};
 
-    SumKronProd& getKronProdForm(){return _op.getKronProdForm();};
+    SumKronProd getKronProdForm(){return _op.getKronProdForm();};
     cx_mat getMatrix(){return _op.getMatrix();};
 protected:
 private:
