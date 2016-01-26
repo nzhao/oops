@@ -54,5 +54,15 @@ sp_mat cSpinCollection::getConnectionMatrix(double threshold) const
     for(int i=0; i<res.n_rows; ++i) res(i, i)=0;
     return res;
 }
+
+mat cSpinCollection::getCoordinateMat() const
+{
+    mat res=zeros<mat> (_spin_list.size(), 3);
+    for(int i=0; i<_spin_list.size(); ++i)
+        res.row(i) = trans( _spin_list[i].get_coordinate() );
+    return res;
+}
+
+
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

@@ -34,6 +34,22 @@ cClusterIndex cSpinCluster::getClusterIndex(int order, int index) const
     return *it;
 }
 
+umat cSpinCluster::getClusterIndex(int order) const
+{
+    umat res = zeros<umat> (_cluster_index_list[order].size(), order+1);
+
+    FIX_ORDER_INDEX_SET::iterator it;
+    int row_i = 0;
+    for(it = _cluster_index_list[order].begin(); it != _cluster_index_list[order].end(); ++it)
+    {
+        res.row(row_i) = trans( it->getIndex() );
+        row_i ++;
+    }
+    return res;
+}
+
+
+
 vector<cSPIN> cSpinCluster::getCluster(int order, int index) const
 {
     cClusterIndex clst = getClusterIndex(order, index);

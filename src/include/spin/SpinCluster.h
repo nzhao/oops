@@ -26,6 +26,7 @@ public:
 
     void make();
     CLST_IDX_LIST getClusterIndex(){return _cluster_index_list;};
+    umat          getClusterIndex(int order) const ;
     cClusterIndex getClusterIndex(int order, int index) const ;
     vector<cSPIN> getCluster(int order, int index) const ;
 

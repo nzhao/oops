@@ -36,6 +36,7 @@ public:
     //@{
     vector<cSPIN> getSpinList() const {return _spin_list;};
     vector<cSPIN> getSpinList(const cClusterIndex& clst) const;
+    mat getCoordinateMat() const;
     mat& getDistanceMatrix() {return dist_mat;};
     sp_mat getConnectionMatrix (double threshold) const;
     //@}

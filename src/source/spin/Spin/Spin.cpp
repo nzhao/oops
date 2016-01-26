@@ -16,6 +16,7 @@ cSPIN::cSPIN()
 
 cSPIN::cSPIN(arma::vec coord, string isotope_str)
 {
+    cSPINDATA SPIN_DATABASE=cSPINDATA();
     coordinate = coord;
     isotope = isotope_str;
     multiplicity = SPIN_DATABASE.getData(isotope_str).multiplicity;
