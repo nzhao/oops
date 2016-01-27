@@ -29,6 +29,8 @@ public:
     umat          getClusterIndex(int order) const ;
     cClusterIndex getClusterIndex(int order, int index) const ;
     vector<cSPIN> getCluster(int order, int index) const ;
+    int           getMaxOrder() const {return _cluster_index_list.size();};
+    int           getClusterNum(int order) const {return _cluster_index_list[order].size();};
 
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
 private:

@@ -1,10 +1,3 @@
-ARMA_INC_PATH   := ${HOME}/code/armadillo/include
-matlabroot      := /usr/local/MATLAB/R2013a
-
-ARMA_LIB        := blas lapack
-MATLAB_INC_PATH := $(matlabroot)/extern/include
-MATLAB_LIB_PATH := $(matlabroot)/bin/glnxa64
-
 DESTINATION := ../bin/cce
 LIBS :=  $(ARMA_LIB) mx mat eng
 LIBPATH := $(MATLAB_LIB_PATH) 
@@ -34,8 +27,6 @@ clean :
 	@$(RM) $(OBJPATH)/*.o
 	@$(RM) $(OBJPATH)/*.d
 	@$(RM) $(DESTINATION)
-#	@rm -rf $(OBJPATH)
-#	@rm -rf $(BINPATH)
 
 doc :
 	/Applications/Doxygen.app/Contents/Resources/doxygen ../doc/DocGen 

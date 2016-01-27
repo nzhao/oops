@@ -30,15 +30,13 @@ using namespace arma;
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
 cSPIN            create_e_spin();
-vector<cSPIN>    create_bath_spins(int which_clst);
+//vector<cSPIN>    create_bath_spins(int which_clst);
 cSpinCollection  create_bath_spins_from_file();
 cSpinCluster     create_spin_clusters(const cSpinCollection& sc);
 Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
 Liouvillian      create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
 DensityOperator  create_spin_density_state(const vector<cSPIN>& spin_list);
 
-mat COORDINATE_MATRIX;
-umat CLUSTER_INDEX_MATRIX;
 
 int  main(int argc, char* argv[])
 {
@@ -47,110 +45,57 @@ int  main(int argc, char* argv[])
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
     LOG(INFO) << "################################################### Program begins ###################################################"; 
 
-  // MPI head;
-  int num(0), rank(0);
-  int mpi_status(0);
-  MPI_Status mpi_error;
-  unsigned int n_rows(0);
-//  unsigned int *index_matrix(NULL);
-//  unsigned int *CLUSTER_INDEX_MATRIX_ptr;
-  unsigned int *rlenlst(NULL), *ridxlst(NULL), d(0), r(0), rlen(0);
-  unsigned int j;
-  
-  // MPI initialization;
-  mpi_status = MPI_Init(&argc, &argv);
-  if (mpi_status != MPI_SUCCESS)
-    std::cout << "MPI_Init() failed." << std::endl;
-  MPI_Comm_size(MPI_COMM_WORLD, &num);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  
+    // MPI head;
+    int worker_num(0), rank(0), mpi_status(0);
+    MPI_Status mpi_error;
+
+    // MPI initialization;
+    mpi_status = MPI_Init(&argc, &argv);
+    if (mpi_status != MPI_SUCCESS)
+        cout << "MPI_Init() failed." << endl;
+    MPI_Comm_size(MPI_COMM_WORLD, &worker_num);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
     cSpinCollection spin_collection = create_bath_spins_from_file();
-    COORDINATE_MATRIX = spin_collection.getCoordinateMat();
-
-    int cce_order = 2;
     cSpinCluster spin_clusters = create_spin_clusters(spin_collection);
-    CLUSTER_INDEX_MATRIX = spin_clusters.getClusterIndex(cce_order);
-
-  
-  // determine the work for on every worker;
-  n_rows = CLUSTER_INDEX_MATRIX.n_rows;
-  rlenlst = new unsigned int [num];
-  ridxlst = new unsigned int [num];
-  d = n_rows / num;
-  r = n_rows % num;
-  for (j = 0; j < (num - r); j++)
-    rlenlst[j] = d;
-  for (j = (num - r); j < num; j++)
-    rlenlst[j] = d + 1;
-  ridxlst[0] = 0;
-  for (j = 1; j < num; j++)
-    ridxlst[j] = ridxlst[j - 1] + rlenlst[j - 1];
-  
-  int worker_id(0);
-  int WHICH_CLUSTER(0);
-  
-  worker_id = rank;
-  for (j = 0; j < rlenlst[rank]; j++)
-  {
-    WHICH_CLUSTER = ridxlst[rank] + j;
-    
-//    int WHICH_CLUSTER = 4;
-
-    ////////////////////////////////////////////////////////////////////////////////
-    //{{{ WORKER block
-//    int worker_id = 3;
-
     cSPIN espin = create_e_spin();
 
-    vector<cSPIN> spin_list = create_bath_spins(WHICH_CLUSTER);
-
-  std::cout << "worker_id = " << worker_id << ", WHICH_CLUSTER = " << WHICH_CLUSTER << std::endl;
-//    cout << "worker id= " << worker_id << endl;
-//    for(int i=0; i<spin_list.size(); ++i)
-//        cout << trans( spin_list[i].get_coordinate() );
-//    cout << endl;
-  
-  
-  
-    /*
-    int spin_up = 0, spin_down = 1;
-    Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
-    Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
-
-    Liouvillian lv = create_spin_liouvillian(hami0, hami1);
-
-    DensityOperator ds = create_spin_density_state(spin_list);
-
-    SimpleFullMatrixVectorEvolution kernel(lv, ds);
-    kernel.setTimeSequence( linspace<vec>(0.0, 1.0, 101) );
-
-    QuantumEvolution dynamics(&kernel);
-    dynamics.run();
-    */
-    //}}}
-    ////////////////////////////////////////////////////////////////////////////////
-  
-  }
-  
-//  delete []index_matrix;
-  // MPI initialization;
-  mpi_status = MPI_Finalize();
-  if (mpi_status != MPI_SUCCESS)
-    std::cout << "MPI_Finalize() failed." << std::endl;
-}
-
-vector<cSPIN> create_bath_spins(int which_clst)
-{
-    vector<cSPIN> spin_list;
-    int clst_nspin = CLUSTER_INDEX_MATRIX.n_cols;
-    urowvec idx = CLUSTER_INDEX_MATRIX.row(which_clst);
-    for(int i=0; i<clst_nspin; ++i)
+    int worker_id = rank;
+    for(int order = 0; order < spin_clusters.getMaxOrder(); ++order)
     {
-        vec coord = trans( COORDINATE_MATRIX.row( idx(i) ) );
-        spin_list.push_back(cSPIN(coord, "13C") );
+        int clst_num = spin_clusters.getClusterNum(order);
+        int blk_num = clst_num / worker_num;
+        if(worker_id < clst_num % worker_num) blk_num++;
+        for(int i = 0; i < blk_num; ++i)
+        {
+            int index = i*worker_num+rank;
+            cout << "worker_id = " << worker_id << " order =" << order << ", index = "  << index << endl;
+            
+            vector<cSPIN> spin_list = spin_clusters.getCluster(order, index);
+
+            int spin_up = 0, spin_down = 1;
+            Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
+            Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
+
+            Liouvillian lv = create_spin_liouvillian(hami0, hami1);
+
+            DensityOperator ds = create_spin_density_state(spin_list);
+
+            SimpleFullMatrixVectorEvolution kernel(lv, ds);
+            kernel.setTimeSequence( linspace<vec>(0.0, 0.001, 101) );
+
+            QuantumEvolution dynamics(&kernel);
+            dynamics.run();
+        }
+
     }
-    return spin_list;
+
+    // MPI initialization;
+    mpi_status = MPI_Finalize();
+    if (mpi_status != MPI_SUCCESS)
+        cout << "MPI_Finalize() failed." << endl;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create an electrion spin
 cSPIN create_e_spin()
