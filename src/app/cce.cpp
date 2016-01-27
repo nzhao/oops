@@ -28,7 +28,8 @@ using namespace arma;
 //cSPINDATA SPIN_DATABASE=cSPINDATA();
 
 cSPIN            create_e_spin();
-vector<cSPIN>    create_bath_spins(int which_clst);
+vector<cSPIN>    create_full_bath_spins();
+vector<cSPIN>    create_clst_bath_spins(int which_clst);
 cSpinCollection  create_bath_spins_from_file();
 cSpinCluster     create_spin_clusters(const cSpinCollection& sc);
 Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
@@ -61,44 +62,26 @@ int  main(int argc, char* argv[])
 
     cSPIN espin = create_e_spin();
 
-    vector<cSPIN> spin_list = create_bath_spins(WHICH_CLUSTER);
+    vector<cSPIN> full_spin_list = create_clst_bath_spins(WHICH_CLUSTER);
+    vector<cSPIN> clst_spin_list = create_clst_bath_spins(WHICH_CLUSTER);
 
-    cout << "worker id= " << worker_id << endl;
-    for(int i=0; i<spin_list.size(); ++i)
-        cout << trans( spin_list[i].get_coordinate() );
-    cout << endl;
-
-    /*
     int spin_up = 0, spin_down = 1;
-    Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
-    Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
+    Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, clst_spin_list);
+    Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, clst_spin_list);
 
     Liouvillian lv = create_spin_liouvillian(hami0, hami1);
 
-    DensityOperator ds = create_spin_density_state(spin_list);
+    DensityOperator ds = create_spin_density_state(clst_spin_list);
 
     SimpleFullMatrixVectorEvolution kernel(lv, ds);
     kernel.setTimeSequence( linspace<vec>(0.0, 1.0, 101) );
 
     QuantumEvolution dynamics(&kernel);
     dynamics.run();
-    */
     //}}}
     ////////////////////////////////////////////////////////////////////////////////
 }
 
-vector<cSPIN> create_bath_spins(int which_clst)
-{
-    vector<cSPIN> spin_list;
-    int clst_nspin = CLUSTER_INDEX_MATRIX.n_cols;
-    urowvec idx = CLUSTER_INDEX_MATRIX.row(which_clst);
-    for(int i=0; i<clst_nspin; ++i)
-    {
-        vec coord = trans( COORDINATE_MATRIX.row( idx(i) ) );
-        spin_list.push_back(cSPIN(coord, "13C") );
-    }
-    return spin_list;
-}
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create an electrion spin
 cSPIN create_e_spin()
@@ -114,10 +97,31 @@ cSPIN create_e_spin()
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
-//{{{ Create bath spin list from xyz file
+//{{{ Create bath spin 
+vector<cSPIN> create_full_bath_spins()
+{
+    vector<cSPIN> full_spin_list;
+    for(int i=0; i<COORDINATE_MATRIX.n_rows; ++i)
+    {
+        vec coord = trans( COORDINATE_MATRIX.row(i) );
+        full_spin_list.push_back(cSPIN(coord, "13C") );
+    }
+    return full_spin_list;
+}
+
+vector<cSPIN> create_clst_bath_spins(int which_clst)
+{
+    vector<cSPIN> spin_list;
+    int clst_nspin = CLUSTER_INDEX_MATRIX.n_cols;
+    urowvec idx = CLUSTER_INDEX_MATRIX.row(which_clst);
+    for(int i=0; i<clst_nspin; ++i)
+    {
+        vec coord = trans( COORDINATE_MATRIX.row( idx(i) ) );
+        spin_list.push_back(cSPIN(coord, "13C") );
+    }
+    return spin_list;
+}
 cSpinCollection create_bath_spins_from_file()
 {
     cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
@@ -127,8 +131,6 @@ cSpinCollection create_bath_spins_from_file()
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin clusters from a given spin list
@@ -144,8 +146,6 @@ cSpinCluster create_spin_clusters(const cSpinCollection& sc)
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin Hamiltonian for a given cluster
@@ -171,8 +171,6 @@ Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, co
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create Liouvillian operator from given Hamiltonians
 Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1)
@@ -186,8 +184,6 @@ Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian 
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin density matrix
