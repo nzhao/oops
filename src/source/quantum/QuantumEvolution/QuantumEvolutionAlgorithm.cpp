@@ -10,6 +10,7 @@ QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm(QuantumOperator& op, Quantu
 {
     _operator_ptr = &op;
     _init_state_ptr = &st;
+    _state_dimension = st.getDimension()*st.getDimension();
 }
 
 QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()

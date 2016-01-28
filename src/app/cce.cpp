@@ -20,7 +20,7 @@
 #include "include/quantum/QuantumEvolutionAlgorithm.h"
 #include "include/quantum/QuantumEvolution.h"
 
-#include "mpi.h"
+#include <mpi.h>
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -30,7 +30,6 @@ using namespace arma;
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
 cSPIN            create_e_spin();
-//vector<cSPIN>    create_bath_spins(int which_clst);
 cSpinCollection  create_bath_spins_from_file();
 cSpinCluster     create_spin_clusters(const cSpinCollection& sc);
 Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
@@ -46,15 +45,13 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "################################################### Program begins ###################################################"; 
 
     // MPI head;
-    int worker_num(0), rank(0), mpi_status(0);
-    MPI_Status mpi_error;
+    int worker_num(0), rank(0);
+    int mpi_status = MPI_Init(&argc, &argv);
+    assert (mpi_status == MPI_SUCCESS);
 
-    // MPI initialization;
-    mpi_status = MPI_Init(&argc, &argv);
-    if (mpi_status != MPI_SUCCESS)
-        cout << "MPI_Init() failed." << endl;
     MPI_Comm_size(MPI_COMM_WORLD, &worker_num);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
 
     cSpinCollection spin_collection = create_bath_spins_from_file();
     cSpinCluster spin_clusters = create_spin_clusters(spin_collection);
@@ -84,16 +81,17 @@ int  main(int argc, char* argv[])
             SimpleFullMatrixVectorEvolution kernel(lv, ds);
             kernel.setTimeSequence( linspace<vec>(0.0, 0.001, 101) );
 
-            QuantumEvolution dynamics(&kernel);
+            ClusterCoherenceEvolution dynamics(&kernel);
             dynamics.run();
+
+            vec clst_coh = dynamics.calc_obs();
         }
 
     }
 
     // MPI initialization;
     mpi_status = MPI_Finalize();
-    if (mpi_status != MPI_SUCCESS)
-        cout << "MPI_Finalize() failed." << endl;
+    assert (mpi_status == MPI_SUCCESS);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

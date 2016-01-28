@@ -2,7 +2,7 @@
 #define QUANTUMEVOLUTION_H
 #include "include/easylogging++.h"
 #include "include/quantum/QuantumEvolutionAlgorithm.h"
-
+#include <armadillo>
 
 /// \addtogroup Quantum
 /// @{
@@ -20,9 +20,29 @@ public:
     ~QuantumEvolution();
 
     void run() {_kernel->perform();};
+
+    virtual vec calc_obs()=0;
+protected:
+    QuantumEvolutionAlgorithm* _kernel;
+    vec _time_list;
+private:
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ ClusterCoherenceEvolution
+class ClusterCoherenceEvolution:public QuantumEvolution
+{
+public:
+    ClusterCoherenceEvolution();
+    ClusterCoherenceEvolution(QuantumEvolutionAlgorithm* kernel):QuantumEvolution(kernel) {};
+    ~ClusterCoherenceEvolution();
+
+    vec calc_obs();
 protected:
 private:
-    QuantumEvolutionAlgorithm* _kernel;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

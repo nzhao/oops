@@ -24,6 +24,7 @@ DensityOperator::~DensityOperator()
 DensityOperator::DensityOperator(const vector<cSPIN>& spin_list)
 {
     _op = HilbertSpaceOperator(spin_list);
+    _dimension = _op.getDimension();
 }
 
 //}}}

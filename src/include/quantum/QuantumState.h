@@ -21,6 +21,7 @@ public:
     ~QuantumState();
 
     cx_vec getVector() const {return _vector;};
+    int    getDimension() const {return _dimension;};
 protected:
     bool _is_pure;
     int _dimension;
