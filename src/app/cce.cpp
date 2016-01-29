@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <mat.h>
 #include <vector>
 #include <string>
@@ -80,7 +81,7 @@ int  main(int argc, char* argv[])
             int index = my_rank*job_num + i;
             if( index < clst_num)
             {
-                //cout << "my_rank = " << my_rank << " cce_order =" << cce_order << ", index = "  << index << endl;
+                cout << "my_rank = " << my_rank << " cce_order =" << cce_order << ", index = "  << index << endl;
 
                 vector<cSPIN> spin_list = spin_clusters.getCluster(cce_order, index);
 
@@ -245,7 +246,10 @@ void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime
     int maxOrder = spin_clusters.getMaxOrder();
     for(int i=0; i<maxOrder; ++i)
     {
-        string label = "cce_res_" + std::to_string(i);
+        char i_str [10];
+        sprintf(i_str, "%d", i);
+        string idx_str = i_str;
+        string label = "cce_res_" + idx_str;
         string filename = label + ".mat";
         cout << "exporting " << filename << endl;
 
