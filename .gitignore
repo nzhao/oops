@@ -2,6 +2,7 @@ bin/*
 obj/*
 doc/html/*
 doc/*.old
+src/logs/*
 src/logs
 src/debug
 *.o
