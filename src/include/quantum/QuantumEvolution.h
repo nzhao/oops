@@ -21,7 +21,6 @@ public:
 
     void run() {_kernel->perform();};
 
-    virtual vec calc_obs()=0;
 protected:
     QuantumEvolutionAlgorithm* _kernel;
     vec _time_list;

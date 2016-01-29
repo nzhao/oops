@@ -1,3 +1,4 @@
+#include <mat.h>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -35,6 +36,7 @@ cSpinCluster     create_spin_clusters(const cSpinCollection& sc);
 Hamiltonian      create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
 Liouvillian      create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
 DensityOperator  create_spin_density_state(const vector<cSPIN>& spin_list);
+void             post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime);
 
 
 int  main(int argc, char* argv[])
@@ -45,49 +47,79 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "################################################### Program begins ###################################################"; 
 
     // MPI head;
-    int worker_num(0), rank(0);
+    int worker_num(0), my_rank(0);
     int mpi_status = MPI_Init(&argc, &argv);
     assert (mpi_status == MPI_SUCCESS);
 
     MPI_Comm_size(MPI_COMM_WORLD, &worker_num);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
     cSpinCollection spin_collection = create_bath_spins_from_file();
-    cSpinCluster spin_clusters = create_spin_clusters(spin_collection);
+
+    size_t maxOrder = 3;
+    sp_mat c=spin_collection.getConnectionMatrix(6.0);
+    cDepthFirstPathTracing dfpt(c, maxOrder);
+    cSpinCluster spin_clusters(spin_collection, &dfpt);
+    spin_clusters.make();
+
     cSPIN espin = create_e_spin();
 
-    int worker_id = rank;
-    for(int order = 0; order < spin_clusters.getMaxOrder(); ++order)
+    double ** data;
+    if(my_rank == 0)
+        data = new double * [maxOrder];
+
+    int nTime = 101;
+    for(int cce_order = 0; cce_order < maxOrder; ++cce_order)
     {
-        int clst_num = spin_clusters.getClusterNum(order);
-        int blk_num = clst_num / worker_num;
-        if(worker_id < clst_num % worker_num) blk_num++;
-        for(int i = 0; i < blk_num; ++i)
+        int clst_num = spin_clusters.getClusterNum(cce_order);
+        int job_num = clst_num % worker_num == 0 ? clst_num / worker_num : clst_num / worker_num + 1;
+
+        mat resMat(nTime, job_num, fill::ones);
+        for(int i = 0; i < job_num; ++i)
         {
-            int index = i*worker_num+rank;
-            cout << "worker_id = " << worker_id << " order =" << order << ", index = "  << index << endl;
+            int index = my_rank*job_num + i;
+            if( index < clst_num)
+            {
+                //cout << "my_rank = " << my_rank << " cce_order =" << cce_order << ", index = "  << index << endl;
+
+                vector<cSPIN> spin_list = spin_clusters.getCluster(cce_order, index);
+
+                int spin_up = 0, spin_down = 1;
+                Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
+                Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
+
+                Liouvillian lv = create_spin_liouvillian(hami0, hami1);
+
+                DensityOperator ds = create_spin_density_state(spin_list);
+
+                SimpleFullMatrixVectorEvolution kernel(lv, ds);
+                kernel.setTimeSequence( linspace<vec>(0.0, 0.001, nTime) );
+
+                ClusterCoherenceEvolution dynamics(&kernel);
+                dynamics.run();
+
+                resMat.col(i) = dynamics.calc_obs();
+            }
+        }
+
+        if(my_rank != 0)
+            MPI_Send(resMat.memptr(), nTime*job_num, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        else
+        {
+            int blk_size = nTime*job_num;
+            data[cce_order] = new double [blk_size * worker_num];
             
-            vector<cSPIN> spin_list = spin_clusters.getCluster(order, index);
+            memcpy(data[cce_order], resMat.memptr(), blk_size*sizeof(double));
 
-            int spin_up = 0, spin_down = 1;
-            Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
-            Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
+            for(int source = 1; source < worker_num; ++source)
+                MPI_Recv(data[cce_order] + source*blk_size, blk_size, MPI_DOUBLE, source, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-            Liouvillian lv = create_spin_liouvillian(hami0, hami1);
-
-            DensityOperator ds = create_spin_density_state(spin_list);
-
-            SimpleFullMatrixVectorEvolution kernel(lv, ds);
-            kernel.setTimeSequence( linspace<vec>(0.0, 0.001, 101) );
-
-            ClusterCoherenceEvolution dynamics(&kernel);
-            dynamics.run();
-
-            vec clst_coh = dynamics.calc_obs();
         }
 
     }
+
+    if(my_rank == 0)
+        post_treatment(data, spin_clusters, nTime);
 
     // MPI initialization;
     mpi_status = MPI_Finalize();
@@ -129,12 +161,13 @@ cSpinCollection create_bath_spins_from_file()
 //{{{ Create spin clusters from a given spin list
 cSpinCluster create_spin_clusters(const cSpinCollection& sc)
 {
-    sp_mat c=sc.getConnectionMatrix(8.0);
+    sp_mat c=sc.getConnectionMatrix(6.0);
 
     cDepthFirstPathTracing dfpt(c, 3);
     cSpinCluster cluster(sc, &dfpt);
 
     cluster.make();
+
     return cluster;
 }
 //}}}
@@ -203,3 +236,31 @@ DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Post treatment
+void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime)
+{
+    cout << "begin post_treatement ... storing cce_data to file" << endl;
+
+    int maxOrder = spin_clusters.getMaxOrder();
+    for(int i=0; i<maxOrder; ++i)
+    {
+        string label = "cce_res_" + std::to_string(i);
+        string filename = label + ".mat";
+        cout << "exporting " << filename << endl;
+
+        int nClst = spin_clusters.getClusterNum(i);
+        mxArray *pArray = mxCreateDoubleMatrix(nTime, nClst, mxREAL);
+
+        int length= nTime * nClst;
+        memcpy((void *)(mxGetPr(pArray)), (void *) data[i], length*sizeof(double));
+    
+        MATFile *mFile = matOpen(filename.c_str(), "w");
+        matPutVariableAsGlobal(mFile, label.c_str(), pArray);
+        matClose(mFile);
+
+        mxDestroyArray(pArray);
+    }
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
