@@ -41,7 +41,7 @@ void cSpinInteraction::make()
     COEFF_LIST coefList=_coeff.getCoeffList();
 
     vector<KronProd> kronProd_list;
-    int domainSize = _domain.getLength();
+    size_t domainSize = _domain.getLength();
     int nTerm = _form.get_nTerm();
     for(int i=0; i<domainSize; ++i)
         for(int j=0; j<nTerm; ++j)

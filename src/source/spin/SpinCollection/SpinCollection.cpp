@@ -32,7 +32,7 @@ void cSpinCollection::make()
 /// call the 'generate' method of the cSpinSource to generate _spin_list.
     _spin_list= _source->generate();
 
-    int nspin=_spin_list.size();
+    size_t nspin=_spin_list.size();
     mat d(nspin, nspin); d.zeros();
     for (int i=0; i<_spin_list.size(); ++i)
     {

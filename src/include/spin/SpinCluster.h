@@ -26,11 +26,11 @@ public:
 
     void make();
     CLST_IDX_LIST getClusterIndex(){return _cluster_index_list;};
-    umat          getClusterIndex(int order) const ;
-    cClusterIndex getClusterIndex(int order, int index) const ;
-    vector<cSPIN> getCluster(int order, int index) const ;
+    umat          getClusterIndex(size_t order) const ;
+    cClusterIndex getClusterIndex(size_t order, size_t index) const ;
+    vector<cSPIN> getCluster(size_t order, size_t index) const ;
     size_t        getMaxOrder() const {return _grouping->getMaxOrder();};
-    int           getClusterNum(int order) const {return _cluster_index_list[order].size();};
+    size_t        getClusterNum(int order) const {return _cluster_index_list[order].size();};
 
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
 private:

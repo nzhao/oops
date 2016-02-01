@@ -27,14 +27,14 @@ void cSpinCluster::make()
     _cluster_index_list = _grouping->get_cluster_index();
 }
 
-cClusterIndex cSpinCluster::getClusterIndex(int order, int index) const
+cClusterIndex cSpinCluster::getClusterIndex(size_t order, size_t index) const
 {
     FIX_ORDER_INDEX_SET::iterator it = _cluster_index_list[order].begin();
     advance(it, index);
     return *it;
 }
 
-umat cSpinCluster::getClusterIndex(int order) const
+umat cSpinCluster::getClusterIndex(size_t order) const
 {
     umat res = zeros<umat> (_cluster_index_list[order].size(), order+1);
 
@@ -50,7 +50,7 @@ umat cSpinCluster::getClusterIndex(int order) const
 
 
 
-vector<cSPIN> cSpinCluster::getCluster(int order, int index) const
+vector<cSPIN> cSpinCluster::getCluster(size_t order, size_t index) const
 {
     cClusterIndex clst = getClusterIndex(order, index);
     return _spin_collection.getSpinList(clst);

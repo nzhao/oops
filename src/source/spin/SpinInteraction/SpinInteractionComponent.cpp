@@ -42,7 +42,7 @@ ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm)
 //{{{ SpinPair
 SpinPair::SpinPair(const vector<cSPIN>& spin_list)
 { LOG(INFO) << "Constructor: SpinPair with spin_list";
-    int nspin=spin_list.size();
+    size_t nspin=spin_list.size();
 
     _nbody = 2;
 
@@ -71,7 +71,7 @@ SpinPair::~SpinPair()
 //{{{ SingleSpin
 SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
 { LOG(INFO) << "Constructor: SingleSpin with spin_list";
-    int nspin=spin_list.size();
+    size_t nspin=spin_list.size();
 
     _nbody = 1;
 
@@ -95,7 +95,7 @@ SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
 
 SingleSpin::SingleSpin(const vector<cSPIN>& spin_list, const vector<int>& pick_up_spins)
 { LOG(INFO) << "Constructor: SingleSpin with spin_list and pick_up list.";
-    int nspin=spin_list.size();
+    //size_t nspin=spin_list.size();
     _nbody = 1;
 
     //for(int i : pick_up_spins)
@@ -294,7 +294,7 @@ cSpinInteractionCoeff::~cSpinInteractionCoeff()
 }
 ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef)
 {
-    int i = 0;
+    //int i = 0;
     COEFF_LIST coefflist = coef.getCoeffList(); 
     //for(auto co : coefflist)
     //{
@@ -307,7 +307,7 @@ ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef)
     //}
     for(int kk=0; kk<coefflist.size(); ++kk)
     {
-        int j = 0;
+        //int j = 0;
         for(int qq=0; qq<coefflist[kk].size(); ++qq)
         {
             cout << coefflist[kk][qq] << ", ";

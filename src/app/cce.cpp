@@ -65,20 +65,20 @@ int  main(int argc, char* argv[])
 
     cSPIN espin = create_e_spin();
 
-    double ** data;
+    double ** data = NULL;
     if(my_rank == 0)
         data = new double * [maxOrder];
 
     int nTime = 101;
     for(int cce_order = 0; cce_order < maxOrder; ++cce_order)
     {
-        int clst_num = spin_clusters.getClusterNum(cce_order);
-        int job_num = clst_num % worker_num == 0 ? clst_num / worker_num : clst_num / worker_num + 1;
+        size_t clst_num = spin_clusters.getClusterNum(cce_order);
+        size_t job_num = clst_num % worker_num == 0 ? clst_num / worker_num : clst_num / worker_num + 1;
 
         mat resMat(nTime, job_num, fill::ones);
         for(int i = 0; i < job_num; ++i)
         {
-            int index = my_rank*job_num + i;
+            size_t index = my_rank*job_num + i;
             if( index < clst_num)
             {
                 cout << "my_rank = " << my_rank << " cce_order =" << cce_order << ", index = "  << index << endl;
@@ -107,7 +107,7 @@ int  main(int argc, char* argv[])
             MPI_Send(resMat.memptr(), nTime*job_num, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
         else
         {
-            int blk_size = nTime*job_num;
+            size_t blk_size = nTime*job_num;
             data[cce_order] = new double [blk_size * worker_num];
             
             memcpy(data[cce_order], resMat.memptr(), blk_size*sizeof(double));
@@ -253,10 +253,10 @@ void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime
         string filename = label + ".mat";
         cout << "exporting " << filename << endl;
 
-        int nClst = spin_clusters.getClusterNum(i);
+        size_t nClst = spin_clusters.getClusterNum(i);
         mxArray *pArray = mxCreateDoubleMatrix(nTime, nClst, mxREAL);
 
-        int length= nTime * nClst;
+        size_t length= nTime * nClst;
         memcpy((void *)(mxGetPr(pArray)), (void *) data[i], length*sizeof(double));
     
         MATFile *mFile = matOpen(filename.c_str(), "w");

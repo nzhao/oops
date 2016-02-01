@@ -29,7 +29,7 @@ public:
 
     INDEX_LIST getIndexList() const {return _index_list;};
     vector< vector<cSPIN> > getSpinAggregate() const {return _spin_aggregate;};
-    int getLength() const {return _index_list.size();};
+    size_t getLength() const {return _index_list.size();};
     int get_nBody() const {return _nbody;};
 
     friend ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm);
@@ -72,7 +72,7 @@ public:
     ~cSpinInteractionForm();
 
     MAT_LIST getMatList(){return _mat_list;};
-    int getLength(){return _mat_list.size();};
+    size_t getLength(){return _mat_list.size();};
     int get_nTerm(){return _nterm;};
 
     friend ostream&  operator << (ostream& outs, cSpinInteractionForm& form);
@@ -114,7 +114,7 @@ public:
     ~cSpinInteractionCoeff();
 
     COEFF_LIST getCoeffList(){return _coeff_list;};
-    int getLength(){return _coeff_list.size();};
+    size_t getLength(){return _coeff_list.size();};
     int get_nCoeff(){return _nCoeff;};
 
     friend ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef);

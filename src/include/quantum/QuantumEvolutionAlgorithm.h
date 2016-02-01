@@ -15,7 +15,7 @@ public:
 
     void setTimeSequence(const vec& tlist){_time_list = tlist;};
     vec  getTimeSequence() const {return _time_list;};
-    int  getStateDim() const {return _state_dimension;};
+    size_t  getStateDim() const {return _state_dimension;};
     vector<cx_vec> getResult() const {return _vector_list;};
     cx_vec getInitalState() const {return _init_state_ptr->getVector();}; 
 
@@ -24,7 +24,7 @@ protected:
     vec              _time_list;
     QuantumOperator* _operator_ptr;
     QuantumState*    _init_state_ptr;
-    int              _state_dimension;
+    size_t           _state_dimension;
 
     cx_mat         _matrix;
     vector<cx_vec> _vector_list;

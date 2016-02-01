@@ -23,7 +23,7 @@ ClusterCoherenceEvolution::~ClusterCoherenceEvolution()
 vec ClusterCoherenceEvolution::calc_obs()
 {
     _time_list = _kernel->getTimeSequence();
-    int n_time = _time_list.size();
+    size_t n_time = _time_list.size();
     
     vector<cx_vec>  state = _kernel->getResult();
     cx_mat stateMat( n_time, _kernel->getStateDim(), fill::zeros);
