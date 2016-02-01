@@ -34,9 +34,9 @@ int  main(int argc, char* argv[])
     _START_EASYLOGGINGPP(argc, argv);
     easyloggingpp::Configurations confFromFile("../src/logs/log.conf");  // Load configuration from file
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
-
     LOG(INFO) << "###################################################";
     LOG(INFO) << "Program begins."; 
+    
     vector<double> coordinate; coordinate.push_back(1.0);coordinate.push_back(2.0);coordinate.push_back(3.0);
     string isotope="13C";
 
