@@ -243,7 +243,7 @@ void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime
 {
     cout << "begin post_treatement ... storing cce_data to file" << endl;
 
-    int maxOrder = spin_clusters.getMaxOrder();
+    size_t maxOrder = spin_clusters.getMaxOrder();
     for(int i=0; i<maxOrder; ++i)
     {
         char i_str [10];
