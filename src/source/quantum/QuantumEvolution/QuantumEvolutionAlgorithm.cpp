@@ -10,6 +10,7 @@ QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm(QuantumOperator& op, Quantu
 {
     _operator_ptr = &op;
     _init_state_ptr = &st;
+    _state_dimension = st.getDimension()*st.getDimension();
 }
 
 QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()
@@ -50,10 +51,10 @@ void SimpleFullMatrixVectorEvolution::perform()
     for(int i=0; i<_time_list.size(); ++i)
     {
         double t_next = _time_list[i];
-        cout << "Evolving form t=" << t_now << " to t=" << t_next << " ... " << endl;
+        //cout << "Evolving form t=" << t_now << " to t=" << t_next << " ... " << endl;
         dt = t_next - t_now;
         state_next = expmat( -1.0*dt*II*_matrix ) * state_now;
-        cout << state_next << endl;
+        //cout << state_next << endl;
 
         _vector_list.push_back( state_next );
 

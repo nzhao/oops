@@ -126,7 +126,8 @@ SumKronProd::SumKronProd()
 SumKronProd::SumKronProd(const vector<KronProd>& kp_lst)
 { LOG(INFO) << "Constructor: SumKronProd with KronProd list.";
     _kron_prod_list = kp_lst;
-    _dim_list = _kron_prod_list[0].getDimList();
+    if( !_kron_prod_list.empty() )
+        _dim_list = _kron_prod_list[0].getDimList();
 }
 SumKronProd::~SumKronProd()
 { LOG(INFO) << "Default destructor: SumKronProd.";
@@ -152,6 +153,12 @@ SumKronProd Expand(const SumKronProd& skp, MatExpanFunc* expan_func)
     return res;
 }
 
+SumKronProd& SumKronProd::scale(double factor)
+{
+    for(vector<KronProd>::iterator it=_kron_prod_list.begin(); it != _kron_prod_list.end(); ++it)
+        it->scale(factor);
+    return *this;
+}
 SumKronProd& operator + (SumKronProd& sum, const SumKronProd skp)
 {
     vector<KronProd> A = sum._kron_prod_list;

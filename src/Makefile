@@ -6,8 +6,9 @@ INCLUDES := . $(ARMA_INC_PATH) $(MATLAB_INC_PATH)
 RM := rm -f
 PS = cpp
 
-CC=g++
-CPPFLAGS = -g
+#CC=g++
+CC = mpic++
+CPPFLAGS = -g -DARMA_DONT_USE_WRAPPER
 CPPFLAGS += $(addprefix -I,$(INCLUDES))
 
 SOURCE := $(wildcard app/*.$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
@@ -16,6 +17,7 @@ DEPS := $(patsubst %.o,%.d,$(OBJS))
 
 OBJPATH := ../obj
 vpath %.cpp $(sort $(dir $(SOURCE)))
+BINPATH := ../bin
 
 .PHONY : all clean
 
@@ -29,15 +31,22 @@ clean :
 doc :
 	/Applications/Doxygen.app/Contents/Resources/doxygen ../doc/DocGen 
 
-$(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp 
+$(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
 	@$(CC) -MM $< -I. -I$(MATLAB_INC_PATH) > $@
 	@sed -i="" '1s/^/..\/obj\//g' $@
 	@rm $@=
 
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS))
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) | $(BINPATH)
 	$(CC) -o $(DESTINATION) $(addprefix $(OBJPATH)/, $(OBJS)) -L$(LIBPATH) $(addprefix -l,$(LIBS))
 
-$(addprefix $(OBJPATH)/, %.o) : %.cpp
+$(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)
 	$(CC) -c $< -o $@ $(CPPFLAGS)
+
+$(OBJPATH) :
+	@mkdir -p $(OBJPATH)
+
+$(BINPATH) :
+	@mkdir -p $(BINPATH)
+

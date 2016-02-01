@@ -41,7 +41,7 @@ void cSpinInteraction::make()
     COEFF_LIST coefList=_coeff.getCoeffList();
 
     vector<KronProd> kronProd_list;
-    int domainSize = _domain.getLength();
+    size_t domainSize = _domain.getLength();
     int nTerm = _form.get_nTerm();
     for(int i=0; i<domainSize; ++i)
         for(int j=0; j<nTerm; ++j)
@@ -72,7 +72,6 @@ SpinDipolarInteraction::SpinDipolarInteraction()
 
 SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
 { LOG(INFO) << "Constructor: SpinDipolarInteraction with spin_list";
-    int nspin;
     _spin_list=spin_list;
 
     _domain=SpinPair(spin_list);
@@ -99,7 +98,6 @@ SpinZeemanInteraction::SpinZeemanInteraction()
 SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, const vec& magB)
 { LOG(INFO) << "Constructor: SpinZeemanInteraction with spin_list and magB";
 
-    int nspin;
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);
@@ -112,5 +110,39 @@ SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, con
 SpinZeemanInteraction::~SpinZeemanInteraction()
 { LOG(INFO) << "Default destructor: SpinZeemanInteraction.";
 }
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ DipolarField 
+DipolarField::DipolarField()
+{ LOG(INFO) << "Default constructor: DipolarField";}
+
+DipolarField::DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const PureState& state)
+{ LOG(INFO) << "Constructor: DipolarField with center spin and spin state";
+
+    _spin_list=spin_list;
+
+    _domain=SingleSpin(spin_list);
+    _form=SingleSpinInteractionForm(_domain);
+    _coeff=DipolarFieldInteractionCoeff(_domain, center_spin, state);
+
+    make();
+}
+DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list)
+{
+    _spin_list=spin_list;
+
+    _domain=SingleSpin(spin_list);
+    _form=SingleSpinInteractionForm(_domain);
+    _coeff=DipolarFieldInteractionCoeff(_domain, source_list, state_list);
+
+    make();
+}
+
+DipolarField::~DipolarField()
+{ LOG(INFO) << "Default destructor: DipolarField";}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

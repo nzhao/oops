@@ -20,10 +20,11 @@ public:
     QuantumState();
     ~QuantumState();
 
-    cx_vec getVector(){return _vector;};
+    cx_vec getVector() const {return _vector;};
+    size_t    getDimension() const {return _dimension;};
 protected:
     bool _is_pure;
-    int _dimension;
+    size_t _dimension;
     cx_vec _vector;
 private:
 };

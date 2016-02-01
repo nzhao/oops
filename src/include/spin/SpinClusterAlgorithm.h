@@ -34,6 +34,7 @@ public:
     ~cClusterIndex();
 
     mat get_array(size_t nspin);
+    uvec getIndex() const {return _index;};
 
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
@@ -63,9 +64,11 @@ public:
     virtual ~cSpinGrouping();
     virtual void generate()=0;
 
+    size_t         getMaxOrder() const {return _max_order;};
     CLST_IDX_LIST& get_cluster_index() {return _cluster_index_list;};
 protected:
     size_t        _nspin;
+    size_t        _max_order;
     sp_mat        _connection_matrix;
     CLST_IDX_LIST _cluster_index_list;
 
@@ -91,7 +94,6 @@ public:
     void generate();
 
 private:
-    size_t _max_order;
     sp_mat subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order);
     sp_mat remove_repeat(sp_mat subgraph, int subgraph_order);
 

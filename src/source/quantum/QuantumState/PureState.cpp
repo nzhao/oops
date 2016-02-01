@@ -23,5 +23,20 @@ PureState::PureState(const cx_vec& v)
     _vector = v; 
     _dimension=v.size();
 };
+
+PureState::PureState(const cSPIN& spin)
+{
+    _is_pure=true;
+    _dimension = spin.get_multiplicity();
+    _vector= zeros<cx_vec> (_dimension);
+}
+PureState::PureState(const vector<cSPIN>& spin_list)
+{
+    _is_pure=true;
+    _dimension = 1;
+    for(int i=0; i<spin_list.size(); ++i)
+        _dimension *= spin_list[i].get_multiplicity();
+    _vector= zeros<cx_vec> (_dimension);
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

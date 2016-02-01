@@ -42,7 +42,7 @@ ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm)
 //{{{ SpinPair
 SpinPair::SpinPair(const vector<cSPIN>& spin_list)
 { LOG(INFO) << "Constructor: SpinPair with spin_list";
-    int nspin=spin_list.size();
+    size_t nspin=spin_list.size();
 
     _nbody = 2;
 
@@ -71,7 +71,7 @@ SpinPair::~SpinPair()
 //{{{ SingleSpin
 SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
 { LOG(INFO) << "Constructor: SingleSpin with spin_list";
-    int nspin=spin_list.size();
+    size_t nspin=spin_list.size();
 
     _nbody = 1;
 
@@ -95,7 +95,7 @@ SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
 
 SingleSpin::SingleSpin(const vector<cSPIN>& spin_list, const vector<int>& pick_up_spins)
 { LOG(INFO) << "Constructor: SingleSpin with spin_list and pick_up list.";
-    int nspin=spin_list.size();
+    //size_t nspin=spin_list.size();
     _nbody = 1;
 
     //for(int i : pick_up_spins)
@@ -181,7 +181,7 @@ ostream&  operator << (ostream& outs, cSpinInteractionForm& form)
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ TwoSpinInteractionFrom
-TwoSpinInteractionForm::TwoSpinInteractionForm(cSpinInteractionDomain& domain)
+TwoSpinInteractionForm::TwoSpinInteractionForm(const cSpinInteractionDomain& domain)
 {
     _nterm = 9;
 
@@ -235,7 +235,7 @@ TwoSpinInteractionForm::~TwoSpinInteractionForm()
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ SingleSpinInteractionForm
-SingleSpinInteractionForm::SingleSpinInteractionForm(cSpinInteractionDomain& domain)
+SingleSpinInteractionForm::SingleSpinInteractionForm(const cSpinInteractionDomain& domain)
 {
     _nterm = 6;
 
@@ -294,7 +294,7 @@ cSpinInteractionCoeff::~cSpinInteractionCoeff()
 }
 ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef)
 {
-    int i = 0;
+    //int i = 0;
     COEFF_LIST coefflist = coef.getCoeffList(); 
     //for(auto co : coefflist)
     //{
@@ -307,7 +307,7 @@ ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef)
     //}
     for(int kk=0; kk<coefflist.size(); ++kk)
     {
-        int j = 0;
+        //int j = 0;
         for(int qq=0; qq<coefflist[kk].size(); ++qq)
         {
             cout << coefflist[kk][qq] << ", ";
@@ -319,7 +319,7 @@ ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef)
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ DipolarInteractionCoeff
-DipolarInteractionCoeff::DipolarInteractionCoeff(cSpinInteractionDomain& domain)
+DipolarInteractionCoeff::DipolarInteractionCoeff(const cSpinInteractionDomain& domain)
 {
     _nCoeff = 9;
 
@@ -346,7 +346,7 @@ DipolarInteractionCoeff::~DipolarInteractionCoeff()
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ ZeemanInteractionCoeff
-ZeemanInteractionCoeff::ZeemanInteractionCoeff(cSpinInteractionDomain& domain, const vec& magB)
+ZeemanInteractionCoeff::ZeemanInteractionCoeff(const cSpinInteractionDomain& domain, const vec& magB)
 {
     _nCoeff = 6;
 
@@ -372,8 +372,48 @@ ZeemanInteractionCoeff::~ZeemanInteractionCoeff()
 }
 //}}}
 //----------------------------------------------------------------------------//
+//{{{ DipolarFieldInteractionCoeff
+DipolarFieldInteractionCoeff::DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const cSPIN& center_spin, const PureState& state)
+{ 
+    _nCoeff = 6;
+
+    vector< vector<cSPIN> > sag;
+    sag = domain.getSpinAggregate();
+    vector< vector<cSPIN> >::iterator it;
+    for(it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];
+        vec dip_field = dipole_field(spin0, center_spin, state.getVector() );
+        vec coeffs; coeffs << dip_field[0] << dip_field[1] << dip_field[2] << 0.0 << 0.0 << 0.0;
+        _coeff_list.push_back(coeffs);
+    }
+}
+DipolarFieldInteractionCoeff::DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const vector<cSPIN>& spin_list, const vector<PureState>& state_list)
+{
+    _nCoeff = 6;
+
+    vector< vector<cSPIN> > sag;
+    sag = domain.getSpinAggregate();
+    vector< vector<cSPIN> >::iterator it;
+    for(it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];
+
+        vec dip_field = zeros<vec>(3);
+        for(int i=0; i<spin_list.size(); ++i)
+            dip_field += dipole_field(spin0, spin_list[i], state_list[i].getVector() );
+        
+        vec coeffs; coeffs << dip_field[0] << dip_field[1] << dip_field[2] << 0.0 << 0.0 << 0.0;
+        _coeff_list.push_back(coeffs);
+    }
+}
+
+DipolarFieldInteractionCoeff::~DipolarFieldInteractionCoeff()
+{ LOG(INFO) << "Default destructor: DipolarFieldInteractionCoeff";}
+//}}}
+//----------------------------------------------------------------------------//
 //{{{ PolarizationCoeff
-PolarizationCoeff::PolarizationCoeff(cSpinInteractionDomain& domain, const vector<vec>& pol)
+PolarizationCoeff::PolarizationCoeff(const cSpinInteractionDomain& domain, const vector<vec>& pol)
 {
     _nCoeff = 6;
     //for(auto pol_i:pol)

@@ -1,79 +1,18 @@
+#include "include/spin/SpinCollection.h"
 #include "include/spin/SpinCluster.h"
 //#include "include/spin/SpinClusterAlgorithm.h"
-
-////////////////////////////////////////////////////////////////////
-//{{{ cClusterIndex
-cClusterIndex::cClusterIndex()
-{ LOG(INFO) << "Default constructor of cClusterIndex.";
-}
-
-cClusterIndex::cClusterIndex(const uvec& idx)
-{
-    _index = idx;
-    sort(_index.begin(), _index.end()); }
-
-cClusterIndex::~cClusterIndex()
-{ LOG(INFO) << "Default destructor of cClusterIndex.";
-}
-
-mat cClusterIndex::get_array(size_t nspin)
-{
-    mat idx_array=zeros(1, nspin);
-    int nnz = _index.size();
-
-    for(int i=0; i<nnz; ++i)
-        idx_array[_index[i]]=1;
-    return idx_array;
-}
-
-bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2)
-{
-    if(idx1._index.size() == idx2._index.size())
-        for(int i=0; i<idx1._index.size(); ++i)
-        { if(idx1._index[i] != idx2._index[i]) return 0; }
-    else
-        return 0;
-    return 1;
-}
-
-
-bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2)
-{
-    int sz1=idx1._index.size(); int sz2=idx2._index.size();
-    if( sz1 == sz2 )
-        for(int i=0; i<sz1; ++i)
-        { if(idx1._index[i] != idx2._index[i]) return idx1._index[i] < idx2._index[i]; }
-    else
-        return (sz1 < sz2);
-    return 0;// idx1 equals to idx2
-}
-
-ostream&  operator << (ostream& outs, const cClusterIndex& idx)
-{
-    //for(auto it=idx._index.begin(); it !=idx._index.end(); ++it)
-    //{
-    //    outs << *it;
-    //    if(next(it) != idx._index.end())
-    //        outs << ", ";
-    //}
-    for(int i=0; i<idx._index.size(); ++i)
-    {
-        outs << idx._index(i);
-        if(i<idx._index.size()-1)
-            outs <<", ";
-    }
-    return outs;
-}
-//}}}
-////////////////////////////////////////////////////////////////////////////////
 
 
 
 ////////////////////////////////////////////////////////////////////
 //{{{ cSpinCluster
-cSpinCluster::cSpinCluster(cSpinGrouping * grouping)
+cSpinCluster::cSpinCluster()
+{ LOG(INFO) << "Defaul constructor: cSpinCluster.";
+}
+cSpinCluster::cSpinCluster(const cSpinCollection& sc, cSpinGrouping * grouping)
 {
     _grouping = grouping;
+    _spin_collection = sc;
 }
 
 cSpinCluster::~cSpinCluster()
@@ -86,6 +25,35 @@ void cSpinCluster::make()
 /// This function calls the 'generate' method of the grouping algorithm.
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
+}
+
+cClusterIndex cSpinCluster::getClusterIndex(size_t order, size_t index) const
+{
+    FIX_ORDER_INDEX_SET::iterator it = _cluster_index_list[order].begin();
+    advance(it, index);
+    return *it;
+}
+
+umat cSpinCluster::getClusterIndex(size_t order) const
+{
+    umat res = zeros<umat> (_cluster_index_list[order].size(), order+1);
+
+    FIX_ORDER_INDEX_SET::iterator it;
+    int row_i = 0;
+    for(it = _cluster_index_list[order].begin(); it != _cluster_index_list[order].end(); ++it)
+    {
+        res.row(row_i) = trans( it->getIndex() );
+        row_i ++;
+    }
+    return res;
+}
+
+
+
+vector<cSPIN> cSpinCluster::getCluster(size_t order, size_t index) const
+{
+    cClusterIndex clst = getClusterIndex(order, index);
+    return _spin_collection.getSpinList(clst);
 }
 
 ostream&  operator << (ostream& outs, const cSpinCluster& clst)
