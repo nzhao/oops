@@ -12,7 +12,7 @@
 
 /// \defgroup SpinCluster SpinCluster
 /// @{
-typedef vector<umat> clusterTable; // nWorder <uma>
+typedef vector<umat> clusterTable; // nWorder <umat>
 
 struct MPI_Cluster_Data
 {
@@ -33,10 +33,11 @@ class cSpinCluster
 public:
     cSpinCluster();
     cSpinCluster(const cSpinCollection& sc, cSpinGrouping * grouping);
+    cSpinCluster(const cSpinCollection& sc, const uvec& clstLength, const vector<umat>& clstMatList);
     ~cSpinCluster();
 
     void make();
-    MPI_Cluster_Data MPI_partition(int nWorker);
+    void MPI_partition(int nWorker);
 
     CLST_IDX_LIST getClusterIndex() const {return _cluster_index_list;};
     umat          getClusterIndex(size_t order) const ;
@@ -45,11 +46,15 @@ public:
     size_t        getMaxOrder() const {return _grouping->getMaxOrder();};
     size_t        getClusterNum(int order) const {return _cluster_index_list[order].size();};
 
+    uvec          getMPI_ClusterLength(int worker_id) const {return _data.jobTable.col(worker_id);};
+    vector<umat>  getMPI_Cluster(int worker_id);
+
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
 private:
-    cSpinGrouping * _grouping;
-    CLST_IDX_LIST _cluster_index_list;
-    cSpinCollection _spin_collection;
+    cSpinGrouping *  _grouping;
+    CLST_IDX_LIST    _cluster_index_list;
+    cSpinCollection  _spin_collection;
+    MPI_Cluster_Data _data;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 DESTINATION := ../bin/cce
-LIBS :=  $(ARMA_LIB) mx mat eng
-LIBPATH := $(MATLAB_LIB_PATH) 
-INCLUDES := . $(ARMA_INC_PATH) $(MATLAB_INC_PATH) 
+LIBS :=  $(ARMA_LIB) # mx mat eng
+LIBPATH := .  # $(MATLAB_LIB_PATH) 
+INCLUDES := . $(ARMA_INC_PATH) # $(MATLAB_INC_PATH) 
 
 RM := rm -f
 PS = cpp

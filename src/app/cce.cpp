@@ -1,5 +1,8 @@
-#include <stdlib.h>
+#ifdef HAS_MATLAB
 #include <mat.h>
+#endif
+#include <cassert>
+#include <stdlib.h>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -55,16 +58,68 @@ int  main(int argc, char* argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &worker_num);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
+    cSPIN espin = create_e_spin();
     cSpinCollection spin_collection = create_bath_spins_from_file();
 
     size_t maxOrder = 3;
-    sp_mat c=spin_collection.getConnectionMatrix(6.0);
-    cDepthFirstPathTracing dfpt(c, maxOrder);
-    cSpinCluster spin_clusters(spin_collection, &dfpt);
-    spin_clusters.make();
 
-    cSPIN espin = create_e_spin();
+    uvec clstLength;
+    vector<umat> clstMat;
+    if(my_rank == 0)
+    {
+        sp_mat c=spin_collection.getConnectionMatrix(6.0);
+        cDepthFirstPathTracing dfpt(c, maxOrder);
+        cSpinCluster spin_clusters(spin_collection, &dfpt);
+        spin_clusters.make();
 
+        spin_clusters.MPI_partition(worker_num);
+
+        clstLength = spin_clusters.getMPI_ClusterLength(0);
+        clstMat = spin_clusters.getMPI_Cluster(0);
+
+//        for(int i = 0; i<worker_num; ++i)
+//        {
+//            cout << trans( spin_clusters.getMPI_ClusterLength(i) )<<endl;
+//            for(int j=0; j<maxOrder; ++j)
+//                cout << trans( spin_clusters.getMPI_Cluster(i)[j] )<<endl;
+//        }
+
+        for(int i=1; i<worker_num; ++i)
+        {
+            uvec clstNum = spin_clusters.getMPI_ClusterLength(i);
+            MPI_Send(clstNum.memptr(), maxOrder, MPI_UNSIGNED, i, 0, MPI_COMM_WORLD);
+
+            vector<umat> clstMatList = spin_clusters.getMPI_Cluster(i);
+            for(int j=0; j<maxOrder; ++j)
+            {
+                umat clstMat = clstMatList[j];
+                MPI_Send(clstMat.memptr(), (j+1)*clstNum(j), MPI_UNSIGNED, i, j+1, MPI_COMM_WORLD);
+            }
+        }
+
+    }
+    else
+    {
+        unsigned int * clstLengthData = new unsigned int [maxOrder];
+        MPI_Recv(clstLengthData, maxOrder, MPI_UNSIGNED, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        uvec tempV(clstLengthData, maxOrder);
+        clstLength = tempV;
+        delete [] clstLengthData;
+
+        for(int j=0; j<maxOrder;++j)
+        {
+            unsigned int * clstMatData = new unsigned int [(j+1)*clstLength(j)];
+            MPI_Recv(clstMatData, (j+1)*clstLength(j), MPI_UNSIGNED, 0, j+1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            umat tempM(clstMatData, clstLength(j), j+1);
+            clstMat.push_back(tempM);
+            delete [] clstMatData;
+        }
+    }
+
+    cSpinCluster partition_clusters(spin_collection, clstLength, clstMat);
+
+/*
     double ** data = NULL;
     if(my_rank == 0)
         data = new double * [maxOrder];
@@ -121,6 +176,7 @@ int  main(int argc, char* argv[])
 
     if(my_rank == 0)
         post_treatment(data, spin_clusters, nTime);
+*/
 
     // MPI initialization;
     mpi_status = MPI_Finalize();
@@ -239,6 +295,7 @@ DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Post treatment
+#ifdef HAS_MATLAB
 void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime)
 {
     cout << "begin post_treatement ... storing cce_data to file" << endl;
@@ -266,5 +323,6 @@ void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime
         mxDestroyArray(pArray);
     }
 }
+#endif
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

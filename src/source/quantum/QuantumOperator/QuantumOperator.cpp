@@ -8,6 +8,7 @@ QuantumOperator::QuantumOperator()
 QuantumOperator::~QuantumOperator()
 { LOG(INFO) << "Default destructor: QuantumOperator."; }
 
+#ifdef HAS_MATLAB
 void QuantumOperator::saveMatrix(string filename)
 {
     cx_mat m= this->getMatrix();
@@ -26,6 +27,12 @@ void QuantumOperator::saveMatrix(string filename)
 
     mxDestroyArray(pArray);
 }
+#else
+void QuantumOperator::saveMatrix(string filename)
+{
+    cout << "MATLAB not installed." << endl;
+}
+#endif
 
 QuantumOperator operator + (const QuantumOperator& op1, const QuantumOperator& op2)
 {

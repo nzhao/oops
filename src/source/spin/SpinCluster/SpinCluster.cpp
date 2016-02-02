@@ -26,6 +26,20 @@ void cSpinCluster::make()
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
 }
+cSpinCluster::cSpinCluster(const cSpinCollection& sc, const uvec& clstLength, const vector<umat>& clstMatList)
+{
+    for(int i=0; i<clstMatList.size(); ++i)
+    {
+        umat fix_order_mat = clstMatList[i];
+        FIX_ORDER_INDEX_SET fix_order_set;
+        for(int j=0; j<fix_order_mat.n_rows; ++j)
+        {
+            uvec v = trans( fix_order_mat.row(j) );
+            fix_order_set.insert( cClusterIndex(v) );
+        }
+        _cluster_index_list.push_back(fix_order_set);
+    }
+}
 
 cClusterIndex cSpinCluster::getClusterIndex(size_t order, size_t index) const
 {
@@ -45,34 +59,42 @@ umat cSpinCluster::getClusterIndex(size_t order) const
     return res;
 }
 
-MPI_Cluster_Data cSpinCluster::MPI_partition(int nWorker)
+void cSpinCluster::MPI_partition(int nWorker)
 {
-    MPI_Cluster_Data res;
-    res.nWorker = nWorker;
-    res.nOrder = getMaxOrder();
+    _data.nWorker = nWorker;
+    _data.nOrder = getMaxOrder();
 
-    res.jobTable = umat(res.nOrder+1, res.nWorker, fill::zeros);
-    for(int order_i = 0; order_i<res.nOrder; ++order_i)
+    _data.jobTable = umat(_data.nOrder, _data.nWorker, fill::zeros);
+    for(int order_i = 0; order_i<_data.nOrder; ++order_i)
     {
         int clstNum = getClusterNum(order_i);
-        res.clusterNumList.push_back( clstNum );
+        _data.clusterNumList.push_back( clstNum );
 
         umat full_clst_idx = getClusterIndex( order_i );
         clusterTable clst_tb_i;
 
         int row1 = 0; int row2 = 0;
         int q = clstNum/nWorker; int r = clstNum % nWorker;
+
         for(int wk_id = 0; wk_id<nWorker; ++wk_id)
         {
             int jobs = wk_id < r ? q + 1: q;
-            res.jobTable(order_i, wk_id) = jobs;
+            _data.jobTable(order_i, wk_id) = jobs;
 
             row2 = row1 + jobs;
-            clst_tb_i.push_back( full_clst_idx.rows(row1, row2) );
+            
+            clst_tb_i.push_back( full_clst_idx.rows(row1, row2-1) );
             row1 = row2;
         }
-        res.clusterData.push_back(clst_tb_i);
+        _data.clusterData.push_back(clst_tb_i);
     }
+}
+
+vector<umat> cSpinCluster::getMPI_Cluster(int worker_id)
+{
+    vector<umat> res;
+    for(int i=0; i<getMaxOrder(); ++i)
+        res.push_back( _data.clusterData[i][worker_id] );
     return res;
 }
 
