@@ -12,6 +12,17 @@
 
 /// \defgroup SpinCluster SpinCluster
 /// @{
+typedef vector<umat> clusterTable; // nWorder <uma>
+
+struct MPI_Cluster_Data
+{
+    int nWorker;
+    int nOrder;
+    umat jobTable; // nOrder * nWorker 
+
+    vector<int>  clusterNumList; // nOrder <int> 
+    vector<clusterTable> clusterData; // nOrder <clusterTable>
+};
 
 ////////////////////////////////////////////////////////////////////
 //{{{ cSpinCluster
@@ -25,7 +36,9 @@ public:
     ~cSpinCluster();
 
     void make();
-    CLST_IDX_LIST getClusterIndex(){return _cluster_index_list;};
+    MPI_Cluster_Data MPI_partition(int nWorker);
+
+    CLST_IDX_LIST getClusterIndex() const {return _cluster_index_list;};
     umat          getClusterIndex(size_t order) const ;
     cClusterIndex getClusterIndex(size_t order, size_t index) const ;
     vector<cSPIN> getCluster(size_t order, size_t index) const ;
