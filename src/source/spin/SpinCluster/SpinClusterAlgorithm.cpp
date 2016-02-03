@@ -67,6 +67,13 @@ ostream&  operator << (ostream& outs, const cClusterIndex& idx)
         if(i<idx._index.size()-1)
             outs <<", ";
     }
+    outs << "; ";
+    for(int i=0; i<idx._sub_clst_pos.size(); ++i)
+    {
+        outs << idx._sub_clst_pos[i];
+        if(i<idx._sub_clst_pos.size()-1)
+            outs << ", ";
+    }
     return outs;
 }
 //}}}
@@ -111,7 +118,7 @@ sp_mat cSpinGrouping::index2subgraph(int order)
     return conv_to<sp_mat>::from(res);
 }
 
-void cSpinGrouping::subgraph2index(const sp_mat& subgraph)
+void cSpinGrouping::subgraph2index(const sp_mat& subgraph, const vector<int> sub_pos_list)
 {
     for(int i=0; i<subgraph.n_rows; ++i)
     {
@@ -119,8 +126,9 @@ void cSpinGrouping::subgraph2index(const sp_mat& subgraph)
              << " subgraphs are inserted.";
         mat r(subgraph.row(i));  uvec nz_r = find(r);  size_t order = nz_r.size()-1;
         cClusterIndex cIdx( nz_r );
-        _cluster_index_list[ order ].insert(cIdx);
-        //_cluster_index_list[ order ].push_back(cIdx);
+        pair<FIX_ORDER_INDEX_SET::iterator, bool> pos = _cluster_index_list[ order ].insert(cIdx);
+        if( order > 0)
+            pos.first->appendSubClstPos( sub_pos_list[i] );
     }
     cout <<endl;
 }
@@ -140,7 +148,8 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
     _max_order = maxOrder;
     _nspin     = connection_matrix.n_cols;
     _connection_matrix=connection_matrix;
-    subgraph2index( speye(_nspin, _nspin) );
+    vector<int> empty (0);
+    subgraph2index( speye(_nspin, _nspin), empty );
 }
 
 cDepthFirstPathTracing::~cDepthFirstPathTracing()
@@ -154,15 +163,19 @@ void cDepthFirstPathTracing::generate()
     for( int i = 1; i < _max_order; ++i)
     {
         sp_mat neighbor = subgraph*_connection_matrix;
-        sp_mat new_subgraph = subgraph_growth(subgraph, neighbor, i);
-        subgraph2index(new_subgraph);
+        pair<sp_mat, vector<int> > growth_res = subgraph_growth(subgraph, neighbor, i);
+        sp_mat new_subgraph = growth_res.first;
+        vector<int> sub_pos = growth_res.second;
+        subgraph2index(new_subgraph, sub_pos);
         subgraph= index2subgraph(i);
     }
 }
 
-sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order)
+pair<sp_mat, vector<int> >  cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order)
+//sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order)
 {
     mat new_subgraph=zeros( sum(nonzeros(neighbor)), _nspin);
+    vector<int> sub_pos_list;
 
     int nGen=0;
     for(int i=0; i<subgraph.n_rows; ++i)
@@ -180,6 +193,7 @@ sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_
             {
                 new_subgraph.row(nGen)=parent_row;
                 new_subgraph(nGen, candidate(j))=1;
+                sub_pos_list.push_back( i );
                 nGen++;
             }
         }
@@ -189,8 +203,9 @@ sp_mat cDepthFirstPathTracing::subgraph_growth(const sp_mat& subgraph, const sp_
 
     sp_mat res_mat=conv_to<sp_mat>::from( new_subgraph.rows(0, nGen-1) );
 
-    return res_mat;
-    //return remove_repeat(res_mat, subgraph_order);
+    pair<sp_mat, vector<int> > res (res_mat, sub_pos_list);
+    //return res_mat;
+    return res;
 }
 
 //}}}

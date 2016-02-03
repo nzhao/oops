@@ -36,11 +36,14 @@ public:
     mat get_array(size_t nspin);
     uvec getIndex() const {return _index;};
 
+    void appendSubClstPos(int pos) const  {_sub_clst_pos.push_back( pos );};
+
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
 private:
     uvec _index;
+    mutable vector<int> _sub_clst_pos;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +75,7 @@ protected:
     sp_mat        _connection_matrix;
     CLST_IDX_LIST _cluster_index_list;
 
-    void subgraph2index(const sp_mat& subgraph);
+    void subgraph2index(const sp_mat& subgraph, const vector<int> sub_pos_list);
     sp_mat index2subgraph(int order);
 private:
 };
@@ -94,8 +97,8 @@ public:
     void generate();
 
 private:
-    sp_mat subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order);
-    sp_mat remove_repeat(sp_mat subgraph, int subgraph_order);
+    pair<sp_mat, vector<int> >  subgraph_growth(const sp_mat& subgraph, const sp_mat& neighbor, int subgraph_order);
+    //sp_mat remove_repeat(sp_mat subgraph, int subgraph_order);
 
 };
 //}}}
