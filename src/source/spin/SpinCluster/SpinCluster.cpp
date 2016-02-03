@@ -28,6 +28,7 @@ void cSpinCluster::make()
 }
 cSpinCluster::cSpinCluster(const cSpinCollection& sc, const uvec& clstLength, const vector<umat>& clstMatList)
 {
+    _spin_collection = sc;
     for(int i=0; i<clstMatList.size(); ++i)
     {
         umat fix_order_mat = clstMatList[i];
@@ -95,6 +96,18 @@ vector<umat> cSpinCluster::getMPI_Cluster(int worker_id)
     vector<umat> res;
     for(int i=0; i<getMaxOrder(); ++i)
         res.push_back( _data.clusterData[i][worker_id] );
+    return res;
+}
+
+pair<size_t, size_t> cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) const
+{
+    size_t pos1, pos2;
+    pos1 = 0;
+    for(int id=0; id<worker_id; ++id)
+        pos1 += _data.jobTable(cce_order, id); 
+    pos2 = pos1 + _data.jobTable(cce_order, worker_id);
+
+    pair<size_t, size_t> res(pos1, pos2);
     return res;
 }
 

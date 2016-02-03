@@ -60,29 +60,33 @@ int  main(int argc, char* argv[])
 
     cSPIN espin = create_e_spin();
     cSpinCollection spin_collection = create_bath_spins_from_file();
+    cSpinCluster spin_clusters;
 
     size_t maxOrder = 3;
+    int nTime = 101;
 
     uvec clstLength;
     vector<umat> clstMat;
+    double ** data = NULL;
+
     if(my_rank == 0)
     {
         sp_mat c=spin_collection.getConnectionMatrix(6.0);
         cDepthFirstPathTracing dfpt(c, maxOrder);
-        cSpinCluster spin_clusters(spin_collection, &dfpt);
+        spin_clusters=cSpinCluster(spin_collection, &dfpt);
         spin_clusters.make();
 
+        data = new double * [maxOrder];
+        for(int cce_order = 0; cce_order<maxOrder; ++cce_order)
+            data[cce_order] = new double [nTime * spin_clusters.getClusterNum(cce_order)];
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //{{{ Job distribution
         spin_clusters.MPI_partition(worker_num);
 
         clstLength = spin_clusters.getMPI_ClusterLength(0);
         clstMat = spin_clusters.getMPI_Cluster(0);
-
-//        for(int i = 0; i<worker_num; ++i)
-//        {
-//            cout << trans( spin_clusters.getMPI_ClusterLength(i) )<<endl;
-//            for(int j=0; j<maxOrder; ++j)
-//                cout << trans( spin_clusters.getMPI_Cluster(i)[j] )<<endl;
-//        }
 
         for(int i=1; i<worker_num; ++i)
         {
@@ -115,68 +119,62 @@ int  main(int argc, char* argv[])
             clstMat.push_back(tempM);
             delete [] clstMatData;
         }
+    //}}}
+    ////////////////////////////////////////////////////////////////////////////////
     }
 
     cSpinCluster partition_clusters(spin_collection, clstLength, clstMat);
 
-/*
-    double ** data = NULL;
-    if(my_rank == 0)
-        data = new double * [maxOrder];
 
-    int nTime = 101;
     for(int cce_order = 0; cce_order < maxOrder; ++cce_order)
     {
-        size_t clst_num = spin_clusters.getClusterNum(cce_order);
-        size_t job_num = clst_num % worker_num == 0 ? clst_num / worker_num : clst_num / worker_num + 1;
+        cout << "my_rank = " << my_rank << ", " << "order  = " << cce_order << endl;
+        size_t clst_num = partition_clusters.getClusterNum(cce_order);
 
-        mat resMat(nTime, job_num, fill::ones);
-        for(int i = 0; i < job_num; ++i)
+        mat resMat(nTime, clst_num, fill::ones);
+        for(int i = 0; i < clst_num; ++i)
         {
-            size_t index = my_rank*job_num + i;
-            if( index < clst_num)
-            {
-                cout << "my_rank = " << my_rank << " cce_order =" << cce_order << ", index = "  << index << endl;
+            vector<cSPIN> spin_list = partition_clusters.getCluster(cce_order, i);
 
-                vector<cSPIN> spin_list = spin_clusters.getCluster(cce_order, index);
+            int spin_up = 0, spin_down = 1;
+            Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
+            Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
 
-                int spin_up = 0, spin_down = 1;
-                Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
-                Hamiltonian hami1 = create_spin_hamiltonian(espin, spin_down, spin_list);
+            Liouvillian lv = create_spin_liouvillian(hami0, hami1);
 
-                Liouvillian lv = create_spin_liouvillian(hami0, hami1);
+            DensityOperator ds = create_spin_density_state(spin_list);
 
-                DensityOperator ds = create_spin_density_state(spin_list);
+            SimpleFullMatrixVectorEvolution kernel(lv, ds);
+            kernel.setTimeSequence( linspace<vec>(0.0, 0.001, nTime) );
 
-                SimpleFullMatrixVectorEvolution kernel(lv, ds);
-                kernel.setTimeSequence( linspace<vec>(0.0, 0.001, nTime) );
+            ClusterCoherenceEvolution dynamics(&kernel);
+            dynamics.run();
 
-                ClusterCoherenceEvolution dynamics(&kernel);
-                dynamics.run();
-
-                resMat.col(i) = dynamics.calc_obs();
-            }
+            resMat.col(i) = dynamics.calc_obs();
         }
 
+        ////////////////////////////////////////////////////////////////////////////////
+        //{{{ Gathering Data
         if(my_rank != 0)
-            MPI_Send(resMat.memptr(), nTime*job_num, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+            MPI_Send(resMat.memptr(), nTime*clst_num, MPI_DOUBLE, 0, 100+my_rank, MPI_COMM_WORLD);
         else
         {
-            size_t blk_size = nTime*job_num;
-            data[cce_order] = new double [blk_size * worker_num];
-            
-            memcpy(data[cce_order], resMat.memptr(), blk_size*sizeof(double));
+            memcpy(data[cce_order], resMat.memptr(), nTime*clst_num*sizeof(double));
 
+            size_t prev_clst_num = clst_num;
             for(int source = 1; source < worker_num; ++source)
-                MPI_Recv(data[cce_order] + source*blk_size, blk_size, MPI_DOUBLE, source, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            {
+                pair<size_t, size_t> pos = spin_clusters.getMPI_ClusterSize(cce_order, source);
+                MPI_Recv(data[cce_order] + nTime*pos.first, nTime*(pos.second - pos.first), MPI_DOUBLE, source, 100+source, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            }
 
         }
-
+        //}}}
+        ////////////////////////////////////////////////////////////////////////////////
     }
 
     if(my_rank == 0)
         post_treatment(data, spin_clusters, nTime);
-*/
 
     // MPI initialization;
     mpi_status = MPI_Finalize();
@@ -295,9 +293,9 @@ DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Post treatment
-#ifdef HAS_MATLAB
 void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime)
 {
+#ifdef HAS_MATLAB
     cout << "begin post_treatement ... storing cce_data to file" << endl;
 
     size_t maxOrder = spin_clusters.getMaxOrder();
@@ -322,7 +320,7 @@ void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime
 
         mxDestroyArray(pArray);
     }
-}
 #endif
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

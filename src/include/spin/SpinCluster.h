@@ -48,6 +48,7 @@ public:
 
     uvec          getMPI_ClusterLength(int worker_id) const {return _data.jobTable.col(worker_id);};
     vector<umat>  getMPI_Cluster(int worker_id);
+    pair<size_t, size_t> getMPI_ClusterSize(int cce_order, int worker_id) const;
 
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
 private:
