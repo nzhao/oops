@@ -1,36 +1,6 @@
-#ifdef HAS_MATLAB
-#include <mat.h>
-#endif
-#include <cassert>
-#include <stdlib.h>
-#include <vector>
-#include <string>
-#include <iostream>
-#include "include/spin/Spin.h"
-#include "include/spin/SpinData.h"
-#include "include/spin/SpinCollection.h"
-#include "include/spin/SpinSource.h"
-#include "include/spin/SpinCluster.h"
-#include "include/spin/SpinClusterAlgorithm.h"
-#include "include/spin/SpinInteraction.h"
-#include "include/kron/KronProd.h"
-
-#include "include/easylogging++.h"
-#include "include/misc/misc.h"
-#include "include/quantum/HilbertSpaceOperator.h"
-#include "include/quantum/LiouvilleSpaceOperator.h"
-#include "include/quantum/MixedState.h"
-#include "include/quantum/PureState.h"
-#include "include/spin/SpinState.h"
-#include "include/quantum/QuantumEvolutionAlgorithm.h"
-#include "include/quantum/QuantumEvolution.h"
-
-#include <mpi.h>
+#include "include/oops.h"
 
 _INITIALIZE_EASYLOGGINGPP
-
-using namespace std;
-using namespace arma;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
@@ -50,27 +20,29 @@ int  main(int argc, char* argv[])
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
     LOG(INFO) << "################################################### Program begins ###################################################"; 
 
-    // MPI head;
+    ////////////////////////////////////////////////////////////////////////////////
+    //{{{ MPI_Initialization
     int worker_num(0), my_rank(0);
     int mpi_status = MPI_Init(&argc, &argv);
     assert (mpi_status == MPI_SUCCESS);
 
     MPI_Comm_size(MPI_COMM_WORLD, &worker_num);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+    //}}}
+    ////////////////////////////////////////////////////////////////////////////////
+
+    size_t maxOrder = 3;
+    int nTime = 101;
+
+    uvec clstLength;     vector<umat> clstMat;
+    double ** data = NULL;
 
     cSPIN espin = create_e_spin();
     cSpinCollection spin_collection = create_bath_spins_from_file();
     cSpinCluster spin_clusters;
 
-    size_t maxOrder = 3;
-    int nTime = 101;
-
-    uvec clstLength;
-    vector<umat> clstMat;
-    double ** data = NULL;
-
     if(my_rank == 0)
-    {
+    {/*{{{ cluster Generation */
         sp_mat c=spin_collection.getConnectionMatrix(6.0);
         cDepthFirstPathTracing dfpt(c, maxOrder);
         spin_clusters=cSpinCluster(spin_collection, &dfpt);
@@ -79,10 +51,12 @@ int  main(int argc, char* argv[])
         data = new double * [maxOrder];
         for(int cce_order = 0; cce_order<maxOrder; ++cce_order)
             data[cce_order] = new double [nTime * spin_clusters.getClusterNum(cce_order)];
-
+    }/*}}}*/
 
     ////////////////////////////////////////////////////////////////////////////////
     //{{{ Job distribution
+    if(my_rank == 0)
+    {
         spin_clusters.MPI_partition(worker_num);
 
         clstLength = spin_clusters.getMPI_ClusterLength(0);
@@ -119,22 +93,21 @@ int  main(int argc, char* argv[])
             clstMat.push_back(tempM);
             delete [] clstMatData;
         }
+    }
     //}}}
     ////////////////////////////////////////////////////////////////////////////////
-    }
 
-    cSpinCluster partition_clusters(spin_collection, clstLength, clstMat);
-
+    cSpinCluster my_clusters(spin_collection, clstLength, clstMat);
 
     for(int cce_order = 0; cce_order < maxOrder; ++cce_order)
     {
         cout << "my_rank = " << my_rank << ", " << "order  = " << cce_order << endl;
-        size_t clst_num = partition_clusters.getClusterNum(cce_order);
+        size_t clst_num = my_clusters.getClusterNum(cce_order);
 
         mat resMat(nTime, clst_num, fill::ones);
         for(int i = 0; i < clst_num; ++i)
-        {
-            vector<cSPIN> spin_list = partition_clusters.getCluster(cce_order, i);
+        {/*{{{ cluster evolution*/
+            vector<cSPIN> spin_list = my_clusters.getCluster(cce_order, i);
 
             int spin_up = 0, spin_down = 1;
             Hamiltonian hami0 = create_spin_hamiltonian(espin, spin_up, spin_list);
@@ -151,7 +124,7 @@ int  main(int argc, char* argv[])
             dynamics.run();
 
             resMat.col(i) = dynamics.calc_obs();
-        }
+        }/*}}}*/
 
         ////////////////////////////////////////////////////////////////////////////////
         //{{{ Gathering Data
@@ -176,9 +149,12 @@ int  main(int argc, char* argv[])
     if(my_rank == 0)
         post_treatment(data, spin_clusters, nTime);
 
-    // MPI initialization;
+    ////////////////////////////////////////////////////////////////////////////////
+    //{{{ MPI Finalization
     mpi_status = MPI_Finalize();
     assert (mpi_status == MPI_SUCCESS);
+    //}}}
+    ////////////////////////////////////////////////////////////////////////////////
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,8 +172,6 @@ cSPIN create_e_spin()
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create bath spin list from xyz file
 cSpinCollection create_bath_spins_from_file()
@@ -209,8 +183,6 @@ cSpinCollection create_bath_spins_from_file()
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin clusters from a given spin list
@@ -227,8 +199,6 @@ cSpinCluster create_spin_clusters(const cSpinCollection& sc)
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin Hamiltonian for a given cluster
@@ -254,8 +224,6 @@ Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, co
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create Liouvillian operator from given Hamiltonians
 Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1)
@@ -269,8 +237,6 @@ Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian 
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Create spin density matrix
@@ -289,8 +255,6 @@ DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Post treatment
 void post_treatment(double ** data, const cSpinCluster& spin_clusters, int nTime)

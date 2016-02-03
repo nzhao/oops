@@ -5,6 +5,7 @@
 #include <set>
 #include "include/easylogging++.h"
 #include "include/spin/Spin.h"
+#include "include/spin/SpinCollection.h"
 #include "include/spin/SpinClusterAlgorithm.h"
 
 /// \addtogroup SpinList

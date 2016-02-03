@@ -5,7 +5,7 @@
 DESTINATION := ../bin/cce
 LIBS :=  $(ARMA_LIB) 
 LIBPATH := .  
-INCLUDES := . $(ARMA_INC_PATH) 
+INCLUDES := .  $(ARMA_INC_PATH) 
 
 RM := rm -f
 PS = cpp
