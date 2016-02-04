@@ -47,6 +47,7 @@ int  main(int argc, char* argv[])
         cDepthFirstPathTracing dfpt(c, maxOrder);
         spin_clusters=cSpinCluster(spin_collection, &dfpt);
         spin_clusters.make();
+        cout << spin_clusters << endl;
 
         data = new double * [maxOrder];
         for(int cce_order = 0; cce_order<maxOrder; ++cce_order)

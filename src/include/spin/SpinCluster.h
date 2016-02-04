@@ -42,14 +42,16 @@ public:
 
     CLST_IDX_LIST getClusterIndex() const {return _cluster_index_list;};
     umat          getClusterIndex(size_t order) const ;
+    cClusterIndex getClusterIndex(const CluserPostion& pos) const {return getClusterIndex(pos.first, pos.second);};
     cClusterIndex getClusterIndex(size_t order, size_t index) const ;
     vector<cSPIN> getCluster(size_t order, size_t index) const ;
-    size_t        getMaxOrder() const {return _max_order;};//_grouping->getMaxOrder();};
+    size_t        getMaxOrder() const {return _max_order;};
     size_t        getClusterNum(int order) const {return _cluster_index_list[order].size();};
+    set<CluserPostion > getSubClusters(size_t order, size_t index) const;
 
     uvec          getMPI_ClusterLength(int worker_id) const {return _data.jobTable.col(worker_id);};
     vector<umat>  getMPI_Cluster(int worker_id);
-    pair<size_t, size_t> getMPI_ClusterSize(int cce_order, int worker_id) const;
+    CluserPostion getMPI_ClusterSize(int cce_order, int worker_id) const;
 
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
 private:

@@ -14,8 +14,9 @@
 using namespace std;
 using namespace arma;
 
+typedef pair<size_t, size_t> CluserPostion;
 
-
+ 
 /// \addtogroup SpinList
 /// @{
 
@@ -35,6 +36,9 @@ public:
 
     mat get_array(size_t nspin);
     uvec getIndex() const {return _index;};
+    size_t getNum() const {return _spin_num;};
+    size_t getOrder() const {return _spin_num-1;};
+    set< CluserPostion > getSubClstPos() const;
 
     void appendSubClstPos(int pos) const  {_sub_clst_pos.push_back( pos );};
 
@@ -43,7 +47,8 @@ public:
     friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
 private:
     uvec _index;
-    mutable vector<int> _sub_clst_pos;
+    size_t _spin_num;
+    mutable vector<size_t> _sub_clst_pos;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
