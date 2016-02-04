@@ -34,10 +34,12 @@ MatExpanFunc* CIRCLEC = &CircleC;
 //{{{ KronProd
 
 KronProd::KronProd()
-{ LOG(INFO) << "Default constructor: KronProd";}
+{ //LOG(INFO) << "Default constructor: KronProd";
+}
 
 KronProd::~KronProd()
-{ LOG(INFO) << "Default destructor: KronProd";}
+{ //LOG(INFO) << "Default destructor: KronProd";
+}
 
 KronProd::KronProd(DIM_LIST dim_list)
 {
@@ -120,17 +122,17 @@ ostream&  operator << (ostream& outs, const KronProd& kp)
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SumKronProd
 SumKronProd::SumKronProd()
-{ LOG(INFO) << "Default constructor: SumKronProd.";
+{ //LOG(INFO) << "Default constructor: SumKronProd.";
 }
 
 SumKronProd::SumKronProd(const vector<KronProd>& kp_lst)
-{ LOG(INFO) << "Constructor: SumKronProd with KronProd list.";
+{ //LOG(INFO) << "Constructor: SumKronProd with KronProd list.";
     _kron_prod_list = kp_lst;
     if( !_kron_prod_list.empty() )
         _dim_list = _kron_prod_list[0].getDimList();
 }
 SumKronProd::~SumKronProd()
-{ LOG(INFO) << "Default destructor: SumKronProd.";
+{ //LOG(INFO) << "Default destructor: SumKronProd.";
 }
 cx_mat SumKronProd::full()
 {

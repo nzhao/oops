@@ -18,7 +18,6 @@ int  main(int argc, char* argv[])
     _START_EASYLOGGINGPP(argc, argv);
     easyloggingpp::Configurations confFromFile("../src/logs/log.conf");  // Load configuration from file
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
-    LOG(INFO) << "################################################### Program begins ###################################################"; 
 
     ////////////////////////////////////////////////////////////////////////////////
     //{{{ MPI_Initialization
@@ -31,6 +30,8 @@ int  main(int argc, char* argv[])
     //}}}
     ////////////////////////////////////////////////////////////////////////////////
 
+    LOG(INFO) << "my_rank = " << my_rank << "  VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV Program begins VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"; 
+    
     size_t maxOrder = 3;
     int nTime = 101;
 
@@ -47,12 +48,13 @@ int  main(int argc, char* argv[])
         cDepthFirstPathTracing dfpt(c, maxOrder);
         spin_clusters=cSpinCluster(spin_collection, &dfpt);
         spin_clusters.make();
-        cout << spin_clusters << endl;
 
         data = new double * [maxOrder];
         for(int cce_order = 0; cce_order<maxOrder; ++cce_order)
             data[cce_order] = new double [nTime * spin_clusters.getClusterNum(cce_order)];
     }/*}}}*/
+
+    LOG(INFO) << "my_rank = " << my_rank << " clsuster generated. " ;
 
     ////////////////////////////////////////////////////////////////////////////////
     //{{{ Job distribution
@@ -98,10 +100,14 @@ int  main(int argc, char* argv[])
     //}}}
     ////////////////////////////////////////////////////////////////////////////////
 
+    LOG(INFO) << "my_rank = " << my_rank << " job distributed." ;
+
     cSpinCluster my_clusters(spin_collection, clstLength, clstMat);
 
     for(int cce_order = 0; cce_order < maxOrder; ++cce_order)
     {
+        LOG(INFO) << "my_rank = " << my_rank << " begin cce_order = " << cce_order ;
+
         cout << "my_rank = " << my_rank << ", " << "order  = " << cce_order << endl;
         size_t clst_num = my_clusters.getClusterNum(cce_order);
 
@@ -127,6 +133,9 @@ int  main(int argc, char* argv[])
             resMat.col(i) = dynamics.calc_obs();
         }/*}}}*/
 
+        LOG(INFO) << "my_rank = " << my_rank << " finish cce_order = " << cce_order ;
+
+        LOG(INFO) << "my_rank = " << my_rank << " begin Gethering data" << cce_order ;
         ////////////////////////////////////////////////////////////////////////////////
         //{{{ Gathering Data
         if(my_rank != 0)
@@ -147,11 +156,13 @@ int  main(int argc, char* argv[])
         }
         //}}}
         ////////////////////////////////////////////////////////////////////////////////
+        LOG(INFO) << "my_rank = " << my_rank << " finish  Gethering data" << cce_order ;
     }
 
     if(my_rank == 0)
         post_treatment(data, spin_clusters, nTime);
 
+    LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program begins ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
     ////////////////////////////////////////////////////////////////////////////////
     //{{{ MPI Finalization
     mpi_status = MPI_Finalize();

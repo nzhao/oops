@@ -3,10 +3,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolution 
 QuantumEvolution::QuantumEvolution()
-{ LOG(INFO) << "Default constructor: QuantumEvolution";}
+{ //LOG(INFO) << "Default constructor: QuantumEvolution";
+}
 
 QuantumEvolution::~QuantumEvolution()
-{ LOG(INFO) << "Default destructor: QuantumEvolution";}
+{ //LOG(INFO) << "Default destructor: QuantumEvolution";
+}
 
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -15,10 +17,12 @@ QuantumEvolution::~QuantumEvolution()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ ClusterCoherenceEvolution
 ClusterCoherenceEvolution::ClusterCoherenceEvolution()
-{ LOG(INFO) << "Default constructor: ClusterCoherenceEvolution";}
+{ //LOG(INFO) << "Default constructor: ClusterCoherenceEvolution";
+}
 
 ClusterCoherenceEvolution::~ClusterCoherenceEvolution()
-{ LOG(INFO) << "Default destructor: ClusterCoherenceEvolution";}
+{ //LOG(INFO) << "Default destructor: ClusterCoherenceEvolution";
+}
 
 vec ClusterCoherenceEvolution::calc_obs()
 {

@@ -9,7 +9,7 @@ using namespace arma;
 ////////////////////////////////////////////////////////////////////
 //{{{ cClusterIndex
 cClusterIndex::cClusterIndex()
-{ LOG(INFO) << "Default constructor of cClusterIndex.";
+{ //LOG(INFO) << "Default constructor of cClusterIndex.";
 }
 
 cClusterIndex::cClusterIndex(const uvec& idx)
@@ -20,7 +20,7 @@ cClusterIndex::cClusterIndex(const uvec& idx)
 }
 
 cClusterIndex::~cClusterIndex()
-{ LOG(INFO) << "Default destructor of cClusterIndex.";
+{ //LOG(INFO) << "Default destructor of cClusterIndex.";
 }
 
 mat cClusterIndex::get_array(size_t nspin)
@@ -93,12 +93,12 @@ cSpinGrouping::cSpinGrouping()
     _cluster_index_list = CLST_IDX_LIST(MAX_CLUSTER_ORDER);
 }
 cSpinGrouping::cSpinGrouping(const sp_mat& connection_matrix)
-{ LOG(INFO) << "Constructor of cSpinGrouping with connextion_matrix.";
+{ //LOG(INFO) << "Constructor of cSpinGrouping with connextion_matrix.";
     _connection_matrix=connection_matrix;
 }
 
 cSpinGrouping::~cSpinGrouping()
-{ LOG(INFO) << "Default destructor of cSpinGrouping";
+{ //LOG(INFO) << "Default destructor of cSpinGrouping";
 }
 
 sp_mat cSpinGrouping::index2subgraph(int order)
@@ -127,15 +127,15 @@ void cSpinGrouping::subgraph2index(const sp_mat& subgraph, const vector<int> sub
 {
     for(int i=0; i<subgraph.n_rows; ++i)
     {
-        cout << "\r" << setw(6) <<  i+1 << "/" << subgraph.n_rows 
-             << " subgraphs are inserted.";
+        //cout << "\r" << setw(6) <<  i+1 << "/" << subgraph.n_rows 
+             //<< " subgraphs are inserted.";
         mat r(subgraph.row(i));  uvec nz_r = find(r);  size_t order = nz_r.size()-1;
         cClusterIndex cIdx( nz_r );
         pair<FIX_ORDER_INDEX_SET::iterator, bool> pos = _cluster_index_list[ order ].insert(cIdx);
         if( order > 0)
             pos.first->appendSubClstPos( sub_pos_list[i] );
     }
-    cout <<endl;
+    //cout <<endl;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ void cSpinGrouping::subgraph2index(const sp_mat& subgraph, const vector<int> sub
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinDepthFirstPathTracing
 cDepthFirstPathTracing::cDepthFirstPathTracing()
-{ LOG(INFO) << "Default constructor: cDepthFirstPathTracing.";
+{ //LOG(INFO) << "Default constructor: cDepthFirstPathTracing.";
 }
 
 cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder)
@@ -158,7 +158,7 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
 }
 
 cDepthFirstPathTracing::~cDepthFirstPathTracing()
-{ LOG(INFO) << "Default destructor: cDepthFirstPathTracing.";
+{ //LOG(INFO) << "Default destructor: cDepthFirstPathTracing.";
 }
 
 void cDepthFirstPathTracing::generate()
@@ -185,8 +185,8 @@ pair<sp_mat, vector<int> >  cDepthFirstPathTracing::subgraph_growth(const sp_mat
     int nGen=0;
     for(int i=0; i<subgraph.n_rows; ++i)
     {
-        cout << "\r"<< i+1 <<  "/" << subgraph.n_rows
-             << " clusters are generated of spin order= " << subgraph_order+1 << "\t";
+        //cout << "\r"<< i+1 <<  "/" << subgraph.n_rows
+             //<< " clusters are generated of spin order= " << subgraph_order+1 << "\t";
 
         mat parent_row(subgraph.row(i));
         mat r(neighbor.row(i));    uvec candidate = find(r);
@@ -202,9 +202,9 @@ pair<sp_mat, vector<int> >  cDepthFirstPathTracing::subgraph_growth(const sp_mat
                 nGen++;
             }
         }
-        cout.flush();
+        //cout.flush();
     }
-    cout << endl;
+    //cout << endl;
 
     sp_mat res_mat=conv_to<sp_mat>::from( new_subgraph.rows(0, nGen-1) );
 

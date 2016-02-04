@@ -8,7 +8,8 @@ using namespace arma;
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinCollection
 cSpinCollection::cSpinCollection()
-{ LOG(INFO) << "Default constructor of cSpinCollection.";}
+{ //LOG(INFO) << "Default constructor of cSpinCollection.";
+}
 cSpinCollection::cSpinCollection(cSpinSource * source)
 {
     _source = source;

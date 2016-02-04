@@ -3,10 +3,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumOperator
 QuantumOperator::QuantumOperator()
-{ LOG(INFO) << "Default constructor: QuantumOperator."; }
+{ //LOG(INFO) << "Default constructor: QuantumOperator.";
+}
 
 QuantumOperator::~QuantumOperator()
-{ LOG(INFO) << "Default destructor: QuantumOperator."; }
+{ //LOG(INFO) << "Default destructor: QuantumOperator.";
+}
 
 #ifdef HAS_MATLAB
 void QuantumOperator::saveMatrix(string filename)

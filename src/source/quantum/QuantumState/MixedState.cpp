@@ -4,10 +4,12 @@
 //{{{ MixedState 
 
 MixedState::MixedState()
-{ LOG(INFO) << "Default constructor: MixedState";}
+{ //LOG(INFO) << "Default constructor: MixedState";
+}
 
 MixedState::~MixedState()
-{ LOG(INFO) << "Default destructor: MixedState";}
+{ //LOG(INFO) << "Default destructor: MixedState";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -16,10 +18,12 @@ MixedState::~MixedState()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ DensityOperator
 DensityOperator::DensityOperator()
-{ LOG(INFO) << "Default constructor: DensityOperator";}
+{ //LOG(INFO) << "Default constructor: DensityOperator";
+}
 
 DensityOperator::~DensityOperator()
-{ LOG(INFO) << "Default destructor: DensityOperator";}
+{ //LOG(INFO) << "Default destructor: DensityOperator";
+}
 
 DensityOperator::DensityOperator(const vector<cSPIN>& spin_list)
 {

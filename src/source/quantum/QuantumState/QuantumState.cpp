@@ -4,10 +4,12 @@
 //{{{ QuantumState 
 
 QuantumState::QuantumState()
-{ LOG(INFO) << "Default constructor: QuantumState";}
+{ //LOG(INFO) << "Default constructor: QuantumState";
+}
 
 QuantumState::~QuantumState()
-{ LOG(INFO) << "Default destructor: QuantumState";}
+{ //LOG(INFO) << "Default destructor: QuantumState";
+}
 
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

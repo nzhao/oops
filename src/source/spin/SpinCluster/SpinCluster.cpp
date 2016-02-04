@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////
 //{{{ cSpinCluster
 cSpinCluster::cSpinCluster()
-{ LOG(INFO) << "Defaul constructor: cSpinCluster.";
+{ //LOG(INFO) << "Defaul constructor: cSpinCluster.";
 }
 cSpinCluster::cSpinCluster(const cSpinCollection& sc, cSpinGrouping * grouping)
 {

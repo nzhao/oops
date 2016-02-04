@@ -4,7 +4,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolutionAlgorithm
 QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm()
-{ LOG(INFO) << "Default constructor: QuantumEvolutionAlgorithm";}
+{ //LOG(INFO) << "Default constructor: QuantumEvolutionAlgorithm";
+}
 
 QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm(QuantumOperator& op, QuantumState& st)
 {
@@ -14,7 +15,8 @@ QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm(QuantumOperator& op, Quantu
 }
 
 QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()
-{ LOG(INFO) << "Default destructor: QuantumEvolutionAlgorithm";}
+{ //LOG(INFO) << "Default destructor: QuantumEvolutionAlgorithm";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +25,8 @@ QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SimpleFullMatrixVectorEvolution
 SimpleFullMatrixVectorEvolution::SimpleFullMatrixVectorEvolution()
-{ LOG(INFO) << "Default constructor: SimpleFullMatrixVectorEvolution";}
+{ //LOG(INFO) << "Default constructor: SimpleFullMatrixVectorEvolution";
+}
 
 void SimpleFullMatrixVectorEvolution::perform()
 {
@@ -64,6 +67,7 @@ void SimpleFullMatrixVectorEvolution::perform()
 }
 
 SimpleFullMatrixVectorEvolution::~SimpleFullMatrixVectorEvolution()
-{ LOG(INFO) << "Default destructor: SimpleFullMatrixVectorEvolution";}
+{ //LOG(INFO) << "Default destructor: SimpleFullMatrixVectorEvolution";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

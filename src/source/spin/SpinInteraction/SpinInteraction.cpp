@@ -8,16 +8,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinInteraction
 cSpinInteraction::cSpinInteraction()
-{ LOG(INFO) << "Defaut constructor: cSpinInteraction.";
+{ //LOG(INFO) << "Defaut constructor: cSpinInteraction.";
 }
 
 cSpinInteraction::cSpinInteraction(const vector<cSPIN>& spin_list)
-{ LOG(INFO) << "Constructor: cSpinInteraction with spin_list.";
+{ //LOG(INFO) << "Constructor: cSpinInteraction with spin_list.";
     _spin_list=spin_list;
 }
 
 cSpinInteraction::~cSpinInteraction()
-{ LOG(INFO) << "Default destructor: cSpinInteraction.";
+{ //LOG(INFO) << "Default destructor: cSpinInteraction.";
 }
 
 void cSpinInteraction::make()
@@ -67,11 +67,11 @@ ostream&  operator << (ostream& outs, cSpinInteraction& interaction)
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SpinDipolarInteraction 
 SpinDipolarInteraction::SpinDipolarInteraction()
-{ LOG(INFO) << "Default constructor: SpinDipolarInteraction.";
+{ //LOG(INFO) << "Default constructor: SpinDipolarInteraction.";
 }
 
 SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
-{ LOG(INFO) << "Constructor: SpinDipolarInteraction with spin_list";
+{ //LOG(INFO) << "Constructor: SpinDipolarInteraction with spin_list";
     _spin_list=spin_list;
 
     _domain=SpinPair(spin_list);
@@ -82,7 +82,7 @@ SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
 }
 
 SpinDipolarInteraction::~SpinDipolarInteraction()
-{ LOG(INFO) << "Default destructor: SpinDipolarInteraction.";
+{ //LOG(INFO) << "Default destructor: SpinDipolarInteraction.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,11 +92,11 @@ SpinDipolarInteraction::~SpinDipolarInteraction()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SpinZeemanInteraction 
 SpinZeemanInteraction::SpinZeemanInteraction()
-{ LOG(INFO) << "Default constructor: SpinZeemanInteraction.";
+{ //LOG(INFO) << "Default constructor: SpinZeemanInteraction.";
 }
 
 SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, const vec& magB)
-{ LOG(INFO) << "Constructor: SpinZeemanInteraction with spin_list and magB";
+{ //LOG(INFO) << "Constructor: SpinZeemanInteraction with spin_list and magB";
 
     _spin_list=spin_list;
 
@@ -108,7 +108,7 @@ SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, con
 }
 
 SpinZeemanInteraction::~SpinZeemanInteraction()
-{ LOG(INFO) << "Default destructor: SpinZeemanInteraction.";
+{ //LOG(INFO) << "Default destructor: SpinZeemanInteraction.";
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,10 +118,11 @@ SpinZeemanInteraction::~SpinZeemanInteraction()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ DipolarField 
 DipolarField::DipolarField()
-{ LOG(INFO) << "Default constructor: DipolarField";}
+{ //LOG(INFO) << "Default constructor: DipolarField";
+}
 
 DipolarField::DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const PureState& state)
-{ LOG(INFO) << "Constructor: DipolarField with center spin and spin state";
+{ //LOG(INFO) << "Constructor: DipolarField with center spin and spin state";
 
     _spin_list=spin_list;
 
@@ -143,6 +144,7 @@ DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& 
 }
 
 DipolarField::~DipolarField()
-{ LOG(INFO) << "Default destructor: DipolarField";}
+{ //LOG(INFO) << "Default destructor: DipolarField";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

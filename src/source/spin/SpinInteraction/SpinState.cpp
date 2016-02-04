@@ -3,7 +3,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ cSpinState
 cSpinState::cSpinState()
-{ LOG(INFO) << "Default constructor: cSpinState";}
+{ //LOG(INFO) << "Default constructor: cSpinState";
+}
 
 void cSpinState::make()
 {
@@ -21,7 +22,8 @@ void cSpinState::make()
 }
 
 cSpinState::~cSpinState()
-{ LOG(INFO) << "Default destructor: cSpinState";}
+{ //LOG(INFO) << "Default destructor: cSpinState";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +31,8 @@ cSpinState::~cSpinState()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SpinPolarization 
 SpinPolarization::SpinPolarization()
-{ LOG(INFO) << "Default constructor: SpinPolarization";}
+{ //LOG(INFO) << "Default constructor: SpinPolarization";
+}
 
 SpinPolarization::SpinPolarization(const vector<cSPIN>& spin_list, const vector<int>& index_list, const vector<vec>& pol_list)
 {
@@ -57,6 +60,7 @@ SpinPolarization::SpinPolarization(const vector<cSPIN>& spin_list, const vec& po
 }
 
 SpinPolarization::~SpinPolarization()
-{ LOG(INFO) << "Default destructor: SpinPolarization";}
+{ //LOG(INFO) << "Default destructor: SpinPolarization";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
