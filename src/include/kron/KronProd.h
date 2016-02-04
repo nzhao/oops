@@ -36,9 +36,10 @@ public:
     KronProd(DIM_LIST dim_list);
     ~KronProd();
 
-    void   fill(INDICES idx, MULTIPLIER coeff, TERM mat);
-    cx_mat full();
-    DIM_LIST getDimList(){return _dim_list;};
+    cx_mat      full();
+    void        fill(INDICES idx, MULTIPLIER coeff, TERM mat);
+    KronProd&   scale(double factor) { _coeff *= factor; return *this;};
+    DIM_LIST    getDimList(){return _dim_list;};
 
     friend KronProd Expand(const KronProd& kp, MatExpanFunc * exppan_func);
     friend ostream&  operator << (ostream& outs, const KronProd& kp);
@@ -67,6 +68,7 @@ public:
     vector<KronProd> getKronProdList(){return _kron_prod_list;};
     DIM_LIST getDimList(){return _dim_list;};
 
+    SumKronProd&  scale(double factor);
     void append(KronProd kp) {_kron_prod_list.push_back(kp);};
     
     friend SumKronProd Expand(const SumKronProd& skp, MatExpanFunc * exppan_func);

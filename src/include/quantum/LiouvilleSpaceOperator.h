@@ -27,9 +27,9 @@ public:
 
     LiouvilleSpaceOperator(const HilbertSpaceOperator& op, MatExpanFunc* func);
 protected:
-private:
     bool _is_expanded;
     EXPAN _expan;
+private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +40,8 @@ class Liouvillian:public LiouvilleSpaceOperator
 {
 public:
     Liouvillian();
+    Liouvillian(const QuantumOperator& op);
+    Liouvillian(const Hamiltonian& hm, MatExpanFunc* func):LiouvilleSpaceOperator(hm, func){};
     Liouvillian(const Hamiltonian& hm):LiouvilleSpaceOperator(hm, CIRCLEC){};
     ~Liouvillian();
 protected:

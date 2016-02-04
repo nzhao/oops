@@ -4,10 +4,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ LiouvilleSpaceOperator
 LiouvilleSpaceOperator::LiouvilleSpaceOperator()
-{ LOG(INFO) << "Default constructor: LiouvilleSpaceOperator";}
+{ //LOG(INFO) << "Default constructor: LiouvilleSpaceOperator";
+}
 
 LiouvilleSpaceOperator::~LiouvilleSpaceOperator()
-{ LOG(INFO) << "Default destructor: LiouvilleSpaceOperator";}
+{ //LOG(INFO) << "Default destructor: LiouvilleSpaceOperator";
+}
 
 LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, MatExpanFunc* func)
 {
@@ -32,10 +34,20 @@ LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, M
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Liouvillian
 Liouvillian::Liouvillian()
-{ LOG(INFO) << "Default constructor: Liouvillian";}
+{ //LOG(INFO) << "Default constructor: Liouvillian";
+}
+
+Liouvillian::Liouvillian(const QuantumOperator& op)
+{
+    _is_expanded = false;
+    _dimension = op.getDimension();
+    _dim_list = op.getDimList();
+    _kron_form = op.getKronProdForm();
+}
 
 Liouvillian::~Liouvillian()
-{ LOG(INFO) << "Default destructor: Liouvillian";}
+{ //LOG(INFO) << "Default destructor: Liouvillian";
+}
 
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

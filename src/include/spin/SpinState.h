@@ -34,6 +34,7 @@ class SpinPolarization:public cSpinState
 public:
     SpinPolarization();
     SpinPolarization(const vector<cSPIN>& spin_list, const vector<int>& index_list, const vector<vec>& pol_list);
+    SpinPolarization(const vector<cSPIN>& spin_list, const vec& pol);
     ~SpinPolarization();
 protected:
 private:
