@@ -44,7 +44,7 @@ public:
     umat          getClusterIndex(size_t order) const ;
     cClusterIndex getClusterIndex(size_t order, size_t index) const ;
     vector<cSPIN> getCluster(size_t order, size_t index) const ;
-    size_t        getMaxOrder() const {return _grouping->getMaxOrder();};
+    size_t        getMaxOrder() const {return _max_order;};//_grouping->getMaxOrder();};
     size_t        getClusterNum(int order) const {return _cluster_index_list[order].size();};
 
     uvec          getMPI_ClusterLength(int worker_id) const {return _data.jobTable.col(worker_id);};
@@ -53,6 +53,7 @@ public:
 
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
 private:
+    size_t           _max_order;
     cSpinGrouping *  _grouping;
     CLST_IDX_LIST    _cluster_index_list;
     cSpinCollection  _spin_collection;

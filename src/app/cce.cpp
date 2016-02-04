@@ -48,8 +48,6 @@ int  main(int argc, char* argv[])
         spin_clusters=cSpinCluster(spin_collection, &dfpt);
         spin_clusters.make();
 
-        cout << spin_clusters << endl;
-
         data = new double * [maxOrder];
         for(int cce_order = 0; cce_order<maxOrder; ++cce_order)
             data[cce_order] = new double [nTime * spin_clusters.getClusterNum(cce_order)];
@@ -68,12 +66,12 @@ int  main(int argc, char* argv[])
         {
             uvec clstNum = spin_clusters.getMPI_ClusterLength(i);
             MPI_Send(clstNum.memptr(), maxOrder, MPI_UNSIGNED, i, 0, MPI_COMM_WORLD);
-
+            
             vector<umat> clstMatList = spin_clusters.getMPI_Cluster(i);
             for(int j=0; j<maxOrder; ++j)
             {
-                umat clstMat = clstMatList[j];
-                MPI_Send(clstMat.memptr(), (j+1)*clstNum(j), MPI_UNSIGNED, i, j+1, MPI_COMM_WORLD);
+                umat clstMat_j = clstMatList[j];
+                MPI_Send(clstMat_j.memptr(), (j+1)*clstNum(j), MPI_UNSIGNED, i, j+1, MPI_COMM_WORLD);
             }
         }
 
@@ -131,7 +129,9 @@ int  main(int argc, char* argv[])
         ////////////////////////////////////////////////////////////////////////////////
         //{{{ Gathering Data
         if(my_rank != 0)
+        {
             MPI_Send(resMat.memptr(), nTime*clst_num, MPI_DOUBLE, 0, 100+my_rank, MPI_COMM_WORLD);
+        }
         else
         {
             memcpy(data[cce_order], resMat.memptr(), nTime*clst_num*sizeof(double));
@@ -251,8 +251,6 @@ DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list)
     ds.addStateComponent(p);
     ds.make();
     ds.makeVector();
-    //cout << ds.getVector() << endl;
-    //cout << ds.getMatrix() << endl;
     return ds;
 }
 //}}}

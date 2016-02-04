@@ -13,6 +13,7 @@ cSpinCluster::cSpinCluster(const cSpinCollection& sc, cSpinGrouping * grouping)
 {
     _grouping = grouping;
     _spin_collection = sc;
+    _max_order = grouping->getMaxOrder();
 }
 
 cSpinCluster::~cSpinCluster()
@@ -29,6 +30,7 @@ void cSpinCluster::make()
 cSpinCluster::cSpinCluster(const cSpinCollection& sc, const uvec& clstLength, const vector<umat>& clstMatList)
 {
     _spin_collection = sc;
+    _max_order = clstMatList.size();
     for(int i=0; i<clstMatList.size(); ++i)
     {
         umat fix_order_mat = clstMatList[i];
@@ -94,6 +96,7 @@ void cSpinCluster::MPI_partition(int nWorker)
 vector<umat> cSpinCluster::getMPI_Cluster(int worker_id)
 {
     vector<umat> res;
+    //for(int i=0; i<_data.nOrder; ++i)
     for(int i=0; i<getMaxOrder(); ++i)
         res.push_back( _data.clusterData[i][worker_id] );
     return res;
