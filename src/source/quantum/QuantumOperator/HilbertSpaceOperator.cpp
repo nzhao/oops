@@ -4,18 +4,25 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  HilbertSpaceOperator
 HilbertSpaceOperator::HilbertSpaceOperator()
-{ LOG(INFO) << "Default constructor: HilbertSpaceOperator."; }
+{ //LOG(INFO) << "Default constructor: HilbertSpaceOperator.";
+}
 
 HilbertSpaceOperator::~HilbertSpaceOperator()
-{ LOG(INFO) << "Default destructor: HilbertSpaceOperator."; }
+{ //LOG(INFO) << "Default destructor: HilbertSpaceOperator.";
+}
 
 HilbertSpaceOperator::HilbertSpaceOperator(const vector<cSPIN>& spin_list)
-{ LOG(INFO) << "constructor of HilbertSpaceOperator with spin_list.";
+{ //LOG(INFO) << "constructor of HilbertSpaceOperator with spin_list.";
     _spin_list = spin_list;
     //for(auto spin: _spin_list)
     //    _dim_list.push_back( spin.get_dimension() );
+    _dimension = 1;
     for(int i=0; i<_spin_list.size(); ++i)
-        _dim_list.push_back( _spin_list[i].get_dimension() );
+    {
+        int dim = _spin_list[i].get_dimension(); 
+        _dim_list.push_back( dim );
+        _dimension *= dim;
+    }
 }
 
 void HilbertSpaceOperator::addInteraction(cSpinInteraction& spin_interaction)
@@ -29,12 +36,6 @@ void HilbertSpaceOperator::make()
     _kron_form = _interaction_list[0].getSumKronProd();
     for(int i=1; i<_interaction_list.size(); ++i)
         _kron_form = _kron_form + _interaction_list[i].getSumKronProd();
-
-    _dim_list = _kron_form.getDimList();
-    _dimension = 1;
-    for(int i=0; i<_dim_list.size(); ++i)
-        _dimension *= _dim_list[i];
-
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,11 +45,13 @@ void HilbertSpaceOperator::make()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Hamiltonian
 Hamiltonian::Hamiltonian()
-{ LOG(INFO) << "Default constructor: Hamiltonian";}
+{ //LOG(INFO) << "Default constructor: Hamiltonian";
+}
 
 
 Hamiltonian::~Hamiltonian()
-{ LOG(INFO) << "Default destructor: Hamiltonian";}
+{ //LOG(INFO) << "Default destructor: Hamiltonian";
+}
 
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

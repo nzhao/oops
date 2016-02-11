@@ -4,16 +4,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolutionAlgorithm
 QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm()
-{ LOG(INFO) << "Default constructor: QuantumEvolutionAlgorithm";}
+{ //LOG(INFO) << "Default constructor: QuantumEvolutionAlgorithm";
+}
 
 QuantumEvolutionAlgorithm::QuantumEvolutionAlgorithm(QuantumOperator& op, QuantumState& st)
 {
     _operator_ptr = &op;
     _init_state_ptr = &st;
+    _state_dimension = st.getDimension()*st.getDimension();
 }
 
 QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()
-{ LOG(INFO) << "Default destructor: QuantumEvolutionAlgorithm";}
+{ //LOG(INFO) << "Default destructor: QuantumEvolutionAlgorithm";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -22,7 +25,8 @@ QuantumEvolutionAlgorithm::~QuantumEvolutionAlgorithm()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SimpleFullMatrixVectorEvolution
 SimpleFullMatrixVectorEvolution::SimpleFullMatrixVectorEvolution()
-{ LOG(INFO) << "Default constructor: SimpleFullMatrixVectorEvolution";}
+{ //LOG(INFO) << "Default constructor: SimpleFullMatrixVectorEvolution";
+}
 
 void SimpleFullMatrixVectorEvolution::perform()
 {
@@ -50,10 +54,10 @@ void SimpleFullMatrixVectorEvolution::perform()
     for(int i=0; i<_time_list.size(); ++i)
     {
         double t_next = _time_list[i];
-        cout << "Evolving form t=" << t_now << " to t=" << t_next << " ... " << endl;
+        //cout << "Evolving form t=" << t_now << " to t=" << t_next << " ... " << endl;
         dt = t_next - t_now;
         state_next = expmat( -1.0*dt*II*_matrix ) * state_now;
-        cout << state_next << endl;
+        //cout << state_next << endl;
 
         _vector_list.push_back( state_next );
 
@@ -63,6 +67,7 @@ void SimpleFullMatrixVectorEvolution::perform()
 }
 
 SimpleFullMatrixVectorEvolution::~SimpleFullMatrixVectorEvolution()
-{ LOG(INFO) << "Default destructor: SimpleFullMatrixVectorEvolution";}
+{ //LOG(INFO) << "Default destructor: SimpleFullMatrixVectorEvolution";
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

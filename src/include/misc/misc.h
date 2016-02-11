@@ -13,5 +13,7 @@ vec dipole(const cSPIN& spin1, const cSPIN& spin2);
 
 vec r_vect(const cSPIN& obj1, const cSPIN& obj2);
 
-vec zeeman(const cSPIN&spin, const vec& magB);
+vec zeeman(const cSPIN& spin, const vec& magB);
+
+vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_mat& source_state_vect);
 #endif
