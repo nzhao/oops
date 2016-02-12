@@ -1,8 +1,10 @@
 let g:alternateSearchPath = '
+            \wdr:include/app,
             \wdr:include/kron,
             \wdr:include/misc,
             \wdr:include/quantum,
             \wdr:include/spin,
+            \wdr:source/app,
             \wdr:source/kron,
             \wdr:source/misc,
             \wdr:source/quantum/QuantumOperator,

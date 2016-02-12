@@ -18,6 +18,7 @@ public:
     size_t  getStateDim() const {return _state_dimension;};
     vector<cx_vec> getResult() const {return _vector_list;};
     cx_vec getInitalState() const {return _init_state_ptr->getVector();}; 
+    size_t getMatrixDim() const {return _init_state_ptr->getDimension();}
 
     virtual void perform()=0;
 protected:
@@ -43,6 +44,7 @@ public:
     SimpleFullMatrixVectorEvolution();
     SimpleFullMatrixVectorEvolution(QuantumOperator& op, QuantumState& st):QuantumEvolutionAlgorithm(op, st){};
     ~SimpleFullMatrixVectorEvolution();
+
 
 
     void perform();

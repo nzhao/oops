@@ -2,7 +2,7 @@
 # If you have Malab installed, pleas set $(HAS_MATLAB) = true, 
 # and define $(MATLAB_LIB_PATH) and $(MATLAB_INC_PATH) in your .bashrc file.
 
-DESTINATION := ../bin/cce
+DESTINATION := ../bin/cce_solution
 LIBS :=  $(ARMA_LIB) 
 LIBPATH := .  
 INCLUDES := .  $(ARMA_INC_PATH) 

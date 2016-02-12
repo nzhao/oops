@@ -33,6 +33,7 @@ class cSpinCluster
 {
 public:
     cSpinCluster();
+    cSpinCluster(const cSpinCluster& clst);
     cSpinCluster(const cSpinCollection& sc, cSpinGrouping * grouping);
     cSpinCluster(const cSpinCollection& sc, const uvec& clstLength, const vector<umat>& clstMatList);
     ~cSpinCluster();

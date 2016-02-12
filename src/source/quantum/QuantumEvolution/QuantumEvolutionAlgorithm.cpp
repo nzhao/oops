@@ -51,7 +51,7 @@ void SimpleFullMatrixVectorEvolution::perform()
     //    t_now = t_next;
     //    state_now = state_next;
     //}
-    for(int i=0; i<_time_list.size(); ++i)
+    for(int i=1; i<_time_list.size(); ++i)
     {
         double t_next = _time_list[i];
         //cout << "Evolving form t=" << t_now << " to t=" << t_next << " ... " << endl;
