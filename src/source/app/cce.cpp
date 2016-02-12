@@ -11,11 +11,15 @@ CCE::CCE(int my_rank, int work_num)
 
 void CCE::run()
 {
+    _center_spin_coord << 0.0 << 0.0 << 0.0;
+    _center_spin_isotope = "E";
+    _bath_spin_filename = "../bin/RoyCoord.xyz";
     _cut_off_dist = 6.0;
     _max_order = 3;
     _nTime = 100;
     _magB << 0.0e-4 << 0.0e-4 << 1.0e-4;
-    _t0 = 0.0; _t1 = 0.000005;
+    _t0 = 0.0; 
+    _t1 = 0.000005;
 
     create_center_spin();
     create_bath_spins();
@@ -28,25 +32,16 @@ void CCE::run()
 
 cSPIN CCE::create_center_spin()
 {
-    string isotope="E";
-
-    double coord[] = {0.0, 0.0, 0.0};
-    vector<double> coordinate(coord, coord+3);
-
-    cSPIN espin=cSPIN(coordinate, isotope);
-
-    _center_spin = espin;
-    return espin;
+    _center_spin=cSPIN(_center_spin_coord, _center_spin_isotope);
+    return _center_spin;
 }
 
 cSpinCollection CCE::create_bath_spins()
 {
-    cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
-    cSpinCollection sc(&spin_file);
-    sc.make();
-
-    _bath_spins = sc;
-    return sc;
+    cSpinSourceFromFile spin_file(_bath_spin_filename);
+    _bath_spins = cSpinCollection(&spin_file);
+    _bath_spins.make();
+    return _bath_spins;
 }
 
 void CCE::create_spin_clusters()
@@ -60,11 +55,10 @@ void CCE::create_spin_clusters()
     }
 
     job_distribution();
-
 }
 
 void CCE::job_distribution()
-{
+{/*{{{*/
     uvec clstLength;     vector<umat> clstMat;
     if(_my_rank == 0)
     {
@@ -105,7 +99,7 @@ void CCE::job_distribution()
         }
     }
     _my_clusters = cSpinCluster(_bath_spins, clstLength, clstMat);
-}
+}/*}}}*/
 
 void CCE::run_each_clusters()
 {
@@ -122,7 +116,7 @@ void CCE::run_each_clusters()
     }
 }
 void CCE::DataGathering(const mat& resMat, int cce_order, int clst_num)
-{
+{/*{{{*/
 
     if(_my_rank != 0)
         MPI_Send(resMat.memptr(), _nTime*clst_num, MPI_DOUBLE, 0, 100+_my_rank, MPI_COMM_WORLD);
@@ -143,7 +137,7 @@ void CCE::DataGathering(const mat& resMat, int cce_order, int clst_num)
 
         delete [] cce_evolve_data;
     }
-}
+}/*}}}*/
 
 void CCE::post_treatment()
 {
@@ -156,7 +150,7 @@ void CCE::post_treatment()
 }
 
 void CCE::cce_coherence_reduction()
-{
+{/*{{{*/
     for(int cce_order = 0; cce_order<_max_order; ++cce_order)
     {
         mat tilder_mat =  ones( size(_cce_evovle_result[cce_order]) );
@@ -175,9 +169,10 @@ void CCE::cce_coherence_reduction()
         _cce_evovle_result_tilder.push_back( tilder_mat );
     }
 
-}
+}/*}}}*/
+
 void CCE::compuate_final_coherence()
-{
+{/*{{{*/
     _final_result = mat(_nTime, _max_order+1, fill::zeros);
     vec final_res_vec = ones<vec> (_nTime);
     for(int cce_order = 0; cce_order<_max_order; ++cce_order)
@@ -189,22 +184,21 @@ void CCE::compuate_final_coherence()
         final_res_vec = final_res_vec % res_vec;
     }
     _final_result.col(_max_order)= final_res_vec;
-}
+}/*}}}*/
 
-void CCE::export_mat_file() {/*{{{*/
+void CCE::export_mat_file() 
+{/*{{{*/
 #ifdef HAS_MATLAB
     cout << "begin post_treatement ... storing cce_data to file" << endl;
+    string filename = "cce_res.mat";
+    MATFile *mFile = matOpen(filename.c_str(), "w");
     for(int i=0; i<_max_order; ++i)
     {
         char i_str [10];
         sprintf(i_str, "%d", i);
         string idx_str = i_str;
-        string label = "cce_res_" + idx_str;
-        string label1 = "cce_res_" + idx_str+"tilder";
-        string filename = label + ".mat";
-        string filename1 = label1 + ".mat";
-        cout << "exporting " << filename << endl;
-        cout << "exporting " << filename1 << endl;
+        string label = "CCE" + idx_str;
+        string label1 = "CCE" + idx_str+"_tilder";
         
         size_t nClst = _spin_clusters.getClusterNum(i);
         mxArray *pArray = mxCreateDoubleMatrix(_nTime, nClst, mxREAL);
@@ -214,13 +208,8 @@ void CCE::export_mat_file() {/*{{{*/
         memcpy((void *)(mxGetPr(pArray)), (void *) _cce_evovle_result[i].memptr(), length*sizeof(double));
         memcpy((void *)(mxGetPr(pArray1)), (void *) _cce_evovle_result_tilder[i].memptr(), length*sizeof(double));
         
-        MATFile *mFile = matOpen(filename.c_str(), "w");
         matPutVariableAsGlobal(mFile, label.c_str(), pArray);
-        matClose(mFile);
-        
-        MATFile *mFile1 = matOpen(filename1.c_str(), "w");
-        matPutVariableAsGlobal(mFile1, label1.c_str(), pArray1);
-        matClose(mFile1);
+        matPutVariableAsGlobal(mFile, label1.c_str(), pArray1);
         
         mxDestroyArray(pArray);
         mxDestroyArray(pArray1);
@@ -229,11 +218,9 @@ void CCE::export_mat_file() {/*{{{*/
     mxArray *pRes = mxCreateDoubleMatrix(_nTime, _max_order+1, mxREAL);
     size_t length= _nTime*(_max_order+1);
     memcpy((void *)(mxGetPr(pRes)), (void *) _final_result.memptr(), length*sizeof(double));
-    MATFile *mRes = matOpen("final_result.mat", "w");
-    matPutVariableAsGlobal(mRes, "final_result", pRes);
-    matClose(mRes);
+    matPutVariableAsGlobal(mFile, "final_result", pRes);
     mxDestroyArray(pRes);
-    
+    matClose(mFile);
 #endif
 }/*}}}*/
 //}}}

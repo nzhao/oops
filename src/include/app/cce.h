@@ -13,6 +13,9 @@ public:
     cSpinCluster    getSpinClusters() const {return _my_clusters;}
     vector<mat>     getResultMatrix() const {return _cce_evovle_result;}
 protected:
+    vec              _center_spin_coord;
+    string           _center_spin_isotope;
+    string           _bath_spin_filename;
     double           _t0;
     double           _t1;
     int              _nTime;
