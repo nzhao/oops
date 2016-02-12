@@ -57,7 +57,6 @@ void CCE::create_spin_clusters()
         cDepthFirstPathTracing dfpt(c, _max_order);
         _spin_clusters=cSpinCluster(_bath_spins, &dfpt);
         _spin_clusters.make();
-        cout << _spin_clusters << endl;
     }
 
     job_distribution();
