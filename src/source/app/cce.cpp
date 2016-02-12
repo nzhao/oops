@@ -13,7 +13,12 @@ void CCE::run()
 {
     _center_spin_coord << 0.0 << 0.0 << 0.0;
     _center_spin_isotope = "E";
-    _bath_spin_filename = "../bin/RoyCoord.xyz";
+
+    strcpy(_bath_spin_filename, PROJECT_PATH); 
+    strcpy(_result_filename, PROJECT_PATH); 
+    strcat(_bath_spin_filename, "/dat/input/RoyCoord.xyz");
+    strcat(_result_filename, "/dat/output/cce_res.mat");
+
     _cut_off_dist = 6.0;
     _max_order = 3;
     _nTime = 100;
@@ -189,9 +194,8 @@ void CCE::compuate_final_coherence()
 void CCE::export_mat_file() 
 {/*{{{*/
 #ifdef HAS_MATLAB
-    cout << "begin post_treatement ... storing cce_data to file" << endl;
-    string filename = "cce_res.mat";
-    MATFile *mFile = matOpen(filename.c_str(), "w");
+    cout << "begin post_treatement ... storing cce_data to file: " << _result_filename << endl;
+    MATFile *mFile = matOpen(_result_filename, "w");
     for(int i=0; i<_max_order; ++i)
     {
         char i_str [10];

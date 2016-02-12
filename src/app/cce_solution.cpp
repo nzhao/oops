@@ -1,15 +1,28 @@
 #include "include/app/cce.h"
+#include <cstdlib>
 
 _INITIALIZE_EASYLOGGINGPP
 
+char PROJECT_PATH[500];
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
 int  main(int argc, char* argv[])
 {
+    char *env_path = std::getenv("CCE_PROJ_PATH");
+    if(env_path!=NULL)
+        strcpy(PROJECT_PATH, env_path);
+    else
+        getcwd(PROJECT_PATH, sizeof(PROJECT_PATH));
+
+    char log_path[500];
+    strcpy(log_path, PROJECT_PATH);
+    strcat(log_path, "/dat/log/log.conf"); 
+
     _START_EASYLOGGINGPP(argc, argv);
-    easyloggingpp::Configurations confFromFile("../src/logs/log.conf");  // Load configuration from file
+    easyloggingpp::Configurations confFromFile(log_path);  // Load configuration from file
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
 
+    
     int worker_num(0), my_rank(0);
     int mpi_status = MPI_Init(&argc, &argv);
     assert (mpi_status == MPI_SUCCESS);

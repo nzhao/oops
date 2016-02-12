@@ -1,5 +1,7 @@
 #include "include/oops.h"
 
+extern char PROJECT_PATH[];
+
 class CCE
 {
 public:
@@ -15,7 +17,8 @@ public:
 protected:
     vec              _center_spin_coord;
     string           _center_spin_isotope;
-    string           _bath_spin_filename;
+    char             _bath_spin_filename[500];
+    char             _result_filename[500];
     double           _t0;
     double           _t1;
     int              _nTime;
