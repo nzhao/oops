@@ -1,4 +1,5 @@
 #include "include/app/cce.h"
+#include "include/misc/xmlreader.h"
 #include <cstdlib>
 
 _INITIALIZE_EASYLOGGINGPP
@@ -18,9 +19,20 @@ int  main(int argc, char* argv[])
     strcpy(log_path, PROJECT_PATH);
     strcat(log_path, "/dat/log/log.conf"); 
 
+    char cfg_path[500];
+    strcpy(cfg_path, PROJECT_PATH);
+    strcat(cfg_path, "/dat/config/config.xml");
+    ConfigXML cfg(cfg_path);
+    cfg.printParameters();
+
+    cout << "cut_off = " << cfg.getDoubleParameter("cut_off") << endl;
+    cout << "maxorder = " << cfg.getIntParameter("maxorder") << endl;
+    cout << "method = " << cfg.getStringParameter("method") << endl;
+
+
     _START_EASYLOGGINGPP(argc, argv);
-    easyloggingpp::Configurations confFromFile(log_path);  // Load configuration from file
-    easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
+    easyloggingpp::Configurations confFromFile(log_path);
+    easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile);
 
     
     int worker_num(0), my_rank(0);
