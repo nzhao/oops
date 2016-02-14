@@ -35,7 +35,7 @@ vec ClusterCoherenceEvolution::calc_obs()
         stateMat.row(i) = trans( state[i] );
 
     cx_vec init_state_vect =  _kernel->getInitalState();
-    vec res = real(stateMat*init_state_vect);
+    vec res = _kernel->getMatrixDim() * real(stateMat*init_state_vect);
     return res;
 }
 

@@ -69,6 +69,22 @@ cx_mat KronProd::full()
     return _coeff*res;
 }
 
+cx_vec KronProd::vecterize()
+{
+    vector<cx_mat> all_mat;
+    for(int i=0; i<_dim_list.size(); ++i)
+        all_mat.push_back( eye<cx_mat>(_dim_list[i], _dim_list[i]) );
+
+    for(int i=0; i<_spin_index.size(); ++i)
+        all_mat[ _spin_index[i] ] = _mat[i];
+
+    cx_vec res=vectorise(all_mat[0]);
+    for(int i=1; i<all_mat.size(); ++i)
+        res=kron(res, vectorise(all_mat[i]) );
+
+    return _coeff*res;
+}
+
 KronProd Expand(const KronProd& kp, MatExpanFunc* expan_func)
 {
     DIM_LIST new_dim;
@@ -139,6 +155,14 @@ cx_mat SumKronProd::full()
     cx_mat res = _kron_prod_list[0].full();
     for(int i=1; i<_kron_prod_list.size(); ++i)
         res = res + _kron_prod_list[i].full();
+    return res;
+}
+
+cx_vec SumKronProd::vecterize()
+{
+    cx_vec res = _kron_prod_list[0].vecterize();
+    for(int i=1; i<_kron_prod_list.size(); ++i)
+        res = res + _kron_prod_list[i].vecterize();
     return res;
 }
 

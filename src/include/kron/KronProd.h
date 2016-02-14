@@ -37,6 +37,7 @@ public:
     ~KronProd();
 
     cx_mat      full();
+    cx_vec      vecterize();
     void        fill(INDICES idx, MULTIPLIER coeff, TERM mat);
     KronProd&   scale(double factor) { _coeff *= factor; return *this;};
     DIM_LIST    getDimList(){return _dim_list;};
@@ -65,6 +66,7 @@ public:
     ~SumKronProd();
 
     cx_mat full();
+    cx_vec vecterize();
     vector<KronProd> getKronProdList(){return _kron_prod_list;};
     DIM_LIST getDimList(){return _dim_list;};
 

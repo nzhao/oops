@@ -27,6 +27,14 @@ void cSpinCluster::make()
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
 }
+
+cSpinCluster::cSpinCluster(const cSpinCluster& clst)
+{
+    _spin_collection = clst._spin_collection;
+    _max_order = clst._max_order;//clst.getMaxOrder();
+    _cluster_index_list = clst._cluster_index_list;//clst.getClusterIndex();
+}
+
 cSpinCluster::cSpinCluster(const cSpinCollection& sc, const uvec& clstLength, const vector<umat>& clstMatList)
 {
     _spin_collection = sc;

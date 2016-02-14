@@ -27,6 +27,7 @@
 
 #include "include/kron/KronProd.h"
 #include "include/misc/misc.h"
+#include "include/misc/xmlreader.h"
 
 #include "include/quantum/HilbertSpaceOperator.h"
 #include "include/quantum/LiouvilleSpaceOperator.h"

@@ -2,7 +2,7 @@
 # If you have Malab installed, pleas set $(HAS_MATLAB) = true, 
 # and define $(MATLAB_LIB_PATH) and $(MATLAB_INC_PATH) in your .bashrc file.
 
-DESTINATION := ../bin/cce
+DESTINATION := ../bin/cce_solution
 LIBS :=  $(ARMA_LIB) 
 LIBPATH := .  
 INCLUDES := .  $(ARMA_INC_PATH) 
@@ -22,7 +22,7 @@ ifeq ($(HAS_MATLAB), true)
 	INCLUDES += $(MATLAB_INC_PATH)
 endif
 
-SOURCE := $(wildcard app/*.$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
+SOURCE := $(wildcard application/*.$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
 OBJS := $(patsubst %.$(PS),%.o,$(notdir $(SOURCE)))
 DEPS := $(patsubst %.o,%.d,$(OBJS))
 
