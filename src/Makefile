@@ -22,7 +22,7 @@ ifeq ($(HAS_MATLAB), true)
 	INCLUDES += $(MATLAB_INC_PATH)
 endif
 
-SOURCE := $(wildcard app/*.$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
+SOURCE := $(wildcard application/*.$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
 OBJS := $(patsubst %.$(PS),%.o,$(notdir $(SOURCE)))
 DEPS := $(patsubst %.o,%.d,$(OBJS))
 
