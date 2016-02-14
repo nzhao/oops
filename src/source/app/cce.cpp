@@ -2,30 +2,24 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  CCE
-
-CCE::CCE(int my_rank, int work_num)
+CCE::CCE(int my_rank, int worker_num, const string& config_file)
 { 
     _my_rank = my_rank;
-    _worker_num = work_num;
+    _worker_num = worker_num;
+    
+    char cfg_path[500];
+    strcpy(cfg_path, PROJECT_PATH);
+    strcat(cfg_path, "/dat/config/");
+    strcat(cfg_path, config_file.c_str() );
+    _cfg = ConfigXML(cfg_path);
+
+    if(my_rank == 0)
+        _cfg.printParameters();
 }
 
 void CCE::run()
 {
-    _center_spin_coord << 0.0 << 0.0 << 0.0;
-    _center_spin_isotope = "E";
-
-    strcpy(_bath_spin_filename, PROJECT_PATH); 
-    strcpy(_result_filename, PROJECT_PATH); 
-    strcat(_bath_spin_filename, "/dat/input/RoyCoord.xyz");
-    strcat(_result_filename, "/dat/output/cce_res.mat");
-
-    _cut_off_dist = 6.0;
-    _max_order = 3;
-    _nTime = 100;
-    _magB << 0.0e-4 << 0.0e-4 << 1.0e-4;
-    _t0 = 0.0; 
-    _t1 = 0.000005;
-
+    set_parameters();
     create_center_spin();
     create_bath_spins();
     create_spin_clusters();
@@ -234,10 +228,44 @@ void CCE::export_mat_file()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  EnsembleCCE
-EnsembleCCE::EnsembleCCE(int my_rank, int worker_num)
+EnsembleCCE::EnsembleCCE(int my_rank, int worker_num, const string& config_file)
 { 
     _my_rank = my_rank;
     _worker_num = worker_num;
+
+    char cfg_path[500];
+    strcpy(cfg_path, PROJECT_PATH);
+    strcat(cfg_path, "/dat/config/");
+    strcat(cfg_path, config_file.c_str() );
+    _cfg = ConfigXML(cfg_path);
+
+    if(my_rank == 0)
+        _cfg.printParameters();
+}
+
+void EnsembleCCE::set_parameters()
+{
+    strcpy(_bath_spin_filename, PROJECT_PATH); 
+    strcpy(_result_filename, PROJECT_PATH); 
+    strcat(_bath_spin_filename, "/dat/input/RoyCoord.xyz");
+    strcat(_result_filename, "/dat/output/cce_res.mat");
+
+    double x = _cfg.getDoubleParameter("CenterSpin", "coordinateX");
+    double y = _cfg.getDoubleParameter("CenterSpin", "coordinateY");
+    double z = _cfg.getDoubleParameter("CenterSpin", "coordinateZ");
+    _center_spin_coord << x << y << z;
+
+    _center_spin_isotope = _cfg.getStringParameter("CenterSpin", "isotope");
+    _cut_off_dist        = _cfg.getDoubleParameter("SpinBath", "cut_off_dist");
+    _max_order           = _cfg.getIntParameter("CCE", "max_order");
+    _nTime               = _cfg.getIntParameter("Dynamics", "nTime");
+    _t0                  = _cfg.getDoubleParameter("Dynamics", "t0"); 
+    _t1                  = _cfg.getDoubleParameter("Dynamics", "t1"); 
+
+    double magBx = _cfg.getDoubleParameter("Condition", "magnetic_fieldX");
+    double magBy = _cfg.getDoubleParameter("Condition", "magnetic_fieldY");
+    double magBz = _cfg.getDoubleParameter("Condition", "magnetic_fieldZ");
+    _magB << magBx << magBy << magBz; 
 }
 
 vec EnsembleCCE::cluster_evolution(int cce_order, int index)

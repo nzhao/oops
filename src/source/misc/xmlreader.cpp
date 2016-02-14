@@ -2,16 +2,17 @@
 
 ConfigXML::ConfigXML(string filename)
 {
-    //xml_document<> _doc;
-    //xml_node<> * root_node;
+    xml_document<> doc;
+    xml_node<> *   root_node;
+
     ifstream theFile (filename);
     vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
     buffer.push_back('\0');
 
-    _doc.parse<0>(&buffer[0]);
-    _root_node = _doc.first_node();
+    doc.parse<0>(&buffer[0]);
+    root_node = doc.first_node();
 
-    for (xml_node<> * section = _root_node->first_node(); section; section = section->next_sibling())
+    for (xml_node<> * section = root_node->first_node(); section; section = section->next_sibling())
     {
         int count = 0;
         string section_name = section->name();
@@ -20,54 +21,60 @@ ConfigXML::ConfigXML(string filename)
             string item_name =  item->name();
             string item_type = item->first_attribute("type")->value();
             string item_value = item->value();
-            _parameters[item_name] = make_pair(item_type, item_value);
+            _parameters[make_pair(section_name, item_name)] = make_pair(item_type, item_value);
             count++;
         }
-        cout << "Section: " << section_name << ", " << count << " parameters read." << endl;
     }
 
 }
 
-void ConfigXML::printParameters()
+void ConfigXML::printParameters() const
 {
-    PARA_MAP::iterator pos;
+    PARA_MAP::const_iterator pos;
+    cout << endl;
+    cout << "##################### parameters #####################" << endl;
     for(pos = _parameters.begin(); pos != _parameters.end(); ++pos)
     {
-        cout << "para: " << pos->first << "\t" ;
+        cout << "para: " << (pos->first).first << ":" << (pos->first).second << "\t" ;
         cout << "type: " << (pos->second).first << "\t";
         cout << "value: " << (pos->second).second << endl; 
     }
+    cout << "######################################################" << endl;
+    cout << endl;
 }
 
-int ConfigXML::getIntParameter(string name)
+int ConfigXML::getIntParameter(string section_name, string para_name) const
 {
+    pair<string, string> name = make_pair(section_name, para_name);
     if( !strcmp(_parameters[name].first.c_str(), "int") )
         return atoi(_parameters[name].second.c_str());
     else
     {
-        cout  << "Wrong parameter type: " << name << " is not INT type" << endl;;
+        cout  << "Wrong parameter type: " << name.first << ":" << name.second << " is not INT type" << endl;;
         return DEFAULT_INT_PARAMETER;
     }
 }
 
-double ConfigXML::getDoubleParameter(string name)
+double ConfigXML::getDoubleParameter(string section_name, string para_name) const
 {
+    pair<string, string> name = make_pair(section_name, para_name);
     if( !strcmp(_parameters[name].first.c_str(), "double") )
         return atof(_parameters[name].second.c_str());
     else
     {
-        cout  << "Wrong parameter type: " << name << " is not DOUBLE type" << endl;;
+        cout  << "Wrong parameter type: " << name.first << ":" << name.second << " is not DOUBLE type" << endl;;
         return DEFAULT_DOUBLE_PARAMETER;
     }
 }
 
-string ConfigXML::getStringParameter(string name)
+string ConfigXML::getStringParameter(string section_name, string para_name) const
 {
+    pair<string, string> name = make_pair(section_name, para_name);
     if( !strcmp(_parameters[name].first.c_str(), "char") )
         return _parameters[name].second;
     else
     {
-        cout  << "Wrong parameter type: " << name << " is not CHAR type" << endl;;
+        cout  << "Wrong parameter type: " << name.first << ":" << name.second << " is not CHAR type" << endl;;
         return DEFAULT_STRING_PARAMETER;
     }
 }

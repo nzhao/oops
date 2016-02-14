@@ -9,6 +9,7 @@
 #include "include/kron/KronProd.h"
 
 using namespace std;
+extern char PROJECT_PATH[];
 
 /// \defgroup Quantum Quantum
 /// @{

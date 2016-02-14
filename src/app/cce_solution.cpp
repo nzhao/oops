@@ -4,7 +4,7 @@
 
 _INITIALIZE_EASYLOGGINGPP
 
-char PROJECT_PATH[500];
+char      PROJECT_PATH[500];
 cSPINDATA SPIN_DATABASE=cSPINDATA();
 
 int  main(int argc, char* argv[])
@@ -18,17 +18,6 @@ int  main(int argc, char* argv[])
     char log_path[500];
     strcpy(log_path, PROJECT_PATH);
     strcat(log_path, "/dat/log/log.conf"); 
-
-    char cfg_path[500];
-    strcpy(cfg_path, PROJECT_PATH);
-    strcat(cfg_path, "/dat/config/config.xml");
-    ConfigXML cfg(cfg_path);
-    cfg.printParameters();
-
-    cout << "cut_off = " << cfg.getDoubleParameter("cut_off") << endl;
-    cout << "maxorder = " << cfg.getIntParameter("maxorder") << endl;
-    cout << "method = " << cfg.getStringParameter("method") << endl;
-
 
     _START_EASYLOGGINGPP(argc, argv);
     easyloggingpp::Configurations confFromFile(log_path);
@@ -44,7 +33,7 @@ int  main(int argc, char* argv[])
 
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
-    EnsembleCCE sol(my_rank, worker_num);
+    EnsembleCCE sol(my_rank, worker_num, "config.xml");
     sol.run();
 
     LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 

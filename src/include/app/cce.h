@@ -6,7 +6,7 @@ class CCE
 {
 public:
     CCE(): _my_rank(0), _worker_num(1) {};
-    CCE(int my_rank, int worker_num);
+    CCE(int my_rank, int worker_num, const string& config_file);
     ~CCE() {};
 	void run();
 
@@ -15,6 +15,7 @@ public:
     cSpinCluster    getSpinClusters() const {return _my_clusters;}
     vector<mat>     getResultMatrix() const {return _cce_evovle_result;}
 protected:
+    ConfigXML        _cfg;
     vec              _center_spin_coord;
     string           _center_spin_isotope;
     char             _bath_spin_filename[500];
@@ -39,6 +40,7 @@ protected:
     mat              _final_result;
 
 private:
+    virtual void     set_parameters()=0;
     cSPIN            create_center_spin();
     cSpinCollection  create_bath_spins();
     void             create_spin_clusters();
@@ -57,11 +59,12 @@ class EnsembleCCE:public CCE
 {
 public:
     EnsembleCCE(){};
-    EnsembleCCE(int my_rank, int worker_num);
+    EnsembleCCE(int my_rank, int worker_num, const string& config_file);
     ~EnsembleCCE(){};
 protected:
 
 private:
+    void set_parameters();
     vec cluster_evolution(int cce_order, int index);
     Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);

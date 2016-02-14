@@ -23,7 +23,12 @@ void QuantumOperator::saveMatrix(string filename)
     memcpy((void *)(mxGetPr(pArray)), (void *) m_r.memptr(), dim2*sizeof(double));
     memcpy((void *)(mxGetPi(pArray)), (void *) m_i.memptr(), dim2*sizeof(double));
     
-    MATFile *mFile = matOpen(filename.c_str(), "w");
+    char dbg_filename[500];
+    strcpy(dbg_filename, PROJECT_PATH);
+    strcat(dbg_filename, "/dat/debug/");
+    strcat(dbg_filename, filename.c_str());
+    cout << dbg_filename << endl;
+    MATFile *mFile = matOpen(dbg_filename, "w");
     matPutVariableAsGlobal(mFile, "OperatorMat", pArray);
     matClose(mFile);
 
