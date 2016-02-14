@@ -172,17 +172,20 @@ void CCE::cce_coherence_reduction()
 
 void CCE::compuate_final_coherence()
 {/*{{{*/
-    _final_result = mat(_nTime, _max_order+1, fill::zeros);
+    _final_result = mat(_nTime, _max_order, fill::zeros);
+    _final_result_each_order = mat(_nTime, _max_order, fill::zeros);
+
     vec final_res_vec = ones<vec> (_nTime);
     for(int cce_order = 0; cce_order<_max_order; ++cce_order)
     {
         vec res_vec = ones<vec> (_nTime);
         for(int j=0; j<_cce_evovle_result_tilder[cce_order].n_cols; ++j)
             res_vec = res_vec % _cce_evovle_result_tilder[cce_order].col(j);
-        _final_result.col(cce_order) = res_vec;
+        _final_result_each_order.col(cce_order) = res_vec;
+        
         final_res_vec = final_res_vec % res_vec;
+        _final_result.col(cce_order)= final_res_vec;
     }
-    _final_result.col(_max_order)= final_res_vec;
 }/*}}}*/
 
 void CCE::export_mat_file() 
@@ -213,11 +216,15 @@ void CCE::export_mat_file()
         mxDestroyArray(pArray1);
     }
 
-    mxArray *pRes = mxCreateDoubleMatrix(_nTime, _max_order+1, mxREAL);
-    size_t length= _nTime*(_max_order+1);
-    memcpy((void *)(mxGetPr(pRes)), (void *) _final_result.memptr(), length*sizeof(double));
-    matPutVariableAsGlobal(mFile, "final_result", pRes);
+    mxArray *pRes = mxCreateDoubleMatrix(_nTime, _max_order, mxREAL);
+    mxArray *pRes1 = mxCreateDoubleMatrix(_nTime, _max_order, mxREAL);
+    size_t length= _nTime*_max_order;
+    memcpy((void *)(mxGetPr(pRes)), (void *) _final_result_each_order.memptr(), length*sizeof(double));
+    memcpy((void *)(mxGetPr(pRes1)), (void *) _final_result.memptr(), length*sizeof(double));
+    matPutVariableAsGlobal(mFile, "final_result_each_order", pRes);
+    matPutVariableAsGlobal(mFile, "final_result", pRes1);
     mxDestroyArray(pRes);
+    mxDestroyArray(pRes1);
     matClose(mFile);
 #endif
 }/*}}}*/

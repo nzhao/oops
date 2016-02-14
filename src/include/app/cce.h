@@ -38,6 +38,7 @@ protected:
     vector<mat>      _cce_evovle_result;
     vector<mat>      _cce_evovle_result_tilder;
     mat              _final_result;
+    mat              _final_result_each_order;
 
 private:
     virtual void     set_parameters()=0;

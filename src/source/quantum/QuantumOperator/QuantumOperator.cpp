@@ -11,7 +11,7 @@ QuantumOperator::~QuantumOperator()
 }
 
 #ifdef HAS_MATLAB
-void QuantumOperator::saveMatrix(string filename)
+void QuantumOperator::saveMatrix(string name)
 {
     cx_mat m= this->getMatrix();
     mat m_r = real(m).t();
@@ -26,16 +26,17 @@ void QuantumOperator::saveMatrix(string filename)
     char dbg_filename[500];
     strcpy(dbg_filename, PROJECT_PATH);
     strcat(dbg_filename, "/dat/debug/");
-    strcat(dbg_filename, filename.c_str());
+    strcat(dbg_filename, name.c_str());
+    strcat(dbg_filename, ".mat");
     cout << dbg_filename << endl;
     MATFile *mFile = matOpen(dbg_filename, "w");
-    matPutVariableAsGlobal(mFile, "OperatorMat", pArray);
+    matPutVariableAsGlobal(mFile, name.c_str(), pArray);
     matClose(mFile);
 
     mxDestroyArray(pArray);
 }
 #else
-void QuantumOperator::saveMatrix(string filename)
+void QuantumOperator::saveMatrix(string name)
 {
     cout << "MATLAB not installed." << endl;
 }
