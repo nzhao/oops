@@ -5,7 +5,7 @@ ConfigXML::ConfigXML(string filename)
     xml_document<> doc;
     xml_node<> *   root_node;
 
-    ifstream theFile (filename);
+    ifstream theFile ( filename.c_str() );
     vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
     buffer.push_back('\0');
 
