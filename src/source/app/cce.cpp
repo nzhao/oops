@@ -113,7 +113,7 @@ void CCE::run_each_clusters()
         mat resMat(_nTime, clst_num, fill::ones);
         for(int i = 0; i < clst_num; ++i)
         {
-            cout << i << "/" << clst_num << endl;
+            cout << "my_rank = " << _my_rank << ": " << i << "/" << clst_num << endl;
             resMat.col(i) = cluster_evolution(cce_order, i);
         }
         
