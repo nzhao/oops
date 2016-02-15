@@ -47,7 +47,7 @@ vec zeeman(const cSPIN&spin, const vec& magB)
     return res;
 };
 
-vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_mat& source_state_vect)
+vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_vec& source_state_vect)
 {
     vec dip=dipole(spin, source_spin);
     mat dip_m = reshape(dip, 3, 3);
@@ -55,3 +55,31 @@ vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_mat& sour
     vec res = dip_m * s_vec;
     return res;
 };
+
+vector<double> Pulse_Timing(string pulsename, int n)
+{
+    vector<double> res;
+    res.push_back( 0.0 );
+    if( !strcmp(pulsename.c_str(), "CPMG") )
+    {
+        for(int i=0; i<n; ++i)
+            res.push_back( (2.0*i+1.0) / (2.0*n) ); 
+    }
+    else
+    {
+        cout << "Pulse type not supported." << endl;
+        assert(0);
+    }
+    res.push_back( 1.0 );
+    return res;
+}
+
+vector<double> Pulse_Interval(string pulsename, int n)
+{
+    vector<double> res;
+    vector<double> timings= Pulse_Timing(pulsename, n);
+    for(int i=0; i<=n; ++i)
+        res.push_back( timings[i+1] - timings[i] );
+    return res;
+}
+

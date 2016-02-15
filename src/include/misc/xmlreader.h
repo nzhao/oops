@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include "include/rapidxml-1.13/rapidxml.hpp"
+#include <iomanip>
 
 using namespace rapidxml;
 using namespace std;

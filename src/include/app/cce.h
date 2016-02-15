@@ -2,6 +2,8 @@
 
 extern char PROJECT_PATH[];
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{  CCE
 class CCE
 {
 public:
@@ -26,6 +28,8 @@ protected:
     int              _cut_off_dist;
     int              _max_order;
     vec              _magB;
+    string           _pulse_name;
+    int              _pulse_num;
 
     int              _my_rank;
     int              _worker_num;
@@ -55,7 +59,13 @@ private:
     void             compuate_final_coherence();
     void             export_mat_file();
 };
+//}}}
+////////////////////////////////////////////////////////////////////////////////
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{  EnsembleCCE
 class EnsembleCCE:public CCE
 {
 public:
@@ -71,3 +81,5 @@ private:
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
 };
+//}}}
+////////////////////////////////////////////////////////////////////////////////

@@ -1,29 +1,8 @@
 #include "include/quantum/QuantumEvolution.h"
 
-////////////////////////////////////////////////////////////////////////////////
-//{{{ QuantumEvolution 
-QuantumEvolution::QuantumEvolution()
-{ //LOG(INFO) << "Default constructor: QuantumEvolution";
-}
-
-QuantumEvolution::~QuantumEvolution()
-{ //LOG(INFO) << "Default destructor: QuantumEvolution";
-}
-
-//}}}
-////////////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ ClusterCoherenceEvolution
-ClusterCoherenceEvolution::ClusterCoherenceEvolution()
-{ //LOG(INFO) << "Default constructor: ClusterCoherenceEvolution";
-}
-
-ClusterCoherenceEvolution::~ClusterCoherenceEvolution()
-{ //LOG(INFO) << "Default destructor: ClusterCoherenceEvolution";
-}
-
 vec ClusterCoherenceEvolution::calc_obs()
 {
     _time_list = _kernel->getTimeSequence();

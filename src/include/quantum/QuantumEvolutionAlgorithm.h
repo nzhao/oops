@@ -9,22 +9,23 @@
 class QuantumEvolutionAlgorithm
 {
 public:
-    QuantumEvolutionAlgorithm();
+    QuantumEvolutionAlgorithm() {};
     QuantumEvolutionAlgorithm(QuantumOperator& op, QuantumState& st);
-    ~QuantumEvolutionAlgorithm();
+    ~QuantumEvolutionAlgorithm() {};
 
-    void setTimeSequence(const vec& tlist){_time_list = tlist;};
+    void setTimeSequence(double t0, double t1, int nt) { _time_list = linspace<vec>(t0, t1, nt); };
+    //void setTimeSequence(const vec& tlist){_time_list = tlist;};
     vec  getTimeSequence() const {return _time_list;};
     size_t  getStateDim() const {return _state_dimension;};
     vector<cx_vec> getResult() const {return _vector_list;};
-    cx_vec getInitalState() const {return _init_state_ptr->getVector();}; 
-    size_t getMatrixDim() const {return _init_state_ptr->getDimension();}
+    cx_vec getInitalState() const {return _init_state.getVector();}; 
+    size_t getMatrixDim() const {return _init_state.getDimension();}
 
     virtual void perform()=0;
 protected:
     vec              _time_list;
-    QuantumOperator* _operator_ptr;
-    QuantumState*    _init_state_ptr;
+    QuantumOperator  _operator;
+    QuantumState     _init_state;
     size_t           _state_dimension;
 
     cx_mat         _matrix;
@@ -41,15 +42,33 @@ private:
 class SimpleFullMatrixVectorEvolution:public QuantumEvolutionAlgorithm
 {
 public:
-    SimpleFullMatrixVectorEvolution();
+    SimpleFullMatrixVectorEvolution() {};
     SimpleFullMatrixVectorEvolution(QuantumOperator& op, QuantumState& st):QuantumEvolutionAlgorithm(op, st){};
-    ~SimpleFullMatrixVectorEvolution();
-
-
+    ~SimpleFullMatrixVectorEvolution() {};
 
     void perform();
 protected:
 private:
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ PiecewiseFullMatrixVectorEvolution
+class PiecewiseFullMatrixVectorEvolution:public QuantumEvolutionAlgorithm
+{
+public:
+    PiecewiseFullMatrixVectorEvolution() {};
+    PiecewiseFullMatrixVectorEvolution(const vector<QuantumOperator>& op_list, const vector<double>& time_segment, const QuantumState& st);
+    ~PiecewiseFullMatrixVectorEvolution() {};
+
+    void perform();
+protected:
+private:
+    vector<QuantumOperator> _op_list;
+    vector<double> _time_segment;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
