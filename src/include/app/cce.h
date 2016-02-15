@@ -1,4 +1,5 @@
 #include "include/oops.h"
+#include "include/app/DefectCenter.h"
 
 extern char PROJECT_PATH[];
 
@@ -20,6 +21,8 @@ protected:
     ConfigXML        _cfg;
     vec              _center_spin_coord;
     string           _center_spin_isotope;
+    PureState        _center_spin_state0;
+    PureState        _center_spin_state1;
     char             _bath_spin_filename[500];
     char             _result_filename[500];
     double           _t0;
@@ -77,7 +80,7 @@ protected:
 private:
     void set_parameters();
     vec cluster_evolution(int cce_order, int index);
-    Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
+    Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
 };

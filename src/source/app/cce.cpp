@@ -32,6 +32,13 @@ void CCE::run()
 cSPIN CCE::create_center_spin()
 {
     _center_spin=cSPIN(_center_spin_coord, _center_spin_isotope);
+    NVCenter nv;
+    nv.set_magB(_magB);
+    nv.make_espin_hamiltonian();
+
+    _center_spin_state0 = nv.get_electron_spin_eigen_state(0);
+    _center_spin_state1 = nv.get_electron_spin_eigen_state(1);
+    _center_spin = nv.get_espin();
     return _center_spin;
 }
 
@@ -288,9 +295,8 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 {
     vector<cSPIN> spin_list = _my_clusters.getCluster(cce_order, index);
 
-    int spin_up = 0, spin_down = 1;
-    Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, spin_up, spin_list);
-    Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, spin_down, spin_list);
+    Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, _center_spin_state0, spin_list);
+    Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, _center_spin_state1, spin_list);
 
     Liouvillian lv1 = create_spin_liouvillian(hami0, hami1);
     Liouvillian lv2 = create_spin_liouvillian(hami1, hami0);
@@ -309,14 +315,12 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
     return dynamics.calc_obs();
 }
 
-Hamiltonian EnsembleCCE::create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list)
+Hamiltonian EnsembleCCE::create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_state, const vector<cSPIN>& spin_list)
 {
     SpinDipolarInteraction dip(spin_list);
 
     SpinZeemanInteraction zee(spin_list, _magB);
 
-    PureState center_spin_state(espin); 
-    center_spin_state.setComponent(spin_state, 1.0);
     DipolarField hf_field(spin_list, espin, center_spin_state);
 
     Hamiltonian hami(spin_list);
