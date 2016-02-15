@@ -16,7 +16,7 @@ vec r_vect(const cSPIN& obj1, const cSPIN& obj2);
 
 vec zeeman(const cSPIN& spin, const vec& magB);
 
-vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_mat& source_state_vect);
+vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_vec& source_state_vect);
 
 vector<double> Pulse_Timing(string pulsename, int n);
 

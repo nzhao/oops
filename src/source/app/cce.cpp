@@ -242,7 +242,7 @@ void CCE::export_mat_file()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  EnsembleCCE
 EnsembleCCE::EnsembleCCE(int my_rank, int worker_num, const string& config_file)
-{ 
+{ /*{{{*/
     _my_rank = my_rank;
     _worker_num = worker_num;
 
@@ -254,10 +254,10 @@ EnsembleCCE::EnsembleCCE(int my_rank, int worker_num, const string& config_file)
 
     if(my_rank == 0)
         _cfg.printParameters();
-}
+}/*}}}*/
 
 void EnsembleCCE::set_parameters()
-{
+{/*{{{*/
     strcpy(_bath_spin_filename, PROJECT_PATH); 
     strcpy(_result_filename, PROJECT_PATH); 
     strcat(_bath_spin_filename, "/dat/input/RoyCoord.xyz");
@@ -282,7 +282,7 @@ void EnsembleCCE::set_parameters()
     double magBz = _cfg.getDoubleParameter("Condition", "magnetic_fieldZ");
     _magB << magBx << magBy << magBz; 
 
-}
+}/*}}}*/
 
 vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 {
