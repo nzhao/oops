@@ -13,7 +13,8 @@ public:
     QuantumEvolutionAlgorithm(QuantumOperator& op, QuantumState& st);
     ~QuantumEvolutionAlgorithm() {};
 
-    void setTimeSequence(const vec& tlist){_time_list = tlist;};
+    void setTimeSequence(double t0, double t1, int nt) { _time_list = linspace<vec>(t0, t1, nt); };
+    //void setTimeSequence(const vec& tlist){_time_list = tlist;};
     vec  getTimeSequence() const {return _time_list;};
     size_t  getStateDim() const {return _state_dimension;};
     vector<cx_vec> getResult() const {return _vector_list;};

@@ -15,9 +15,9 @@
 class QuantumEvolution
 {
 public:
-    QuantumEvolution();
+    QuantumEvolution() {};
     QuantumEvolution(QuantumEvolutionAlgorithm* kernel){ _kernel = kernel; };
-    ~QuantumEvolution();
+    ~QuantumEvolution() {};
 
     void run() {_kernel->perform();};
 
@@ -35,9 +35,9 @@ private:
 class ClusterCoherenceEvolution:public QuantumEvolution
 {
 public:
-    ClusterCoherenceEvolution();
+    ClusterCoherenceEvolution() {};
     ClusterCoherenceEvolution(QuantumEvolutionAlgorithm* kernel):QuantumEvolution(kernel) {};
-    ~ClusterCoherenceEvolution();
+    ~ClusterCoherenceEvolution() {};
 
     vec calc_obs();
 protected:

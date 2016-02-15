@@ -32,14 +32,14 @@ void ConfigXML::printParameters() const
 {
     PARA_MAP::const_iterator pos;
     cout << endl;
-    cout << "##################### parameters #####################" << endl;
+    cout << "####################################### parameters #######################################" << endl;
     for(pos = _parameters.begin(); pos != _parameters.end(); ++pos)
     {
-        cout << "para: " << (pos->first).first << ":" << (pos->first).second << "\t" ;
-        cout << "type: " << (pos->second).first << "\t";
-        cout << "value: " << (pos->second).second << endl; 
+        cout <<  setw(12) << (pos->first).first << setw(25) <<  (pos->first).second;
+        cout <<  setw(12) << (pos->second).first;
+        cout <<  setw(12) << (pos->second).second << endl; 
     }
-    cout << "######################################################" << endl;
+    cout << "##########################################################################################" << endl;
     cout << endl;
 }
 

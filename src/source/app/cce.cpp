@@ -40,6 +40,9 @@ cSpinCollection CCE::create_bath_spins()
     cSpinSourceFromFile spin_file(_bath_spin_filename);
     _bath_spins = cSpinCollection(&spin_file);
     _bath_spins.make();
+
+    if(_my_rank == 0)
+        cout << _bath_spins.getSpinNum() << " spins are read from file: " << _bath_spin_filename << endl << endl;
     return _bath_spins;
 }
 
@@ -109,7 +112,10 @@ void CCE::run_each_clusters()
         
         mat resMat(_nTime, clst_num, fill::ones);
         for(int i = 0; i < clst_num; ++i)
+        {
+            cout << i << "/" << clst_num << endl;
             resMat.col(i) = cluster_evolution(cce_order, i);
+        }
         
         DataGathering(resMat, cce_order, clst_num);
     }
@@ -268,33 +274,16 @@ void EnsembleCCE::set_parameters()
     _nTime               = _cfg.getIntParameter("Dynamics", "nTime");
     _t0                  = _cfg.getDoubleParameter("Dynamics", "t0"); 
     _t1                  = _cfg.getDoubleParameter("Dynamics", "t1"); 
+    _pulse_name          = _cfg.getStringParameter("Condition", "pulse_name");
+    _pulse_num           = _cfg.getIntParameter("Condition", "pulse_number");
 
     double magBx = _cfg.getDoubleParameter("Condition", "magnetic_fieldX");
     double magBy = _cfg.getDoubleParameter("Condition", "magnetic_fieldY");
     double magBz = _cfg.getDoubleParameter("Condition", "magnetic_fieldZ");
     _magB << magBx << magBy << magBz; 
+
 }
 
-//vec EnsembleCCE::cluster_evolution(int cce_order, int index)
-//{
-    //vector<cSPIN> spin_list = _my_clusters.getCluster(cce_order, index);
-
-    //int spin_up = 0, spin_down = 1;
-    //Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, spin_up, spin_list);
-    //Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, spin_down, spin_list);
-
-    //Liouvillian lv = create_spin_liouvillian(hami0, hami1);
-
-    //DensityOperator ds = create_spin_density_state(spin_list);
-
-    //SimpleFullMatrixVectorEvolution kernel(lv, ds);
-    //kernel.setTimeSequence( linspace<vec>(_t0, _t1, _nTime) );
-
-    //ClusterCoherenceEvolution dynamics(&kernel);
-    //dynamics.run();
-
-    //return dynamics.calc_obs();
-//}
 vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 {
     vector<cSPIN> spin_list = _my_clusters.getCluster(cce_order, index);
@@ -305,18 +294,14 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 
     Liouvillian lv1 = create_spin_liouvillian(hami0, hami1);
     Liouvillian lv2 = create_spin_liouvillian(hami1, hami0);
-    vector<QuantumOperator> lv_list;
-    lv_list.push_back(lv1);
-    lv_list.push_back(lv2);
-
-    vector<double> time_segment;
-    time_segment.push_back(0.5);
-    time_segment.push_back(0.5);
+    
+    vector<QuantumOperator> lv_list = riffle((QuantumOperator) lv1, (QuantumOperator) lv2, _pulse_num);
+    vector<double> time_segment = Pulse_Interval(_pulse_name, _pulse_num);
 
     DensityOperator ds = create_spin_density_state(spin_list);
 
     PiecewiseFullMatrixVectorEvolution kernel(lv_list, time_segment, ds);
-    kernel.setTimeSequence( linspace<vec>(_t0, _t1, _nTime) );
+    kernel.setTimeSequence( _t0, _t1, _nTime);
 
     ClusterCoherenceEvolution dynamics(&kernel);
     dynamics.run();

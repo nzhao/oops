@@ -26,10 +26,7 @@ cSpinSourceFromFile::cSpinSourceFromFile()
 { //LOG(INFO) << "Default constructor: cSpinSourceFromFile.";
 }
 cSpinSourceFromFile::cSpinSourceFromFile(string filename)
-{
-    _filename=filename;
-    cout << "filename=" << _filename << endl;
-}
+{ _filename=filename; }
 
 cSpinSourceFromFile::~cSpinSourceFromFile()
 { //LOG(INFO) << "Default destructor: cSpinSourceFromFile.";
