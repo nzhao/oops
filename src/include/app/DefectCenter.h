@@ -42,15 +42,4 @@ private:
 
     void make_spin();
 };
-
-//Adapter
-class NVCenterElectronSpin : public cSPIN
-{
-public:
-    NVCenterElectronSpin(const NVCenter& nv){ _nv = nv;};
-    PureState get_eigenState(int i) const {return _nv.get_electron_spin_eigen_state(i);}
-protected:
-private:
-    NVCenter _nv;
-};
 #endif
