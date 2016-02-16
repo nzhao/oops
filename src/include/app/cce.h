@@ -19,8 +19,10 @@ public:
     vector<mat>     getResultMatrix() const {return _cce_evovle_result;}
 protected:
     ConfigXML        _cfg;
-    vec              _center_spin_coord;
-    string           _center_spin_isotope;
+    //DefectCenter*    _defect_center;
+    string           _center_spin_name;
+    int              _state_idx0;
+    int              _state_idx1;
     pair<PureState, 
          PureState>  _state_pair;
     char             _bath_spin_filename[500];
@@ -28,6 +30,7 @@ protected:
     double           _t0;
     double           _t1;
     int              _nTime;
+    vec              _time_list;
     int              _cut_off_dist;
     int              _max_order;
     vec              _magB;
@@ -49,8 +52,8 @@ protected:
 
 private:
     virtual void     set_parameters()=0;
-    cSPIN            create_center_spin();
-    cSpinCollection  create_bath_spins();
+    void             prepare_center_spin();
+    void             create_bath_spins();
     void             create_spin_clusters();
     void             job_distribution();
     void             run_each_clusters();
@@ -79,6 +82,7 @@ protected:
 
 private:
     void set_parameters();
+    //void prepare_center_spin();
     vec cluster_evolution(int cce_order, int index);
     Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);

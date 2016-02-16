@@ -7,6 +7,9 @@ class DefectCenter
 public:
     DefectCenter() {};
     ~DefectCenter() {};
+
+    virtual cSPIN get_espin() const = 0;
+    virtual PureState get_electron_spin_eigen_state(int i) const = 0; 
 protected:
 private:
 };

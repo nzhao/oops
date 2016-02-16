@@ -20,7 +20,7 @@ CCE::CCE(int my_rank, int worker_num, const string& config_file)
 void CCE::run()
 {
     set_parameters();
-    create_center_spin();
+    prepare_center_spin();
     create_bath_spins();
     create_spin_clusters();
 
@@ -29,20 +29,27 @@ void CCE::run()
 
 }
 
-cSPIN CCE::create_center_spin()
+void CCE::prepare_center_spin()
 {
-    NVCenter nv;
-    _center_spin = nv.get_espin();
-
-    nv.set_magB(_magB);
-    nv.make_espin_hamiltonian();
-    _state_pair = make_pair(
-            nv.get_electron_spin_eigen_state(0),
-            nv.get_electron_spin_eigen_state(1));
-    return _center_spin;
+    if( !strcmp(_center_spin_name.c_str(), "NV") )
+    {
+        NVCenter nv;
+        nv.set_magB(_magB);
+        nv.make_espin_hamiltonian();
+        
+        _center_spin = nv.get_espin();
+        _state_pair = make_pair( 
+                nv.get_electron_spin_eigen_state(_state_idx0), 
+                nv.get_electron_spin_eigen_state(_state_idx1) ); 
+    }
+    else
+    {
+        cout << "Center Spin " << _center_spin_name << " is not supported." << endl;
+        assert(0);
+    }
 }
 
-cSpinCollection CCE::create_bath_spins()
+void CCE::create_bath_spins()
 {
     cSpinSourceFromFile spin_file(_bath_spin_filename);
     _bath_spins = cSpinCollection(&spin_file);
@@ -50,7 +57,6 @@ cSpinCollection CCE::create_bath_spins()
 
     if(_my_rank == 0)
         cout << _bath_spins.getSpinNum() << " spins are read from file: " << _bath_spin_filename << endl << endl;
-    return _bath_spins;
 }
 
 void CCE::create_spin_clusters()
@@ -231,13 +237,17 @@ void CCE::export_mat_file()
 
     mxArray *pRes = mxCreateDoubleMatrix(_nTime, _max_order, mxREAL);
     mxArray *pRes1 = mxCreateDoubleMatrix(_nTime, _max_order, mxREAL);
+    mxArray *pTime = mxCreateDoubleMatrix(_nTime, 1, mxREAL);
     size_t length= _nTime*_max_order;
     memcpy((void *)(mxGetPr(pRes)), (void *) _final_result_each_order.memptr(), length*sizeof(double));
     memcpy((void *)(mxGetPr(pRes1)), (void *) _final_result.memptr(), length*sizeof(double));
+    memcpy((void *)(mxGetPr(pTime)), (void *) _time_list.memptr(), _nTime*sizeof(double));
     matPutVariableAsGlobal(mFile, "final_result_each_order", pRes);
     matPutVariableAsGlobal(mFile, "final_result", pRes1);
+    matPutVariableAsGlobal(mFile, "time_list", pTime);
     mxDestroyArray(pRes);
     mxDestroyArray(pRes1);
+    mxDestroyArray(pTime);
     matClose(mFile);
 #endif
 }/*}}}*/
@@ -267,11 +277,10 @@ void EnsembleCCE::set_parameters()
 {/*{{{*/
     string input_filename  = _cfg.getStringParameter("Data",       "input_file");
     string output_filename = _cfg.getStringParameter("Data",       "output_file");
-    double x               = _cfg.getDoubleParameter("CenterSpin", "coordinateX");
-    double y               = _cfg.getDoubleParameter("CenterSpin", "coordinateY");
-    double z               = _cfg.getDoubleParameter("CenterSpin", "coordinateZ");
+    _state_idx0            = _cfg.getIntParameter   ("CenterSpin", "state_index0");
+    _state_idx1            = _cfg.getIntParameter   ("CenterSpin", "state_index1");
 
-    _center_spin_isotope   = _cfg.getStringParameter("CenterSpin", "isotope");
+    _center_spin_name      = _cfg.getStringParameter("CenterSpin", "name");
     _cut_off_dist          = _cfg.getDoubleParameter("SpinBath",   "cut_off_dist");
     _max_order             = _cfg.getIntParameter   ("CCE",        "max_order");
     _nTime                 = _cfg.getIntParameter   ("Dynamics",   "nTime");
@@ -290,9 +299,8 @@ void EnsembleCCE::set_parameters()
     strcat(_result_filename, "/dat/output/");
     strcat(_bath_spin_filename, input_filename.c_str());
     strcat(_result_filename, output_filename.c_str());
-    _center_spin_coord << x << y << z;
     _magB << magBx << magBy << magBz; 
-
+    _time_list = linspace<vec>(_t0, _t1, _nTime);
 }/*}}}*/
 
 vec EnsembleCCE::cluster_evolution(int cce_order, int index)
