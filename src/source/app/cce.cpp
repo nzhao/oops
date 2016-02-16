@@ -31,14 +31,14 @@ void CCE::run()
 
 cSPIN CCE::create_center_spin()
 {
-    _center_spin=cSPIN(_center_spin_coord, _center_spin_isotope);
     NVCenter nv;
+    _center_spin = nv.get_espin();
+
     nv.set_magB(_magB);
     nv.make_espin_hamiltonian();
-
-    _center_spin_state0 = nv.get_electron_spin_eigen_state(0);
-    _center_spin_state1 = nv.get_electron_spin_eigen_state(1);
-    _center_spin = nv.get_espin();
+    _state_pair = make_pair(
+            nv.get_electron_spin_eigen_state(0),
+            nv.get_electron_spin_eigen_state(1));
     return _center_spin;
 }
 
@@ -265,28 +265,32 @@ EnsembleCCE::EnsembleCCE(int my_rank, int worker_num, const string& config_file)
 
 void EnsembleCCE::set_parameters()
 {/*{{{*/
+    string input_filename  = _cfg.getStringParameter("Data",       "input_file");
+    string output_filename = _cfg.getStringParameter("Data",       "output_file");
+    double x               = _cfg.getDoubleParameter("CenterSpin", "coordinateX");
+    double y               = _cfg.getDoubleParameter("CenterSpin", "coordinateY");
+    double z               = _cfg.getDoubleParameter("CenterSpin", "coordinateZ");
+
+    _center_spin_isotope   = _cfg.getStringParameter("CenterSpin", "isotope");
+    _cut_off_dist          = _cfg.getDoubleParameter("SpinBath",   "cut_off_dist");
+    _max_order             = _cfg.getIntParameter   ("CCE",        "max_order");
+    _nTime                 = _cfg.getIntParameter   ("Dynamics",   "nTime");
+    _t0                    = _cfg.getDoubleParameter("Dynamics",   "t0"); 
+    _t1                    = _cfg.getDoubleParameter("Dynamics",   "t1"); 
+    _pulse_name            = _cfg.getStringParameter("Condition",  "pulse_name");
+    _pulse_num             = _cfg.getIntParameter   ("Condition",  "pulse_number");
+
+    double magBx           = _cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
+    double magBy           = _cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
+    double magBz           = _cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
+
     strcpy(_bath_spin_filename, PROJECT_PATH); 
     strcpy(_result_filename, PROJECT_PATH); 
-    strcat(_bath_spin_filename, "/dat/input/RoyCoord.xyz");
-    strcat(_result_filename, "/dat/output/cce_res.mat");
-
-    double x = _cfg.getDoubleParameter("CenterSpin", "coordinateX");
-    double y = _cfg.getDoubleParameter("CenterSpin", "coordinateY");
-    double z = _cfg.getDoubleParameter("CenterSpin", "coordinateZ");
+    strcat(_bath_spin_filename, "/dat/input/");
+    strcat(_result_filename, "/dat/output/");
+    strcat(_bath_spin_filename, input_filename.c_str());
+    strcat(_result_filename, output_filename.c_str());
     _center_spin_coord << x << y << z;
-
-    _center_spin_isotope = _cfg.getStringParameter("CenterSpin", "isotope");
-    _cut_off_dist        = _cfg.getDoubleParameter("SpinBath", "cut_off_dist");
-    _max_order           = _cfg.getIntParameter("CCE", "max_order");
-    _nTime               = _cfg.getIntParameter("Dynamics", "nTime");
-    _t0                  = _cfg.getDoubleParameter("Dynamics", "t0"); 
-    _t1                  = _cfg.getDoubleParameter("Dynamics", "t1"); 
-    _pulse_name          = _cfg.getStringParameter("Condition", "pulse_name");
-    _pulse_num           = _cfg.getIntParameter("Condition", "pulse_number");
-
-    double magBx = _cfg.getDoubleParameter("Condition", "magnetic_fieldX");
-    double magBy = _cfg.getDoubleParameter("Condition", "magnetic_fieldY");
-    double magBz = _cfg.getDoubleParameter("Condition", "magnetic_fieldZ");
     _magB << magBx << magBy << magBz; 
 
 }/*}}}*/
@@ -295,8 +299,8 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 {
     vector<cSPIN> spin_list = _my_clusters.getCluster(cce_order, index);
 
-    Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, _center_spin_state0, spin_list);
-    Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, _center_spin_state1, spin_list);
+    Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, _state_pair.first, spin_list);
+    Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, _state_pair.second, spin_list);
 
     Liouvillian lv1 = create_spin_liouvillian(hami0, hami1);
     Liouvillian lv2 = create_spin_liouvillian(hami1, hami0);

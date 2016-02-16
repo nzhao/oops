@@ -21,8 +21,8 @@ protected:
     ConfigXML        _cfg;
     vec              _center_spin_coord;
     string           _center_spin_isotope;
-    PureState        _center_spin_state0;
-    PureState        _center_spin_state1;
+    pair<PureState, 
+         PureState>  _state_pair;
     char             _bath_spin_filename[500];
     char             _result_filename[500];
     double           _t0;
