@@ -1,11 +1,15 @@
 #ifndef QUANTUMOPERATOR_H
 #define QUANTUMOPERATOR_H
-#include <armadillo>
+#ifdef HAS_MATLAB
 #include <mat.h>
+#endif
+
+#include <armadillo>
 #include "include/easylogging++.h"
 #include "include/kron/KronProd.h"
 
 using namespace std;
+extern string DEBUG_PATH;
 
 /// \defgroup Quantum Quantum
 /// @{
@@ -18,8 +22,8 @@ using namespace std;
 class QuantumOperator
 {
 public:
-    QuantumOperator();
-    ~QuantumOperator();
+    QuantumOperator() {};
+    ~QuantumOperator() {};
 
     cx_mat       getMatrix() {return _kron_form.full();};
     SumKronProd  getKronProdForm() const  {return _kron_form;};

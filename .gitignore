@@ -1,4 +1,5 @@
 bin/*
+dat/*
 obj/*
 doc/html/*
 doc/*.old
@@ -7,3 +8,10 @@ src/debug
 *.o
 .*.sw*
 tags
+
+*.pyc
+
+src/.ycm_extra_conf.py
+*.mat
+
+*.old

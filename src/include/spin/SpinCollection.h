@@ -34,6 +34,7 @@ public:
     //@}
 
     //@{
+    int           getSpinNum() const {return _spin_list.size();};
     vector<cSPIN> getSpinList() const {return _spin_list;};
     vector<cSPIN> getSpinList(const cClusterIndex& clst) const;
     mat getCoordinateMat() const;

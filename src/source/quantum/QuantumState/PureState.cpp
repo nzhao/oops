@@ -3,12 +3,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ PureState
 PureState::PureState()
-{ LOG(INFO) << "Default constructor: PureState";
+{ //LOG(INFO) << "Default constructor: PureState";
     _is_pure = true;
 }
 
 PureState::~PureState()
-{ LOG(INFO) << "Default destructor: PureState";}
+{ //LOG(INFO) << "Default destructor: PureState";
+}
 
 PureState::PureState(const int& dim)
 {

@@ -2,13 +2,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumOperator
-QuantumOperator::QuantumOperator()
-{ LOG(INFO) << "Default constructor: QuantumOperator."; }
-
-QuantumOperator::~QuantumOperator()
-{ LOG(INFO) << "Default destructor: QuantumOperator."; }
-
-void QuantumOperator::saveMatrix(string filename)
+#ifdef HAS_MATLAB
+void QuantumOperator::saveMatrix(string name)
 {
     cx_mat m= this->getMatrix();
     mat m_r = real(m).t();
@@ -20,12 +15,20 @@ void QuantumOperator::saveMatrix(string filename)
     memcpy((void *)(mxGetPr(pArray)), (void *) m_r.memptr(), dim2*sizeof(double));
     memcpy((void *)(mxGetPi(pArray)), (void *) m_i.memptr(), dim2*sizeof(double));
     
-    MATFile *mFile = matOpen(filename.c_str(), "w");
-    matPutVariableAsGlobal(mFile, "OperatorMat", pArray);
+    string dbg_filename = DEBUG_PATH + name + ".mat";
+    cout << dbg_filename << " is exported for debug! " << endl;
+    MATFile *mFile = matOpen(dbg_filename.c_str(), "w");
+    matPutVariableAsGlobal(mFile, name.c_str(), pArray);
     matClose(mFile);
 
     mxDestroyArray(pArray);
 }
+#else
+void QuantumOperator::saveMatrix(string name)
+{
+    cout << "MATLAB not installed." << endl;
+}
+#endif
 
 QuantumOperator operator + (const QuantumOperator& op1, const QuantumOperator& op2)
 {

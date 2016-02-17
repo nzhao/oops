@@ -4,13 +4,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  HilbertSpaceOperator
 HilbertSpaceOperator::HilbertSpaceOperator()
-{ LOG(INFO) << "Default constructor: HilbertSpaceOperator."; }
+{ //LOG(INFO) << "Default constructor: HilbertSpaceOperator.";
+}
 
 HilbertSpaceOperator::~HilbertSpaceOperator()
-{ LOG(INFO) << "Default destructor: HilbertSpaceOperator."; }
+{ //LOG(INFO) << "Default destructor: HilbertSpaceOperator.";
+}
 
 HilbertSpaceOperator::HilbertSpaceOperator(const vector<cSPIN>& spin_list)
-{ LOG(INFO) << "constructor of HilbertSpaceOperator with spin_list.";
+{ //LOG(INFO) << "constructor of HilbertSpaceOperator with spin_list.";
     _spin_list = spin_list;
     //for(auto spin: _spin_list)
     //    _dim_list.push_back( spin.get_dimension() );
@@ -43,11 +45,13 @@ void HilbertSpaceOperator::make()
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ Hamiltonian
 Hamiltonian::Hamiltonian()
-{ LOG(INFO) << "Default constructor: Hamiltonian";}
+{ //LOG(INFO) << "Default constructor: Hamiltonian";
+}
 
 
 Hamiltonian::~Hamiltonian()
-{ LOG(INFO) << "Default destructor: Hamiltonian";}
+{ //LOG(INFO) << "Default destructor: Hamiltonian";
+}
 
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

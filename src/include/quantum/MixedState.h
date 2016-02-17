@@ -41,7 +41,8 @@ public:
     DensityOperator(const vector<cSPIN>& spin_list);
 
     void make() {_op.make();};
-    void makeVector(){ _vector = vectorise( this->getKronProdForm().full() ); };
+    void makeVector(){ _vector = this->getKronProdForm().vecterize(); };
+    //void makeVector(){ _vector = vectorise( this->getKronProdForm().full() ); };
     void addStateComponent(cSpinInteraction& spin_interaction){_op.addInteraction(spin_interaction);};
 
     SumKronProd getKronProdForm(){return _op.getKronProdForm();};
