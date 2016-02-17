@@ -12,7 +12,6 @@ PS = cpp
 
 CC = mpic++
 CPPFLAGS = $(addprefix -I,$(INCLUDES))
-CPPFLAGS += -g -DARMA_DONT_USE_WRAPPER 
 
 ifeq ($(USE_MKL), true)
 	LIBS := 
@@ -20,9 +19,11 @@ ifeq ($(USE_MKL), true)
 	#CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_intel_thread -lmkl_blacs_intelmpi_ilp64 -lpthread -lm 
 	CPPFLAGS  +=  -DARMA_BLAS_LONG -DMKL_ILP64 -I${MKLROOT}/include 
 	CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm
+	CPPFLAGS += -O2 -DARMA_DONT_USE_WRAPPER 
 else
 	LIBS :=  $(ARMA_LIB) 
 	CXXLINKS  := 
+	CPPFLAGS += -g -DARMA_DONT_USE_WRAPPER 
 endif
 
 
@@ -54,7 +55,7 @@ doc :
 	/Applications/Doxygen.app/Contents/Resources/doxygen ../doc/DocGen 
 
 $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
-	@$(CC) -MM $< -I. -I$(MATLAB_INC_PATH) > $@
+	@$(CC) -MM $< -I. -I$(MATLAB_INC_PATH) -I$(ARMA_INC_PATH) > $@
 	@sed -i="" '1s/^/..\/obj\//g' $@
 	@rm $@=
 
