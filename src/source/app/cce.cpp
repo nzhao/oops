@@ -117,7 +117,7 @@ void CCE::run_each_clusters()
         DataGathering(resMat, cce_order, clst_num);
     }
 }
-void CCE::DataGathering(const mat& resMat, int cce_order, int clst_num)
+void CCE::DataGathering(mat& resMat, int cce_order, int clst_num)
 {/*{{{*/
 
     if(_my_rank != 0)

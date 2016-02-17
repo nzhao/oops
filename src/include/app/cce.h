@@ -58,7 +58,7 @@ private:
     void             create_spin_clusters();
     void             job_distribution();
     void             run_each_clusters();
-    void             DataGathering(const mat& resMat, int cce_order, int clst_num);
+    void             DataGathering(mat& resMat, int cce_order, int clst_num);
 
     virtual vec      cluster_evolution(int cce_order, int index)=0;
     void             post_treatment();
