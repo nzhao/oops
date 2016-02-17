@@ -42,9 +42,11 @@ void             post_treatment(double ** data, const cSpinCluster& spin_cluster
 
 int  main(int argc, char* argv[])
 {
+    /*
     _START_EASYLOGGINGPP(argc, argv);
     easyloggingpp::Configurations confFromFile("../src/logs/log.conf");  // Load configuration from file
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile); // Re-configures all the loggers to current configuration file
+     */
     LOG(INFO) << "################################################### Program begins ###################################################"; 
 
     // MPI head;
@@ -92,7 +94,7 @@ int  main(int argc, char* argv[])
                 Liouvillian lv = create_spin_liouvillian(hami0, hami1);
 
                 DensityOperator ds = create_spin_density_state(spin_list);
->>>>>>> 1366a6907533d93b4162eaa075e06fbc451a1ffd
+
 
                 SimpleFullMatrixVectorEvolution kernel(lv, ds);
                 kernel.setTimeSequence( linspace<vec>(0.0, 0.001, nTime) );
@@ -149,7 +151,7 @@ cSPIN create_e_spin()
 //{{{ Create bath spin list from xyz file
 cSpinCollection create_bath_spins_from_file()
 {
-    cSpinSourceFromFile spin_file("../bin/RoyCoord.xyz");
+    cSpinSourceFromFile spin_file("/Users/ylp/Documents/WorkSpace/oops/bin/RoyCoord.xyz");
     cSpinCollection sc(&spin_file);
     sc.make();
     return sc;
