@@ -2,16 +2,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  CCE
-CCE::CCE(int my_rank, int worker_num, const string& config_file)
+CCE::CCE(int my_rank, int worker_num, DefectCenter* defect, const ConfigXML& cfg)
 { 
     _my_rank = my_rank;
     _worker_num = worker_num;
-    
-    char cfg_path[500];
-    strcpy(cfg_path, PROJECT_PATH);
-    strcat(cfg_path, "/dat/config/");
-    strcat(cfg_path, config_file.c_str() );
-    _cfg = ConfigXML(cfg_path);
+    _defect_center = defect;
+    _cfg = cfg;
 
     if(my_rank == 0)
         _cfg.printParameters();
@@ -20,7 +16,7 @@ CCE::CCE(int my_rank, int worker_num, const string& config_file)
 void CCE::run()
 {
     set_parameters();
-    create_center_spin();
+    prepare_center_spin();
     create_bath_spins();
     create_spin_clusters();
 
@@ -29,13 +25,15 @@ void CCE::run()
 
 }
 
-cSPIN CCE::create_center_spin()
+void CCE::prepare_center_spin()
 {
-    _center_spin=cSPIN(_center_spin_coord, _center_spin_isotope);
-    return _center_spin;
+    _center_spin = _defect_center->get_espin();
+    _state_pair = make_pair( 
+            PureState(_defect_center->get_eigen_state(_state_idx0)), 
+            PureState(_defect_center->get_eigen_state(_state_idx1)) ); 
 }
 
-cSpinCollection CCE::create_bath_spins()
+void CCE::create_bath_spins()
 {
     cSpinSourceFromFile spin_file(_bath_spin_filename);
     _bath_spins = cSpinCollection(&spin_file);
@@ -43,7 +41,6 @@ cSpinCollection CCE::create_bath_spins()
 
     if(_my_rank == 0)
         cout << _bath_spins.getSpinNum() << " spins are read from file: " << _bath_spin_filename << endl << endl;
-    return _bath_spins;
 }
 
 void CCE::create_spin_clusters()
@@ -120,7 +117,7 @@ void CCE::run_each_clusters()
         DataGathering(resMat, cce_order, clst_num);
     }
 }
-void CCE::DataGathering(const mat& resMat, int cce_order, int clst_num)
+void CCE::DataGathering(mat& resMat, int cce_order, int clst_num)
 {/*{{{*/
 
     if(_my_rank != 0)
@@ -198,7 +195,7 @@ void CCE::export_mat_file()
 {/*{{{*/
 #ifdef HAS_MATLAB
     cout << "begin post_treatement ... storing cce_data to file: " << _result_filename << endl;
-    MATFile *mFile = matOpen(_result_filename, "w");
+    MATFile *mFile = matOpen(_result_filename.c_str(), "w");
     for(int i=0; i<_max_order; ++i)
     {
         char i_str [10];
@@ -224,13 +221,17 @@ void CCE::export_mat_file()
 
     mxArray *pRes = mxCreateDoubleMatrix(_nTime, _max_order, mxREAL);
     mxArray *pRes1 = mxCreateDoubleMatrix(_nTime, _max_order, mxREAL);
+    mxArray *pTime = mxCreateDoubleMatrix(_nTime, 1, mxREAL);
     size_t length= _nTime*_max_order;
     memcpy((void *)(mxGetPr(pRes)), (void *) _final_result_each_order.memptr(), length*sizeof(double));
     memcpy((void *)(mxGetPr(pRes1)), (void *) _final_result.memptr(), length*sizeof(double));
+    memcpy((void *)(mxGetPr(pTime)), (void *) _time_list.memptr(), _nTime*sizeof(double));
     matPutVariableAsGlobal(mFile, "final_result_each_order", pRes);
     matPutVariableAsGlobal(mFile, "final_result", pRes1);
+    matPutVariableAsGlobal(mFile, "time_list", pTime);
     mxDestroyArray(pRes);
     mxDestroyArray(pRes1);
+    mxDestroyArray(pTime);
     matClose(mFile);
 #endif
 }/*}}}*/
@@ -241,56 +242,39 @@ void CCE::export_mat_file()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  EnsembleCCE
-EnsembleCCE::EnsembleCCE(int my_rank, int worker_num, const string& config_file)
-{ /*{{{*/
-    _my_rank = my_rank;
-    _worker_num = worker_num;
-
-    char cfg_path[500];
-    strcpy(cfg_path, PROJECT_PATH);
-    strcat(cfg_path, "/dat/config/");
-    strcat(cfg_path, config_file.c_str() );
-    _cfg = ConfigXML(cfg_path);
-
-    if(my_rank == 0)
-        _cfg.printParameters();
-}/*}}}*/
-
 void EnsembleCCE::set_parameters()
 {/*{{{*/
-    strcpy(_bath_spin_filename, PROJECT_PATH); 
-    strcpy(_result_filename, PROJECT_PATH); 
-    strcat(_bath_spin_filename, "/dat/input/RoyCoord.xyz");
-    strcat(_result_filename, "/dat/output/cce_res.mat");
+    string input_filename  = _cfg.getStringParameter("Data",       "input_file");
+    string output_filename = _cfg.getStringParameter("Data",       "output_file");
 
-    double x = _cfg.getDoubleParameter("CenterSpin", "coordinateX");
-    double y = _cfg.getDoubleParameter("CenterSpin", "coordinateY");
-    double z = _cfg.getDoubleParameter("CenterSpin", "coordinateZ");
-    _center_spin_coord << x << y << z;
+    _state_idx0            = _cfg.getIntParameter   ("CenterSpin", "state_index0");
+    _state_idx1            = _cfg.getIntParameter   ("CenterSpin", "state_index1");
 
-    _center_spin_isotope = _cfg.getStringParameter("CenterSpin", "isotope");
-    _cut_off_dist        = _cfg.getDoubleParameter("SpinBath", "cut_off_dist");
-    _max_order           = _cfg.getIntParameter("CCE", "max_order");
-    _nTime               = _cfg.getIntParameter("Dynamics", "nTime");
-    _t0                  = _cfg.getDoubleParameter("Dynamics", "t0"); 
-    _t1                  = _cfg.getDoubleParameter("Dynamics", "t1"); 
-    _pulse_name          = _cfg.getStringParameter("Condition", "pulse_name");
-    _pulse_num           = _cfg.getIntParameter("Condition", "pulse_number");
+    _center_spin_name      = _cfg.getStringParameter("CenterSpin", "name");
+    _cut_off_dist          = _cfg.getDoubleParameter("SpinBath",   "cut_off_dist");
+    _max_order             = _cfg.getIntParameter   ("CCE",        "max_order");
+    _nTime                 = _cfg.getIntParameter   ("Dynamics",   "nTime");
+    _t0                    = _cfg.getDoubleParameter("Dynamics",   "t0"); 
+    _t1                    = _cfg.getDoubleParameter("Dynamics",   "t1"); 
+    _pulse_name            = _cfg.getStringParameter("Condition",  "pulse_name");
+    _pulse_num             = _cfg.getIntParameter   ("Condition",  "pulse_number");
 
-    double magBx = _cfg.getDoubleParameter("Condition", "magnetic_fieldX");
-    double magBy = _cfg.getDoubleParameter("Condition", "magnetic_fieldY");
-    double magBz = _cfg.getDoubleParameter("Condition", "magnetic_fieldZ");
-    _magB << magBx << magBy << magBz; 
+    _magB << _cfg.getDoubleParameter("Condition",  "magnetic_fieldX")
+           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldY")
+           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
 
+    _bath_spin_filename = INPUT_PATH + input_filename;
+    _result_filename    = OUTPUT_PATH + output_filename;
+
+    _time_list = linspace<vec>(_t0, _t1, _nTime);
 }/*}}}*/
 
 vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 {
     vector<cSPIN> spin_list = _my_clusters.getCluster(cce_order, index);
 
-    int spin_up = 0, spin_down = 1;
-    Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, spin_up, spin_list);
-    Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, spin_down, spin_list);
+    Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, _state_pair.first, spin_list);
+    Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, _state_pair.second, spin_list);
 
     Liouvillian lv1 = create_spin_liouvillian(hami0, hami1);
     Liouvillian lv2 = create_spin_liouvillian(hami1, hami0);
@@ -309,14 +293,12 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
     return dynamics.calc_obs();
 }
 
-Hamiltonian EnsembleCCE::create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list)
+Hamiltonian EnsembleCCE::create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_state, const vector<cSPIN>& spin_list)
 {
     SpinDipolarInteraction dip(spin_list);
 
     SpinZeemanInteraction zee(spin_list, _magB);
 
-    PureState center_spin_state(espin); 
-    center_spin_state.setComponent(spin_state, 1.0);
     DipolarField hf_field(spin_list, espin, center_spin_state);
 
     Hamiltonian hami(spin_list);

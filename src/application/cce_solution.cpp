@@ -4,23 +4,23 @@
 
 _INITIALIZE_EASYLOGGINGPP
 
-char      PROJECT_PATH[500];
+string PROJECT_PATH;
+string LOG_PATH;
+string INPUT_PATH;
+string OUTPUT_PATH;
+string CONFIG_PATH;
+string DEBUG_PATH;
+
 cSPINDATA SPIN_DATABASE=cSPINDATA();
+ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
-    char *env_path = std::getenv("CCE_PROJ_PATH");
-    if(env_path!=NULL)
-        strcpy(PROJECT_PATH, env_path);
-    else
-        getcwd(PROJECT_PATH, sizeof(PROJECT_PATH));
+    ConfigXML cfg = set_parameters("EnsembleCCE.xml");
 
-    char log_path[500];
-    strcpy(log_path, PROJECT_PATH);
-    strcat(log_path, "/dat/log/log.conf"); 
-
+    string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");
     _START_EASYLOGGINGPP(argc, argv);
-    easyloggingpp::Configurations confFromFile(log_path);
+    easyloggingpp::Configurations confFromFile(log_file.c_str());
     easyloggingpp::Loggers::reconfigureAllLoggers(confFromFile);
 
     
@@ -33,7 +33,16 @@ int  main(int argc, char* argv[])
 
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
-    EnsembleCCE sol(my_rank, worker_num, "config.xml");
+    // create defect center
+    NVCenter nv(NVCenter::N14);
+    double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
+    double magBy = cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
+    double magBz = cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
+    nv.set_magB(magBx, magBy, magBz);
+    nv.make_espin_hamiltonian();
+
+    // CCE
+    EnsembleCCE sol(my_rank, worker_num, &nv, cfg);
     sol.run();
 
     LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
@@ -41,3 +50,26 @@ int  main(int argc, char* argv[])
     mpi_status = MPI_Finalize();
     assert (mpi_status == MPI_SUCCESS);
 }
+
+ConfigXML set_parameters(const string& xml_file_name)
+{/*{{{*/
+    char *env_path = std::getenv("CCE_PROJ_PATH");
+    if(env_path!=NULL)
+        PROJECT_PATH = env_path;
+    else
+    {
+        char pwd[500];
+        getcwd(pwd, sizeof(pwd));
+        PROJECT_PATH = pwd;
+    }
+
+    LOG_PATH    = PROJECT_PATH + "/dat/log/";
+    INPUT_PATH  = PROJECT_PATH + "/dat/input/";
+    OUTPUT_PATH = PROJECT_PATH + "/dat/output/";
+    CONFIG_PATH = PROJECT_PATH + "/dat/config/";
+    DEBUG_PATH  = PROJECT_PATH = "/dat/debug/";
+
+    ConfigXML cfg( CONFIG_PATH+xml_file_name );
+    return cfg;
+}/*}}}*/
+

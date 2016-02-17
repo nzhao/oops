@@ -9,7 +9,7 @@
 #include "include/kron/KronProd.h"
 
 using namespace std;
-extern char PROJECT_PATH[];
+extern string DEBUG_PATH;
 
 /// \defgroup Quantum Quantum
 /// @{
@@ -22,8 +22,8 @@ extern char PROJECT_PATH[];
 class QuantumOperator
 {
 public:
-    QuantumOperator();
-    ~QuantumOperator();
+    QuantumOperator() {};
+    ~QuantumOperator() {};
 
     cx_mat       getMatrix() {return _kron_form.full();};
     SumKronProd  getKronProdForm() const  {return _kron_form;};

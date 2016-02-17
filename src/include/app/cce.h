@@ -1,6 +1,8 @@
 #include "include/oops.h"
+#include "include/app/DefectCenter.h"
 
-extern char PROJECT_PATH[];
+extern string INPUT_PATH;
+extern string OUTPUT_PATH;
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  CCE
@@ -8,7 +10,7 @@ class CCE
 {
 public:
     CCE(): _my_rank(0), _worker_num(1) {};
-    CCE(int my_rank, int worker_num, const string& config_file);
+    CCE(int my_rank, int worker_num, DefectCenter* defect, const ConfigXML& cfg);
     ~CCE() {};
 	void run();
 
@@ -18,13 +20,18 @@ public:
     vector<mat>     getResultMatrix() const {return _cce_evovle_result;}
 protected:
     ConfigXML        _cfg;
-    vec              _center_spin_coord;
-    string           _center_spin_isotope;
-    char             _bath_spin_filename[500];
-    char             _result_filename[500];
+    DefectCenter*    _defect_center;
+    string           _center_spin_name;
+    int              _state_idx0;
+    int              _state_idx1;
+    pair<PureState, 
+         PureState>  _state_pair;
+    string             _bath_spin_filename;
+    string             _result_filename;
     double           _t0;
     double           _t1;
     int              _nTime;
+    vec              _time_list;
     int              _cut_off_dist;
     int              _max_order;
     vec              _magB;
@@ -46,12 +53,12 @@ protected:
 
 private:
     virtual void     set_parameters()=0;
-    cSPIN            create_center_spin();
-    cSpinCollection  create_bath_spins();
+    void             prepare_center_spin();
+    void             create_bath_spins();
     void             create_spin_clusters();
     void             job_distribution();
     void             run_each_clusters();
-    void             DataGathering(const mat& resMat, int cce_order, int clst_num);
+    void             DataGathering(mat& resMat, int cce_order, int clst_num);
 
     virtual vec      cluster_evolution(int cce_order, int index)=0;
     void             post_treatment();
@@ -70,14 +77,14 @@ class EnsembleCCE:public CCE
 {
 public:
     EnsembleCCE(){};
-    EnsembleCCE(int my_rank, int worker_num, const string& config_file);
+    EnsembleCCE(int my_rank, int worker_num, DefectCenter* defect, const ConfigXML& cfg):CCE(my_rank, worker_num, defect, cfg) {};
     ~EnsembleCCE(){};
 protected:
 
 private:
     void set_parameters();
     vec cluster_evolution(int cce_order, int index);
-    Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const int spin_state, const vector<cSPIN>& spin_list);
+    Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
 };
