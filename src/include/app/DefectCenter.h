@@ -8,9 +8,22 @@ public:
     DefectCenter() {};
     ~DefectCenter() {};
 
-    virtual cSPIN get_espin() const = 0;
-    virtual PureState get_electron_spin_eigen_state(int i) const = 0; 
+    cSPIN get_espin() const {return _electron_spin;}
+    cSPIN get_nspin() const {return _nuclear_spin;}
+    cx_vec get_eigen_state(int i) const {return _eigen_vectors.col(i);}
+
+    virtual void make_espin_hamiltonian()=0;
+
+    void  set_magB(double bx, double by, double bz) {_magB << bx << by << bz;}
+    void  set_eleE(double ex, double ey, double ez) {_eleE << ex << ey << ez;}
 protected:
+    cSPIN _electron_spin;
+    cSPIN _nuclear_spin;
+    vec   _magB;
+    vec   _eleE;
+    cx_mat _espin_hamiltonian;
+    cx_mat _eigen_vectors;
+    vec _eigen_vals;
 private:
 };
 
@@ -19,30 +32,11 @@ class NVCenter:public DefectCenter
 public:
     enum NVNuclearSpin { N14, N15 };
     
-    NVCenter() : _nuc(N14) { make_spin();};
-    NVCenter(NVNuclearSpin nuc ) {_nuc = nuc; make_spin();};
+    NVCenter(NVNuclearSpin nuc);
     ~NVCenter() {};
-
-    cSPIN get_espin() const {return _electron;}
-    cSPIN get_nspin() const {return _nitrogen;}
-    cx_mat get_espin_hamiltonian() const {return _espin_hamiltonian;}
-    PureState get_electron_spin_eigen_state(int i) const {return PureState(_eigen_vec_list[i]); }
-    vec       get_spin_vector(int i) const {return _electron.get_spin_vector(_eigen_vec_list[i]); }
-
-    void  set_magB(vec magB) {_magB = magB;}
-    void  set_eleE(vec eleE) {_eleE = eleE;}
     void  make_espin_hamiltonian();
 
 protected:
 private:
-    NVNuclearSpin _nuc;
-    cSPIN         _nitrogen;
-    cSPIN         _electron;
-    vec           _magB;
-    vec           _eleE;
-    cx_mat        _espin_hamiltonian;
-    vector<cx_vec> _eigen_vec_list;
-
-    void make_spin();
 };
 #endif

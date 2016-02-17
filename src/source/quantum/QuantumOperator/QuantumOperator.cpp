@@ -2,14 +2,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumOperator
-QuantumOperator::QuantumOperator()
-{ //LOG(INFO) << "Default constructor: QuantumOperator.";
-}
-
-QuantumOperator::~QuantumOperator()
-{ //LOG(INFO) << "Default destructor: QuantumOperator.";
-}
-
 #ifdef HAS_MATLAB
 void QuantumOperator::saveMatrix(string name)
 {
@@ -23,13 +15,9 @@ void QuantumOperator::saveMatrix(string name)
     memcpy((void *)(mxGetPr(pArray)), (void *) m_r.memptr(), dim2*sizeof(double));
     memcpy((void *)(mxGetPi(pArray)), (void *) m_i.memptr(), dim2*sizeof(double));
     
-    char dbg_filename[500];
-    strcpy(dbg_filename, PROJECT_PATH);
-    strcat(dbg_filename, "/dat/debug/");
-    strcat(dbg_filename, name.c_str());
-    strcat(dbg_filename, ".mat");
-    cout << dbg_filename << endl;
-    MATFile *mFile = matOpen(dbg_filename, "w");
+    string dbg_filename = DEBUG_PATH + name + ".mat";
+    cout << dbg_filename << " is exported for debug! " << endl;
+    MATFile *mFile = matOpen(dbg_filename.c_str(), "w");
     matPutVariableAsGlobal(mFile, name.c_str(), pArray);
     matClose(mFile);
 

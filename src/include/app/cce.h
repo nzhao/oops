@@ -1,7 +1,8 @@
 #include "include/oops.h"
 #include "include/app/DefectCenter.h"
 
-extern char PROJECT_PATH[];
+extern string INPUT_PATH;
+extern string OUTPUT_PATH;
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  CCE
@@ -9,7 +10,7 @@ class CCE
 {
 public:
     CCE(): _my_rank(0), _worker_num(1) {};
-    CCE(int my_rank, int worker_num, const string& config_file);
+    CCE(int my_rank, int worker_num, DefectCenter* defect, const ConfigXML& cfg);
     ~CCE() {};
 	void run();
 
@@ -19,14 +20,14 @@ public:
     vector<mat>     getResultMatrix() const {return _cce_evovle_result;}
 protected:
     ConfigXML        _cfg;
-    //DefectCenter*    _defect_center;
+    DefectCenter*    _defect_center;
     string           _center_spin_name;
     int              _state_idx0;
     int              _state_idx1;
     pair<PureState, 
          PureState>  _state_pair;
-    char             _bath_spin_filename[500];
-    char             _result_filename[500];
+    string             _bath_spin_filename;
+    string             _result_filename;
     double           _t0;
     double           _t1;
     int              _nTime;
@@ -76,13 +77,12 @@ class EnsembleCCE:public CCE
 {
 public:
     EnsembleCCE(){};
-    EnsembleCCE(int my_rank, int worker_num, const string& config_file);
+    EnsembleCCE(int my_rank, int worker_num, DefectCenter* defect, const ConfigXML& cfg):CCE(my_rank, worker_num, defect, cfg) {};
     ~EnsembleCCE(){};
 protected:
 
 private:
     void set_parameters();
-    //void prepare_center_spin();
     vec cluster_evolution(int cce_order, int index);
     Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);

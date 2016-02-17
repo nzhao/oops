@@ -2,16 +2,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  CCE
-CCE::CCE(int my_rank, int worker_num, const string& config_file)
+CCE::CCE(int my_rank, int worker_num, DefectCenter* defect, const ConfigXML& cfg)
 { 
     _my_rank = my_rank;
     _worker_num = worker_num;
-    
-    char cfg_path[500];
-    strcpy(cfg_path, PROJECT_PATH);
-    strcat(cfg_path, "/dat/config/");
-    strcat(cfg_path, config_file.c_str() );
-    _cfg = ConfigXML(cfg_path);
+    _defect_center = defect;
+    _cfg = cfg;
 
     if(my_rank == 0)
         _cfg.printParameters();
@@ -31,22 +27,10 @@ void CCE::run()
 
 void CCE::prepare_center_spin()
 {
-    if( !strcmp(_center_spin_name.c_str(), "NV") )
-    {
-        NVCenter nv;
-        nv.set_magB(_magB);
-        nv.make_espin_hamiltonian();
-        
-        _center_spin = nv.get_espin();
-        _state_pair = make_pair( 
-                nv.get_electron_spin_eigen_state(_state_idx0), 
-                nv.get_electron_spin_eigen_state(_state_idx1) ); 
-    }
-    else
-    {
-        cout << "Center Spin " << _center_spin_name << " is not supported." << endl;
-        assert(0);
-    }
+    _center_spin = _defect_center->get_espin();
+    _state_pair = make_pair( 
+            PureState(_defect_center->get_eigen_state(_state_idx0)), 
+            PureState(_defect_center->get_eigen_state(_state_idx1)) ); 
 }
 
 void CCE::create_bath_spins()
@@ -211,7 +195,7 @@ void CCE::export_mat_file()
 {/*{{{*/
 #ifdef HAS_MATLAB
     cout << "begin post_treatement ... storing cce_data to file: " << _result_filename << endl;
-    MATFile *mFile = matOpen(_result_filename, "w");
+    MATFile *mFile = matOpen(_result_filename.c_str(), "w");
     for(int i=0; i<_max_order; ++i)
     {
         char i_str [10];
@@ -258,25 +242,11 @@ void CCE::export_mat_file()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  EnsembleCCE
-EnsembleCCE::EnsembleCCE(int my_rank, int worker_num, const string& config_file)
-{ /*{{{*/
-    _my_rank = my_rank;
-    _worker_num = worker_num;
-
-    char cfg_path[500];
-    strcpy(cfg_path, PROJECT_PATH);
-    strcat(cfg_path, "/dat/config/");
-    strcat(cfg_path, config_file.c_str() );
-    _cfg = ConfigXML(cfg_path);
-
-    if(my_rank == 0)
-        _cfg.printParameters();
-}/*}}}*/
-
 void EnsembleCCE::set_parameters()
 {/*{{{*/
     string input_filename  = _cfg.getStringParameter("Data",       "input_file");
     string output_filename = _cfg.getStringParameter("Data",       "output_file");
+
     _state_idx0            = _cfg.getIntParameter   ("CenterSpin", "state_index0");
     _state_idx1            = _cfg.getIntParameter   ("CenterSpin", "state_index1");
 
@@ -289,17 +259,13 @@ void EnsembleCCE::set_parameters()
     _pulse_name            = _cfg.getStringParameter("Condition",  "pulse_name");
     _pulse_num             = _cfg.getIntParameter   ("Condition",  "pulse_number");
 
-    double magBx           = _cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
-    double magBy           = _cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
-    double magBz           = _cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
+    _magB << _cfg.getDoubleParameter("Condition",  "magnetic_fieldX")
+           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldY")
+           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
 
-    strcpy(_bath_spin_filename, PROJECT_PATH); 
-    strcpy(_result_filename, PROJECT_PATH); 
-    strcat(_bath_spin_filename, "/dat/input/");
-    strcat(_result_filename, "/dat/output/");
-    strcat(_bath_spin_filename, input_filename.c_str());
-    strcat(_result_filename, output_filename.c_str());
-    _magB << magBx << magBy << magBz; 
+    _bath_spin_filename = INPUT_PATH + input_filename;
+    _result_filename    = OUTPUT_PATH + output_filename;
+
     _time_list = linspace<vec>(_t0, _t1, _nTime);
 }/*}}}*/
 

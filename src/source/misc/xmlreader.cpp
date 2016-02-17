@@ -35,9 +35,9 @@ void ConfigXML::printParameters() const
     cout << "####################################### parameters #######################################" << endl;
     for(pos = _parameters.begin(); pos != _parameters.end(); ++pos)
     {
-        cout <<  setw(12) << (pos->first).first << setw(25) <<  (pos->first).second;
-        cout <<  setw(12) << (pos->second).first;
-        cout <<  setw(12) << (pos->second).second << endl; 
+        cout <<  std::right << setw(12) << (pos->first).first << " :: " << std::left << setw(25) <<  (pos->first).second;
+        cout <<  std::right << setw(12) << (pos->second).first << " = " ;
+        cout <<  std::left << setw(35) << (pos->second).second << endl; 
     }
     cout << "##########################################################################################" << endl;
     cout << endl;

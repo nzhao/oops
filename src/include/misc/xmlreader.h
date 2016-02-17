@@ -34,8 +34,6 @@ public:
 
 protected:
 private:
-    //xml_document<> _doc;
-    //xml_node<> *   _root_node;
     mutable PARA_MAP       _parameters;
 };
 #endif
