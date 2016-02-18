@@ -1,5 +1,6 @@
 #include "include/misc/misc.h"
 cx_double II = cx_double( 0.0, 1.0);
+double DISTANCE_EPSILON = 1e-10;
 
 double spin_distance(const cSPIN& spin1, const cSPIN& spin2) {
     return  norm(spin1.get_coordinate() - spin2.get_coordinate() ); }
@@ -10,6 +11,11 @@ vec r_vect(const cSPIN& obj1, const cSPIN& obj2){
 vec dipole(const cSPIN& spin1, const cSPIN& spin2)
 {
     double d=spin_distance(spin1, spin2);
+    if(d==DISTANCE_EPSILON)
+    {
+        vec res = zeros<vec>(9);
+        return  res;
+    }
     vec    r=r_vect(spin1, spin2);
     vec    n=r/d;
 
@@ -40,4 +46,40 @@ vec zeeman(const cSPIN&spin, const vec& magB)
     res << -g*bx <<  -g*by <<  -g*bz <<   e/3.0 <<  -e/3.0 << q;
     return res;
 };
+
+vec dipole_field(const cSPIN& spin, const cSPIN& source_spin, const cx_vec& source_state_vect)
+{
+    vec dip=dipole(spin, source_spin);
+    mat dip_m = reshape(dip, 3, 3);
+    vec s_vec = source_spin.get_spin_vector(source_state_vect);
+    vec res = dip_m * s_vec;
+    return res;
+};
+
+vector<double> Pulse_Timing(string pulsename, int n)
+{
+    vector<double> res;
+    res.push_back( 0.0 );
+    if( !strcmp(pulsename.c_str(), "CPMG") )
+    {
+        for(int i=0; i<n; ++i)
+            res.push_back( (2.0*i+1.0) / (2.0*n) ); 
+    }
+    else
+    {
+        cout << "Pulse type not supported." << endl;
+        assert(0);
+    }
+    res.push_back( 1.0 );
+    return res;
+}
+
+vector<double> Pulse_Interval(string pulsename, int n)
+{
+    vector<double> res;
+    vector<double> timings= Pulse_Timing(pulsename, n);
+    for(int i=0; i<=n; ++i)
+        res.push_back( timings[i+1] - timings[i] );
+    return res;
+}
 

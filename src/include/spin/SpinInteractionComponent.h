@@ -6,6 +6,7 @@
 #include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 #include "include/spin/SpinInteractionDefine.h"
+#include "include/quantum/PureState.h"
 
 using namespace std;
 using namespace arma;
@@ -26,10 +27,10 @@ public:
      cSpinInteractionDomain();
     ~cSpinInteractionDomain();
 
-    INDEX_LIST getIndexList(){return _index_list;};
-    vector< vector<cSPIN> > getSpinAggregate(){return _spin_aggregate;};
-    int getLength(){return _index_list.size();};
-    int get_nBody(){return _nbody;};
+    INDEX_LIST getIndexList() const {return _index_list;};
+    vector< vector<cSPIN> > getSpinAggregate() const {return _spin_aggregate;};
+    size_t getLength() const {return _index_list.size();};
+    int get_nBody() const {return _nbody;};
 
     friend ostream&  operator << (ostream& outs, const cSpinInteractionDomain& dm);
 protected:
@@ -71,7 +72,7 @@ public:
     ~cSpinInteractionForm();
 
     MAT_LIST getMatList(){return _mat_list;};
-    int getLength(){return _mat_list.size();};
+    size_t getLength(){return _mat_list.size();};
     int get_nTerm(){return _nterm;};
 
     friend ostream&  operator << (ostream& outs, cSpinInteractionForm& form);
@@ -85,7 +86,7 @@ protected:
 class TwoSpinInteractionForm:public cSpinInteractionForm
 {
 public:
-    TwoSpinInteractionForm(cSpinInteractionDomain& domain);
+    TwoSpinInteractionForm(const cSpinInteractionDomain& domain);
     ~TwoSpinInteractionForm();
 };
 //}}}
@@ -94,7 +95,7 @@ public:
 class SingleSpinInteractionForm:public cSpinInteractionForm
 {
 public:
-    SingleSpinInteractionForm(cSpinInteractionDomain& domain);
+    SingleSpinInteractionForm(const cSpinInteractionDomain& domain);
     ~SingleSpinInteractionForm();
 };
 //}}}
@@ -113,7 +114,7 @@ public:
     ~cSpinInteractionCoeff();
 
     COEFF_LIST getCoeffList(){return _coeff_list;};
-    int getLength(){return _coeff_list.size();};
+    size_t getLength(){return _coeff_list.size();};
     int get_nCoeff(){return _nCoeff;};
 
     friend ostream&  operator << (ostream& outs, cSpinInteractionCoeff& coef);
@@ -127,7 +128,7 @@ protected:
 class DipolarInteractionCoeff:public cSpinInteractionCoeff
 {
 public:
-    DipolarInteractionCoeff(cSpinInteractionDomain& domain);
+    DipolarInteractionCoeff(const cSpinInteractionDomain& domain);
     ~DipolarInteractionCoeff();
 };
 //}}}
@@ -136,8 +137,21 @@ public:
 class ZeemanInteractionCoeff:public cSpinInteractionCoeff
 {
 public:
-    ZeemanInteractionCoeff(cSpinInteractionDomain& domain, const vec& magB);
+    ZeemanInteractionCoeff(const cSpinInteractionDomain& domain, const vec& magB);
     ~ZeemanInteractionCoeff();
+};
+//}}}
+//----------------------------------------------------------------------------//
+////////////////////////////////////////////////////////////////////////////////
+//{{{ DipolarFieldInteractionCoeff
+class DipolarFieldInteractionCoeff:public cSpinInteractionCoeff
+{
+public:
+    DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const cSPIN& center_spin, const PureState& state);
+    DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const vector<cSPIN>& spin_list, const vector<PureState>& state_list);
+    ~DipolarFieldInteractionCoeff();
+protected:
+private:
 };
 //}}}
 //----------------------------------------------------------------------------//
@@ -145,7 +159,7 @@ public:
 class PolarizationCoeff:public cSpinInteractionCoeff
 {
 public:
-    PolarizationCoeff(cSpinInteractionDomain& domain, const vector<vec>& pol);
+    PolarizationCoeff(const cSpinInteractionDomain& domain, const vector<vec>& pol);
     ~PolarizationCoeff();
 };
 //}}}

@@ -1,79 +1,19 @@
+#include "include/spin/SpinCollection.h"
 #include "include/spin/SpinCluster.h"
 //#include "include/spin/SpinClusterAlgorithm.h"
-
-////////////////////////////////////////////////////////////////////
-//{{{ cClusterIndex
-cClusterIndex::cClusterIndex()
-{ LOG(INFO) << "Default constructor of cClusterIndex.";
-}
-
-cClusterIndex::cClusterIndex(const uvec& idx)
-{
-    _index = idx;
-    sort(_index.begin(), _index.end()); }
-
-cClusterIndex::~cClusterIndex()
-{ LOG(INFO) << "Default destructor of cClusterIndex.";
-}
-
-mat cClusterIndex::get_array(size_t nspin)
-{
-    mat idx_array=zeros(1, nspin);
-    int nnz = _index.size();
-
-    for(int i=0; i<nnz; ++i)
-        idx_array[_index[i]]=1;
-    return idx_array;
-}
-
-bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2)
-{
-    if(idx1._index.size() == idx2._index.size())
-        for(int i=0; i<idx1._index.size(); ++i)
-        { if(idx1._index[i] != idx2._index[i]) return 0; }
-    else
-        return 0;
-    return 1;
-}
-
-
-bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2)
-{
-    int sz1=idx1._index.size(); int sz2=idx2._index.size();
-    if( sz1 == sz2 )
-        for(int i=0; i<sz1; ++i)
-        { if(idx1._index[i] != idx2._index[i]) return idx1._index[i] < idx2._index[i]; }
-    else
-        return (sz1 < sz2);
-    return 0;// idx1 equals to idx2
-}
-
-ostream&  operator << (ostream& outs, const cClusterIndex& idx)
-{
-    //for(auto it=idx._index.begin(); it !=idx._index.end(); ++it)
-    //{
-    //    outs << *it;
-    //    if(next(it) != idx._index.end())
-    //        outs << ", ";
-    //}
-    for(int i=0; i<idx._index.size(); ++i)
-    {
-        outs << idx._index(i);
-        if(i<idx._index.size()-1)
-            outs <<", ";
-    }
-    return outs;
-}
-//}}}
-////////////////////////////////////////////////////////////////////////////////
 
 
 
 ////////////////////////////////////////////////////////////////////
 //{{{ cSpinCluster
-cSpinCluster::cSpinCluster(cSpinGrouping * grouping)
+cSpinCluster::cSpinCluster()
+{ //LOG(INFO) << "Defaul constructor: cSpinCluster.";
+}
+cSpinCluster::cSpinCluster(const cSpinCollection& sc, cSpinGrouping * grouping)
 {
     _grouping = grouping;
+    _spin_collection = sc;
+    _max_order = grouping->getMaxOrder();
 }
 
 cSpinCluster::~cSpinCluster()
@@ -88,39 +28,144 @@ void cSpinCluster::make()
     _cluster_index_list = _grouping->get_cluster_index();
 }
 
-ostream&  operator << (ostream& outs, const cSpinCluster& clst)
+cSpinCluster::cSpinCluster(const cSpinCluster& clst)
 {
+    _spin_collection = clst._spin_collection;
+    _max_order = clst._max_order;//clst.getMaxOrder();
+    _cluster_index_list = clst._cluster_index_list;//clst.getClusterIndex();
+}
+
+cSpinCluster::cSpinCluster(const cSpinCollection& sc, const uvec& clstLength, const vector<umat>& clstMatList)
+{
+    _spin_collection = sc;
+    _max_order = clstMatList.size();
+    for(int i=0; i<clstMatList.size(); ++i)
+    {
+        umat fix_order_mat = clstMatList[i];
+        FIX_ORDER_INDEX_SET fix_order_set;
+        for(int j=0; j<fix_order_mat.n_rows; ++j)
+        {
+            uvec v = trans( fix_order_mat.row(j) );
+            fix_order_set.insert( cClusterIndex(v) );
+        }
+        _cluster_index_list.push_back(fix_order_set);
+    }
+}
+
+cClusterIndex cSpinCluster::getClusterIndex(size_t order, size_t index) const
+{
+    FIX_ORDER_INDEX_SET::iterator it = _cluster_index_list[order].begin();
+    advance(it, index);
+    return *it;
+}
+
+umat cSpinCluster::getClusterIndex(size_t order) const
+{
+    umat res = zeros<umat> (getClusterNum(order), order+1);
+
+    FIX_ORDER_INDEX_SET::iterator it;
+    const FIX_ORDER_INDEX_SET& clusters = _cluster_index_list[order];
+    for(it = clusters.begin(); it != clusters.end(); ++it)
+        res.row( distance(clusters.begin(), it ) ) = trans( it->getIndex() );
+    return res;
+}
+set<CluserPostion > cSpinCluster::getSubClusters(size_t order, size_t index) const
+{
+    cClusterIndex clst = getClusterIndex(order, index);
+    set<CluserPostion > sub_pos = clst.getSubClstPos();
+    set<CluserPostion >::iterator it;
+    for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
+    {
+        cClusterIndex sub_cluster = getClusterIndex(it->first, it->second); 
+        set<CluserPostion > sub_sub_pos = getSubClusters(it->first, it->second);//sub_cluster.getSubClstPos();
+        set<CluserPostion >::iterator sub_it;
+        for(sub_it=sub_sub_pos.begin(); sub_it!=sub_sub_pos.end(); ++sub_it)
+            sub_pos.insert( *sub_it );
+    }
+    return sub_pos;
+}
+
+void cSpinCluster::MPI_partition(int nWorker)
+{
+    _data.nWorker = nWorker;
+    _data.nOrder = getMaxOrder();
+
+    _data.jobTable = umat(_data.nOrder, _data.nWorker, fill::zeros);
+    for(int order_i = 0; order_i<_data.nOrder; ++order_i)
+    {
+        int clstNum = getClusterNum(order_i);
+        _data.clusterNumList.push_back( clstNum );
+
+        umat full_clst_idx = getClusterIndex( order_i );
+        clusterTable clst_tb_i;
+
+        int row1 = 0; int row2 = 0;
+        int q = clstNum/nWorker; int r = clstNum % nWorker;
+
+        for(int wk_id = 0; wk_id<nWorker; ++wk_id)
+        {
+            int jobs = wk_id < r ? q + 1: q;
+            _data.jobTable(order_i, wk_id) = jobs;
+
+            row2 = row1 + jobs;
+            
+            clst_tb_i.push_back( full_clst_idx.rows(row1, row2-1) );
+            row1 = row2;
+        }
+        _data.clusterData.push_back(clst_tb_i);
+    }
+}
+
+vector<umat> cSpinCluster::getMPI_Cluster(int worker_id)
+{
+    vector<umat> res;
+    for(int i=0; i<getMaxOrder(); ++i)
+        res.push_back( _data.clusterData[i][worker_id] );
+    return res;
+}
+
+CluserPostion cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) const
+{
+    size_t pos1, pos2;
+    pos1 = 0;
+    for(int id=0; id<worker_id; ++id)
+        pos1 += _data.jobTable(cce_order, id); 
+    pos2 = pos1 + _data.jobTable(cce_order, worker_id);
+
+    CluserPostion res(pos1, pos2);
+    return res;
+}
+
+vector<cSPIN> cSpinCluster::getCluster(size_t order, size_t index) const
+{
+    cClusterIndex clst = getClusterIndex(order, index);
+    return _spin_collection.getSpinList(clst);
+}
+
+ostream&  operator << (ostream& outs, const cSpinCluster& clst)
+{/*{{{*/
 /// Operator << is reloaded to display the cluster index one by one.
-    int i, j, tot; i=1; j=1; tot=0;
+    int i, j, tot; i=0; j=0; tot=0;
     
     outs << "Total Order = " << clst._cluster_index_list.size() << endl;
-//    for(auto clst_set: clst._cluster_index_list)
-//    {
-//        j=1; tot += clst_set.size();
-//        if(clst_set.size() > 0)
-//        {
-//            outs << "Cluster Order = " << i << ": Number = " << clst_set.size() << ": " << endl;
-//            for(auto idx: clst_set)
-//            {
-//                outs << j << ": " <<  idx << endl;
-//                j++;
-//            }
-//            outs << endl;
-//        }
-//        i++;
-//    }
     for(int order=0; order<clst._cluster_index_list.size(); ++order)
     {
         FIX_ORDER_INDEX_SET clst_set = clst._cluster_index_list[order];
 
-        j=1; tot += clst_set.size();
+        j=0; tot += clst_set.size();
         if(clst_set.size() > 0)
         {
             outs << "Cluster Order = " << i << ": Number = " << clst_set.size() << ": " << endl;
             for(set<cClusterIndex>::iterator pos=clst_set.begin(); pos!=clst_set.end(); ++pos)
             {
                 cClusterIndex vIdx = *pos;
-                outs << j << ": " <<  vIdx << endl;
+                outs << "{ " << order << ", " << j << " } = "  <<  vIdx << "\t";
+
+                set<CluserPostion > sub_pos = clst.getSubClusters(order, j);//vIdx.getSubClstPos();
+                set<CluserPostion >::iterator it;
+                for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
+                    outs << "{ " << it->first << ", " << it->second << " }\t" ;
+                cout << endl;
                 j++;
             }
             outs << endl;
@@ -129,6 +174,6 @@ ostream&  operator << (ostream& outs, const cSpinCluster& clst)
     }
     outs << tot << " clusters are generated." << endl;
     return outs;
-}
+}/*}}}*/
 //}}}
 ////////////////////////////////////////////////////////////////////

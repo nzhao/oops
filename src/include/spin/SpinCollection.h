@@ -5,6 +5,7 @@
 #include <armadillo>
 #include "include/spin/Spin.h"
 #include "include/spin/SpinSource.h"
+#include "include/spin/SpinClusterAlgorithm.h"
 
 using namespace std;
 using namespace arma;
@@ -24,6 +25,7 @@ using namespace arma;
 class cSpinCollection
 {
 public:
+    cSpinCollection();
     cSpinCollection(cSpinSource * source);
     ~cSpinCollection();
 
@@ -32,13 +34,16 @@ public:
     //@}
 
     //@{
-    vector<cSPIN>& getSpinList(){return spin_list;};
-    mat& getDistanceMatrix(){return dist_mat;};
-    sp_mat getConnectionMatrix(double threshold);
+    int           getSpinNum() const {return _spin_list.size();};
+    vector<cSPIN> getSpinList() const {return _spin_list;};
+    vector<cSPIN> getSpinList(const cClusterIndex& clst) const;
+    mat getCoordinateMat() const;
+    mat& getDistanceMatrix() {return dist_mat;};
+    sp_mat getConnectionMatrix (double threshold) const;
     //@}
 private:
     cSpinSource* _source;
-    vector<cSPIN> spin_list;
+    vector<cSPIN> _spin_list;
 
     mat dist_mat;
 };
