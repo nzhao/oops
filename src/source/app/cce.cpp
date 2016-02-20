@@ -148,6 +148,7 @@ void CCE::post_treatment()
         cce_coherence_reduction();
         compuate_final_coherence();
         export_mat_file();
+        cout<<"The data have been exported."<<endl;
     }
 }
 
@@ -194,6 +195,7 @@ void CCE::compuate_final_coherence()
 void CCE::export_mat_file() 
 {/*{{{*/
 #ifdef HAS_MATLAB
+    cout <<"exporting the data."<<endl;
     cout << "begin post_treatement ... storing cce_data to file: " << _result_filename << endl;
     MATFile *mFile = matOpen(_result_filename.c_str(), "w");
     for(int i=0; i<_max_order; ++i)
