@@ -98,7 +98,7 @@ void PiecewiseFullMatrixVectorEvolution::perform()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ PiecewiseFullMatrixMatrixEvolution
-PiecewiseFullMatrixMatrixEvolution::PiecewiseFullMatrixMatrixEvolution( const vector<QuantumOperator>& left_op_list, const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const QuantumState& st)
+PiecewiseFullMatrixMatrixEvolution::PiecewiseFullMatrixMatrixEvolution( const vector<QuantumOperator>& left_op_list, const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const DensityOperator& st)
 {
    _left_op_list = left_op_list; 
    _right_op_list = right_op_list; 
