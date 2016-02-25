@@ -1263,7 +1263,7 @@ public:
         }
 
         int decrement(void) {
-            return this == nullptr ? 0 : --count_;
+            return this == NULL ? 0 : --count_;
         }
 
     private:

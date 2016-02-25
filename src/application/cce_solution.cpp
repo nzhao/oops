@@ -17,7 +17,7 @@ ConfigXML set_parameters(const string& xml_file_name);
 int  main(int argc, char* argv[])
 {
     ConfigXML cfg = set_parameters("EnsembleCCE.xml");
-    
+
     string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");
     _START_EASYLOGGINGPP(argc, argv);
     easyloggingpp::Configurations confFromFile(log_file.c_str());
@@ -34,11 +34,7 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
     // create defect center
-    double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
-    double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
-    double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
-    vec coord; coord<< x << y<< z;    
-    NVCenter nv(NVCenter::N14, coord);
+    NVCenter nv(NVCenter::N14);
     double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
     double magBy = cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
     double magBz = cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
@@ -53,11 +49,8 @@ int  main(int argc, char* argv[])
 
     mpi_status = MPI_Finalize();
     assert (mpi_status == MPI_SUCCESS);
-    
 }
 
-
- 
 ConfigXML set_parameters(const string& xml_file_name)
 {/*{{{*/
     char *env_path = std::getenv("CCE_PROJ_PATH");
@@ -75,6 +68,7 @@ ConfigXML set_parameters(const string& xml_file_name)
     OUTPUT_PATH = PROJECT_PATH + "/dat/output/";
     CONFIG_PATH = PROJECT_PATH + "/dat/config/";
     DEBUG_PATH  = PROJECT_PATH = "/dat/debug/";
+
     ConfigXML cfg( CONFIG_PATH+xml_file_name );
     return cfg;
 }/*}}}*/
