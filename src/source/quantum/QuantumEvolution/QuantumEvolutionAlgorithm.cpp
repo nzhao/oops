@@ -93,3 +93,40 @@ void PiecewiseFullMatrixVectorEvolution::perform()
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ PiecewiseFullMatrixMatrixEvolution
+PiecewiseFullMatrixMatrixEvolution::PiecewiseFullMatrixMatrixEvolution( const vector<QuantumOperator>& left_op_list, const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const QuantumState& st)
+{
+   _left_op_list = left_op_list; 
+   _right_op_list = right_op_list; 
+   _time_segment = time_segment;
+   _init_state = st;
+   _state_dimension = st.getDimension();
+}
+
+void PiecewiseFullMatrixMatrixEvolution::perform()
+{
+    _vector_list.push_back(_init_state.getVector());
+    double dt = _time_list[1] - _time_list[0];
+
+    vector<cx_mat> expm_list, expm_list1;
+    for(int j=0; j<_op_list.size(); ++j)
+        expm_list.push_back( expmat(-1.0*II* _time_segment[j]*dt * _op_list[j].getMatrix() ) );
+
+    expm_list1 = expm_list;
+    for(int i=1; i<_time_list.size(); ++i)
+    {
+        cx_vec state_i = _vector_list[0];
+        for(int j=0; j<_op_list.size(); ++j)
+        {
+            state_i = expm_list1[j]*state_i; 
+            expm_list1[j] = expm_list[j]*expm_list1[j];
+        }
+        _vector_list.push_back( state_i );
+    }
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////

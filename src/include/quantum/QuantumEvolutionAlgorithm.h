@@ -72,4 +72,29 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{  PiecewiseFullMatrixMatrixEvolution
+class PiecewiseFullMatrixMatrixEvolution:public QuantumEvolutionAlgorithm
+{
+public:
+    PiecewiseFullMatrixMatrixEvolution() {};
+    PiecewiseFullMatrixMatrixEvolution(
+            const vector<QuantumOperator>& left_op_list, 
+            const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const QuantumState& st);
+    ~PiecewiseFullMatrixMatrixEvolution() {};
+
+    void perform();
+protected:
+private:
+    vector<QuantumOperator> _left_op_list;
+    vector<QuantumOperator> _right_op_list;
+    vector<double> _time_segment;
+};
+
+//}}}
+////////////////////////////////////////////////////////////////////////////////
 #endif
