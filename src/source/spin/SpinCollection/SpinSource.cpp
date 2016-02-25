@@ -39,6 +39,10 @@ vector<cSPIN>& cSpinSourceFromFile::generate()
     double x, y, z;
 
     ifstream coord(_filename.c_str());
+    if(coord.fail())
+     {
+        cout<< "Input spin source opening failed.\n";
+     }
     if(!coord) assert(0);
 
     coord >> nbath;
