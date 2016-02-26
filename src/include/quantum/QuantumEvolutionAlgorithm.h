@@ -86,12 +86,13 @@ public:
     PiecewiseFullMatrixMatrixEvolution() {};
     PiecewiseFullMatrixMatrixEvolution(
             const vector<QuantumOperator>& left_op_list, 
-            const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const DensityOperator& st);
+            const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const DensityOperator& ds);
     ~PiecewiseFullMatrixMatrixEvolution() {};
 
     void perform();
 protected:
 private:
+    DensityOperator _density_matrix;
     vector<QuantumOperator> _left_op_list;
     vector<QuantumOperator> _right_op_list;
     vector<double> _time_segment;

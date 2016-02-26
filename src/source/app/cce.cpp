@@ -52,7 +52,7 @@ void CCE::create_spin_clusters()
         _spin_clusters=cSpinCluster(_bath_spins, &dfpt);
         _spin_clusters.make();
     }
-
+    
     job_distribution();
 }
 
@@ -272,24 +272,23 @@ void EnsembleCCE::set_parameters()
 vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 {
     vector<cSPIN> spin_list = _my_clusters.getCluster(cce_order, index);
-
+    
     Hamiltonian hami0 = create_spin_hamiltonian(_center_spin, _state_pair.first, spin_list);
     Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, _state_pair.second, spin_list);
-
-    Liouvillian lv1 = create_spin_liouvillian(hami0, hami1);
-    Liouvillian lv2 = create_spin_liouvillian(hami1, hami0);
     
-    vector<QuantumOperator> lv_list = riffle((QuantumOperator) lv1, (QuantumOperator) lv2, _pulse_num);
+    vector<QuantumOperator> left_hm_list = riffle((QuantumOperator) hami0, (QuantumOperator) hami1, _pulse_num);
+    vector<QuantumOperator> right_hm_list = riffle((QuantumOperator) hami1, (QuantumOperator) hami0, _pulse_num);
+
     vector<double> time_segment = Pulse_Interval(_pulse_name, _pulse_num);
 
     DensityOperator ds = create_spin_density_state(spin_list);
 
-    PiecewiseFullMatrixVectorEvolution kernel(lv_list, time_segment, ds);
+    PiecewiseFullMatrixMatrixEvolution kernel(left_hm_list, right_hm_list, time_segment, ds);
     kernel.setTimeSequence( _t0, _t1, _nTime);
 
     ClusterCoherenceEvolution dynamics(&kernel);
     dynamics.run();
-
+    
     return dynamics.calc_obs();
 }
 

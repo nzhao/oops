@@ -98,22 +98,26 @@ void PiecewiseFullMatrixVectorEvolution::perform()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ PiecewiseFullMatrixMatrixEvolution
-PiecewiseFullMatrixMatrixEvolution::PiecewiseFullMatrixMatrixEvolution( const vector<QuantumOperator>& left_op_list, const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const DensityOperator& st)
+PiecewiseFullMatrixMatrixEvolution::PiecewiseFullMatrixMatrixEvolution( const vector<QuantumOperator>& left_op_list, const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const DensityOperator& ds)
 {
    _left_op_list = left_op_list; 
    _right_op_list = right_op_list; 
    _time_segment = time_segment;
-   _init_state = st;
-   _state_dimension = st.getDimension();
+   _density_matrix = ds;
+   _init_state = ds;
+   _state_dimension = ds.getDimension()*ds.getDimension();
 }
 
 void PiecewiseFullMatrixMatrixEvolution::perform()
 {
-    _vector_list.push_back(_init_state.getVector());
+    _vector_list.push_back(_density_matrix.getVector());
+        
     double dt = _time_list[1] - _time_list[0];
 
     vector<cx_mat> left_expm_list, right_expm_list, expm_list1, expm_list2;
-    if (_left_op_list.size()==_right_op_list.size()) assert(0);
+    if (_left_op_list.size()!=_right_op_list.size()) assert(0);
+    
+//    cout<<"the time segment is "<<_time_segment[0]<<endl;
 
     for(int j=0; j<_left_op_list.size(); ++j)
     {
@@ -125,14 +129,14 @@ void PiecewiseFullMatrixMatrixEvolution::perform()
     expm_list1 = left_expm_list; expm_list2 = right_expm_list;
     for(int i=1; i<_time_list.size(); ++i)
     {
-        size_t dim=_init_state.getDimension();
-        cx_mat state_i = _init_state.getMatrix();
+        cx_mat state_i = _density_matrix.getMatrix();
         for(int j=0; j<_left_op_list.size(); ++j)
         {
             state_i = expm_list1[j]*state_i*expm_list2[j];
             expm_list1[j] = left_expm_list[j]*expm_list1[j];
             expm_list2[j] = right_expm_list[j]*expm_list2[j];
         }
+        
         cx_vec vector_i= vectorise(state_i);
         _vector_list.push_back( vector_i );
     }
