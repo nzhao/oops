@@ -117,23 +117,21 @@ void PiecewiseFullMatrixMatrixEvolution::perform()
     vector<cx_mat> left_expm_list, right_expm_list, expm_list1, expm_list2;
     if (_left_op_list.size()!=_right_op_list.size()) assert(0);
     
-//    cout<<"the time segment is "<<_time_segment[0]<<endl;
-
-    for(int j=0; j<_left_op_list.size(); ++j)
+    int op_num=_left_op_list.size();
+    for(int j=0; j<op_num; ++j)
     {
         left_expm_list.push_back( expmat(-1.0*II* _time_segment[j]*dt * _left_op_list[j].getMatrix() ) );
         right_expm_list.push_back( expmat(1.0*II* _time_segment[j]*dt * _right_op_list[j].getMatrix() ) );
     }
-  
-    
+
     expm_list1 = left_expm_list; expm_list2 = right_expm_list;
     for(int i=1; i<_time_list.size(); ++i)
     {
         cx_mat state_i = _density_matrix.getMatrix();
-        for(int j=0; j<_left_op_list.size(); ++j)
+        for(int j=0; j<op_num; ++j)
         {
-            state_i = expm_list1[j]*state_i*expm_list2[j];
-            expm_list1[j] = left_expm_list[j]*expm_list1[j];
+            state_i = expm_list1[op_num-1-j]*state_i*expm_list2[j];
+            expm_list1[op_num-1-j] = left_expm_list[op_num-1-j]*expm_list1[op_num-1-j];
             expm_list2[j] = right_expm_list[j]*expm_list2[j];
         }
         

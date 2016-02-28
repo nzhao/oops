@@ -277,7 +277,11 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
     Hamiltonian hami1 = create_spin_hamiltonian(_center_spin, _state_pair.second, spin_list);
     
     vector<QuantumOperator> left_hm_list = riffle((QuantumOperator) hami0, (QuantumOperator) hami1, _pulse_num);
-    vector<QuantumOperator> right_hm_list = riffle((QuantumOperator) hami1, (QuantumOperator) hami0, _pulse_num);
+    vector<QuantumOperator> right_hm_list;
+    if (_pulse_num % 2 == 0)
+        right_hm_list= riffle((QuantumOperator) hami1, (QuantumOperator) hami0, _pulse_num);
+    if (_pulse_num % 2 == 1)
+        right_hm_list = riffle((QuantumOperator) hami0, (QuantumOperator) hami1, _pulse_num);
 
     vector<double> time_segment = Pulse_Interval(_pulse_name, _pulse_num);
 
