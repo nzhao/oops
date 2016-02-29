@@ -2,7 +2,7 @@
 
 NVCenter::NVCenter(NVNuclearSpin nuc)
 {
-    vec coord; coord<< 0.0 << 0.0 << 0.0;
+    vec coord; coord << 0.0 << 0.0 << 0.0;
     add_spin_member(nuc, coord);
 }
 

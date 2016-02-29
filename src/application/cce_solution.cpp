@@ -37,7 +37,7 @@ int  main(int argc, char* argv[])
     double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
     double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
     double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
-    vec coord; coord<< x << y<< z;
+    vec coord; coord << x << y << z;
     NVCenter nv(NVCenter::N14, coord);
     
     double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
