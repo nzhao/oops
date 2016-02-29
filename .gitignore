@@ -3,6 +3,8 @@ dat/*
 obj/*
 doc/html/*
 doc/*.old
+doc/*.pdf
+src/logs/*
 src/logs
 src/debug
 *.o

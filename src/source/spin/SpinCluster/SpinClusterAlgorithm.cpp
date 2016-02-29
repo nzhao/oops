@@ -71,7 +71,7 @@ bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2)
 
 ostream&  operator << (ostream& outs, const cClusterIndex& idx)
 {
-    cout << "[" ;
+    outs << "[" ;
     for(int i=0; i<idx._index.size(); ++i)
     {
         outs << idx._index(i);

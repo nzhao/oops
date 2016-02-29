@@ -62,6 +62,7 @@ private:
     void             DataGathering(mat& resMat, int cce_order, int clst_num);
 
     virtual vec      cluster_evolution(int cce_order, int index)=0;
+    virtual vec      calc_observables(QuantumEvolutionAlgorithm* ker)=0;
     void             post_treatment();
     void             cce_coherence_reduction();
     void             compuate_final_coherence();
@@ -91,6 +92,7 @@ private:
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
 
     vec _bath_polarization;
+    vec calc_observables(QuantumEvolutionAlgorithm* ker);
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +122,8 @@ private:
     vector< vector<vec> > _dipole_field_data;
     int _bath_state_seed;
     vector<PureState> _bath_state_list;
+
+    vec calc_observables(QuantumEvolutionAlgorithm* ker);
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
