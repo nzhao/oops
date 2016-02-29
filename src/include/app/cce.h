@@ -115,6 +115,7 @@ private:
     Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list, const cClusterIndex& clstIndex);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
+    PureState create_cluster_state(const cClusterIndex& clstIndex);
 
     void cache_dipole_field();
 

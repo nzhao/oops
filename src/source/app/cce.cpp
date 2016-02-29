@@ -412,14 +412,15 @@ vec SingleSampleCCE::cluster_evolution(int cce_order, int index)
     vector<double> time_segment = Pulse_Interval(_pulse_name, _pulse_num);
 
     DensityOperator ds = create_spin_density_state(spin_list);
+    PureState psi = create_cluster_state(clstIndex);
 
-    PiecewiseFullMatrixVectorEvolution kernel(hm_list1, time_segment, ds);
+    PiecewiseFullMatrixVectorEvolution kernel(hm_list1, time_segment, psi);
     kernel.setTimeSequence( _t0, _t1, _nTime);
 
     ClusterCoherenceEvolution dynamics(&kernel);
     dynamics.run();
 
-    return dynamics.calc_obs();
+    return calc_observables(&kernel);
 }/*}}}*/
 
 Hamiltonian SingleSampleCCE::create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_state, const vector<cSPIN>& spin_list, const cClusterIndex& clstIndex )
@@ -460,6 +461,17 @@ DensityOperator SingleSampleCCE::create_spin_density_state(const vector<cSPIN>& 
     return ds;
 }/*}}}*/
 
+PureState SingleSampleCCE::create_cluster_state(const cClusterIndex& clstIndex)
+{
+    uvec idx = clstIndex.getIndex();
+    cx_vec state_vec = _bath_state_list[ idx[0] ].getVector();
+    for(int i=1; i<idx.n_elem; ++i)
+        state_vec = kron( state_vec, _bath_state_list[ idx[i] ].getVector() );
+
+    PureState res( state_vec );
+    return res;
+}
+
 void SingleSampleCCE::cache_dipole_field()
 {/*{{{*/
     vector<cSPIN> sl = _bath_spins.getSpinList();
@@ -477,10 +489,10 @@ void SingleSampleCCE::cache_dipole_field()
 
 vec SingleSampleCCE::calc_observables(QuantumEvolutionAlgorithm* kernel)
 {
-    vector<cx_mat>  state = kernel->getResultMat();
+    vector<cx_vec>  state = kernel->getResult();
     vec res = ones<vec>(_nTime);
     for(int i=0; i<_nTime; ++i)
-        res(i) = real( trace(state[i]) );
+        res(i) = real( state[i](0) );
     return res;
 }
 //}}}
