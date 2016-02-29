@@ -3,6 +3,8 @@
 #include "include/misc/misc.h"
 #include "include/quantum/QuantumOperator.h"
 #include "include/quantum/QuantumState.h"
+#include "include/quantum/MixedState.h"
+#include "include/quantum/PureState.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolutionAlgorithm
@@ -18,6 +20,7 @@ public:
     vec  getTimeSequence() const {return _time_list;};
     size_t  getStateDim() const {return _state_dimension;};
     vector<cx_vec> getResult() const {return _vector_list;};
+    vector<cx_mat> getResultMat() const {return _state_mat_list;};
     cx_vec getInitalState() const {return _init_state.getVector();}; 
     size_t getMatrixDim() const {return _init_state.getDimension();}
 
@@ -30,6 +33,7 @@ protected:
 
     cx_mat         _matrix;
     vector<cx_vec> _vector_list;
+    vector<cx_mat> _state_mat_list;
 private:
 };
 //}}}
@@ -70,6 +74,32 @@ private:
     vector<QuantumOperator> _op_list;
     vector<double> _time_segment;
 };
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{  PiecewiseFullMatrixMatrixEvolution
+class PiecewiseFullMatrixMatrixEvolution:public QuantumEvolutionAlgorithm
+{
+public:
+    PiecewiseFullMatrixMatrixEvolution() {};
+    PiecewiseFullMatrixMatrixEvolution(
+            const vector<QuantumOperator>& left_op_list, 
+            const vector<QuantumOperator>& right_op_list, const vector<double>& time_segment, const DensityOperator& ds);
+    ~PiecewiseFullMatrixMatrixEvolution() {};
+
+    void perform();
+protected:
+private:
+    DensityOperator _density_matrix;
+    vector<QuantumOperator> _left_op_list;
+    vector<QuantumOperator> _right_op_list;
+    vector<double> _time_segment;
+};
+
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 #endif
