@@ -62,7 +62,7 @@ private:
     void             DataGathering(mat& resMat, int cce_order, int clst_num);
 
     virtual vec      cluster_evolution(int cce_order, int index)=0;
-    virtual vec      calc_observables(QuantumEvolutionAlgorithm* ker)=0;
+    //virtual vec      calc_observables(QuantumEvolutionAlgorithm* ker)=0;
     void             post_treatment();
     void             cce_coherence_reduction();
     void             compuate_final_coherence();
@@ -124,7 +124,7 @@ private:
     int _bath_state_seed;
     vector<PureState> _bath_state_list;
 
-    vec calc_observables(QuantumEvolutionAlgorithm* ker);
+    vec calc_observables(QuantumEvolutionAlgorithm* ker1, QuantumEvolutionAlgorithm* ker2);
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

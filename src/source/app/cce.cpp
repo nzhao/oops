@@ -411,16 +411,19 @@ vec SingleSampleCCE::cluster_evolution(int cce_order, int index)
     vector<QuantumOperator> hm_list2 = riffle((QuantumOperator) hami1, (QuantumOperator) hami0, _pulse_num);
     vector<double> time_segment = Pulse_Interval(_pulse_name, _pulse_num);
 
-    DensityOperator ds = create_spin_density_state(spin_list);
     PureState psi = create_cluster_state(clstIndex);
 
-    PiecewiseFullMatrixVectorEvolution kernel(hm_list1, time_segment, psi);
-    kernel.setTimeSequence( _t0, _t1, _nTime);
+    PiecewiseFullMatrixVectorEvolution kernel1(hm_list1, time_segment, psi);
+    PiecewiseFullMatrixVectorEvolution kernel2(hm_list2, time_segment, psi);
+    kernel1.setTimeSequence( _t0, _t1, _nTime);
+    kernel2.setTimeSequence( _t0, _t1, _nTime);
 
-    ClusterCoherenceEvolution dynamics(&kernel);
-    dynamics.run();
+    ClusterCoherenceEvolution dynamics1(&kernel1);
+    ClusterCoherenceEvolution dynamics2(&kernel2);
+    dynamics1.run();
+    dynamics2.run();
 
-    return calc_observables(&kernel);
+    return calc_observables(&kernel1, &kernel2);
 }/*}}}*/
 
 Hamiltonian SingleSampleCCE::create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_state, const vector<cSPIN>& spin_list, const cClusterIndex& clstIndex )
@@ -462,7 +465,7 @@ DensityOperator SingleSampleCCE::create_spin_density_state(const vector<cSPIN>& 
 }/*}}}*/
 
 PureState SingleSampleCCE::create_cluster_state(const cClusterIndex& clstIndex)
-{
+{/*{{{*/
     uvec idx = clstIndex.getIndex();
     cx_vec state_vec = _bath_state_list[ idx[0] ].getVector();
     for(int i=1; i<idx.n_elem; ++i)
@@ -470,7 +473,7 @@ PureState SingleSampleCCE::create_cluster_state(const cClusterIndex& clstIndex)
 
     PureState res( state_vec );
     return res;
-}
+}/*}}}*/
 
 void SingleSampleCCE::cache_dipole_field()
 {/*{{{*/
@@ -487,13 +490,14 @@ void SingleSampleCCE::cache_dipole_field()
     }
 }/*}}}*/
 
-vec SingleSampleCCE::calc_observables(QuantumEvolutionAlgorithm* kernel)
-{
-    vector<cx_vec>  state = kernel->getResult();
-    vec res = ones<vec>(_nTime);
+vec SingleSampleCCE::calc_observables(QuantumEvolutionAlgorithm* kernel1, QuantumEvolutionAlgorithm* kernel2)
+{/*{{{*/
+    vector<cx_vec>  state1 = kernel1->getResult();
+    vector<cx_vec>  state2 = kernel2->getResult();
+    cx_vec res = ones<cx_vec>(_nTime);
     for(int i=0; i<_nTime; ++i)
-        res(i) = real( state[i](0) );
-    return res;
-}
+        res(i) =  cdot(state1[i], state2[i]);
+    return real(res);
+}/*}}}*/
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
