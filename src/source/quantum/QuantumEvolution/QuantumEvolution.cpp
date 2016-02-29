@@ -10,6 +10,7 @@ vec ClusterCoherenceEvolution::calc_obs()
     
     vector<cx_vec>  state = _kernel->getResult();
     cx_mat stateMat( n_time, _kernel->getStateDim(), fill::zeros);
+    
     for(int i=0; i<n_time; ++i)
         stateMat.row(i) = trans( state[i] );
 
