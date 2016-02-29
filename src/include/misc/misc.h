@@ -25,15 +25,14 @@ vector<double> Pulse_Interval(string pulsename, int n);
 template<class T> vector<T> riffle(T obj1, T obj2, int n)
 {
     vector<T> res;
-    if (n>0)
+
+    int q = (n+1)/2;
+    for(int i=0; i<q; ++i)
     {
-        int q = (n+1)/2;
-        for(int i=0; i<q; ++i)
-        {
-            res.push_back(obj1);
-            res.push_back(obj2);
-        }
+        res.push_back(obj1);
+        res.push_back(obj2);
     }
+
     
     if( n % 2 == 0 )
         res.push_back(obj1);
