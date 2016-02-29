@@ -280,7 +280,7 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
     vector<QuantumOperator> right_hm_list;
     if (_pulse_num % 2 == 0)
         right_hm_list= riffle((QuantumOperator) hami1, (QuantumOperator) hami0, _pulse_num);
-    if (_pulse_num % 2 == 1)
+    else
         right_hm_list = riffle((QuantumOperator) hami0, (QuantumOperator) hami1, _pulse_num);
 
     vector<double> time_segment = Pulse_Interval(_pulse_name, _pulse_num);
@@ -293,7 +293,7 @@ vec EnsembleCCE::cluster_evolution(int cce_order, int index)
     ClusterCoherenceEvolution dynamics(&kernel);
     dynamics.run();
     
-    return dynamics.calc_obs();
+    return calc_observables(&kernel);
 }
 
 Hamiltonian EnsembleCCE::create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_state, const vector<cSPIN>& spin_list)
@@ -330,6 +330,15 @@ DensityOperator EnsembleCCE::create_spin_density_state(const vector<cSPIN>& spin
     ds.make();
     ds.makeVector();
     return ds;
+}
+
+vec EnsembleCCE::calc_observables(QuantumEvolutionAlgorithm* kernel)
+{
+    vector<cx_mat>  state = kernel->getResultMat();
+    vec res = ones<vec>(_nTime);
+    for(int i=0; i<_nTime; ++i)
+        res(i) = real( trace(state[i]) );
+    return res;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

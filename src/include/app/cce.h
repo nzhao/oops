@@ -61,6 +61,7 @@ private:
     void             DataGathering(mat& resMat, int cce_order, int clst_num);
 
     virtual vec      cluster_evolution(int cce_order, int index)=0;
+    virtual vec      calc_observables(QuantumEvolutionAlgorithm* ker)=0;
     void             post_treatment();
     void             cce_coherence_reduction();
     void             compuate_final_coherence();
@@ -87,6 +88,7 @@ private:
     Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
+    vec calc_observables(QuantumEvolutionAlgorithm* ker);
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

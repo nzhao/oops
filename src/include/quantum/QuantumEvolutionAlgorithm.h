@@ -20,6 +20,7 @@ public:
     vec  getTimeSequence() const {return _time_list;};
     size_t  getStateDim() const {return _state_dimension;};
     vector<cx_vec> getResult() const {return _vector_list;};
+    vector<cx_mat> getResultMat() const {return _state_mat_list;};
     cx_vec getInitalState() const {return _init_state.getVector();}; 
     size_t getMatrixDim() const {return _init_state.getDimension();}
 
@@ -32,6 +33,7 @@ protected:
 
     cx_mat         _matrix;
     vector<cx_vec> _vector_list;
+    vector<cx_mat> _state_mat_list;
 private:
 };
 //}}}

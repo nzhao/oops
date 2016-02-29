@@ -110,8 +110,8 @@ PiecewiseFullMatrixMatrixEvolution::PiecewiseFullMatrixMatrixEvolution( const ve
 
 void PiecewiseFullMatrixMatrixEvolution::perform()
 {
-    _vector_list.push_back(_density_matrix.getVector());
-        
+    _state_mat_list.push_back(_density_matrix.getMatrix());
+
     double dt = _time_list[1] - _time_list[0];
 
     vector<cx_mat> left_expm_list, right_expm_list, expm_list1, expm_list2;
@@ -135,8 +135,7 @@ void PiecewiseFullMatrixMatrixEvolution::perform()
             expm_list2[j] = right_expm_list[j]*expm_list2[j];
         }
         
-        cx_vec vector_i= vectorise(state_i);
-        _vector_list.push_back( vector_i );
+        _state_mat_list.push_back(state_i);
     }
 }
 //}}}
