@@ -14,6 +14,7 @@ public:
 
     virtual void make_espin_hamiltonian()=0;
 
+    void  add_spin_member();
     void  set_magB(double bx, double by, double bz) {_magB << bx << by << bz;}
     void  set_eleE(double ex, double ey, double ez) {_eleE << ex << ey << ez;}
 protected:
@@ -33,7 +34,10 @@ public:
     enum NVNuclearSpin { N14, N15 };
     
     NVCenter(NVNuclearSpin nuc);
+    NVCenter(NVNuclearSpin nuc, vec coord);
     ~NVCenter() {};
+    
+    void  add_spin_member(NVNuclearSpin nuc, vec coord);
     void  make_espin_hamiltonian();
 
 protected:
