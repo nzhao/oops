@@ -11,7 +11,7 @@ vec r_vect(const cSPIN& obj1, const cSPIN& obj2){
 vec dipole(const cSPIN& spin1, const cSPIN& spin2)
 {
     double d=spin_distance(spin1, spin2);
-    if(d==DISTANCE_EPSILON)
+    if(d<=DISTANCE_EPSILON)
     {
         vec res = zeros<vec>(9);
         return  res;

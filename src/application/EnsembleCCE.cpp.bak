@@ -16,7 +16,7 @@ ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
-    ConfigXML cfg = set_parameters("SingleSampleCCE.xml");
+    ConfigXML cfg = set_parameters("EnsembleCCE.xml");
 
     string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");
     _START_EASYLOGGINGPP(argc, argv);
@@ -42,8 +42,7 @@ int  main(int argc, char* argv[])
     nv.make_espin_hamiltonian();
 
     // CCE
-    //EnsembleCCE sol(my_rank, worker_num, &nv, cfg);
-    SingleSampleCCE sol(my_rank, worker_num, &nv, cfg);
+    EnsembleCCE sol(my_rank, worker_num, &nv, cfg);
     sol.run();
 
     LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
