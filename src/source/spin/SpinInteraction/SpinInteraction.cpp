@@ -142,6 +142,20 @@ DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& 
 
     make();
 }
+DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list, const uvec& exclude_idx)
+{
+    _spin_list=spin_list;
+
+    _domain=SingleSpin(spin_list);
+    _form=SingleSpinInteractionForm(_domain);
+
+    vec mask = ones<vec>(source_list.size() );
+    for(int i=0; i< exclude_idx.n_elem; ++i)
+        mask( exclude_idx[i]) = 0.0;
+    _coeff=DipolarFieldInteractionCoeff(_domain, source_list, state_list, mask);
+
+    make();
+}
 
 DipolarField::~DipolarField()
 { //LOG(INFO) << "Default destructor: DipolarField";

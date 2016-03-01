@@ -149,6 +149,7 @@ class DipolarFieldInteractionCoeff:public cSpinInteractionCoeff
 public:
     DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const cSPIN& center_spin, const PureState& state);
     DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const vector<cSPIN>& spin_list, const vector<PureState>& state_list);
+    DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const vector<cSPIN>& spin_list, const vector<PureState>& state_list, const vec& pre_factor_list);
     ~DipolarFieldInteractionCoeff();
 protected:
 private:

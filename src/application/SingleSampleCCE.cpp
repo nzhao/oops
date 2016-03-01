@@ -16,7 +16,7 @@ ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
-    ConfigXML cfg = set_parameters("EnsembleCCE.xml");
+    ConfigXML cfg = set_parameters("SingleSampleCCE.xml");
 
     string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");
     _START_EASYLOGGINGPP(argc, argv);
@@ -34,7 +34,12 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
     // create defect center
-    NVCenter nv(NVCenter::N14);
+    double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
+    double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
+    double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
+    vec coord; coord << x << y << z;
+    NVCenter nv(NVCenter::N14, coord);
+    
     double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
     double magBy = cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
     double magBz = cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
@@ -42,7 +47,7 @@ int  main(int argc, char* argv[])
     nv.make_espin_hamiltonian();
 
     // CCE
-    EnsembleCCE sol(my_rank, worker_num, &nv, cfg);
+    SingleSampleCCE sol(my_rank, worker_num, &nv, cfg);
     sol.run();
 
     LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 

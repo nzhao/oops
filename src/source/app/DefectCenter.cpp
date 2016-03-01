@@ -2,9 +2,20 @@
 
 NVCenter::NVCenter(NVNuclearSpin nuc)
 {
+    vec coord; coord << 0.0 << 0.0 << 0.0;
+    add_spin_member(nuc, coord);
+}
+
+NVCenter::NVCenter(NVNuclearSpin nuc, vec coord)
+{
+    add_spin_member(nuc, coord);
+}
+
+void NVCenter::add_spin_member(NVNuclearSpin nuc, vec coord)
+{
     double DIAMOND_LATTICE_CONST = 3.57; double dia4 = DIAMOND_LATTICE_CONST/4.0;
-    vec nitrogen_coord; nitrogen_coord << 0.0 << 0.0 << 0.0;
-    vec electron_coord; electron_coord << dia4 << dia4 << dia4;
+    vec nitrogen_coord; nitrogen_coord << coord[0] << coord[1] << coord[2];
+    vec electron_coord; electron_coord << coord[0]+dia4 << coord[1]+dia4 << coord[2]+dia4;
     switch(nuc)
     {
         case N14:
@@ -18,7 +29,6 @@ NVCenter::NVCenter(NVNuclearSpin nuc)
     }
     _electron_spin = cSPIN(electron_coord, "NVe");
 }
-
 void NVCenter::make_espin_hamiltonian()
 {
     cx_mat sx=_electron_spin.sx();

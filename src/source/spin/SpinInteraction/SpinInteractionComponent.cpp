@@ -407,6 +407,25 @@ DipolarFieldInteractionCoeff::DipolarFieldInteractionCoeff(const cSpinInteractio
         _coeff_list.push_back(coeffs);
     }
 }
+DipolarFieldInteractionCoeff::DipolarFieldInteractionCoeff(const cSpinInteractionDomain& domain, const vector<cSPIN>& spin_list, const vector<PureState>& state_list, const vec& pre_factor_list)
+{
+    _nCoeff = 6;
+
+    vector< vector<cSPIN> > sag;
+    sag = domain.getSpinAggregate();
+    vector< vector<cSPIN> >::iterator it;
+    for(it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];
+
+        vec dip_field = zeros<vec>(3);
+        for(int i=0; i<spin_list.size(); ++i)
+            dip_field += pre_factor_list[i] * dipole_field(spin0, spin_list[i], state_list[i].getVector() );
+        
+        vec coeffs; coeffs << dip_field[0] << dip_field[1] << dip_field[2] << 0.0 << 0.0 << 0.0;
+        _coeff_list.push_back(coeffs);
+    }
+}
 
 DipolarFieldInteractionCoeff::~DipolarFieldInteractionCoeff()
 { //LOG(INFO) << "Default destructor: DipolarFieldInteractionCoeff";

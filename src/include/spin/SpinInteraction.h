@@ -88,6 +88,7 @@ public:
     DipolarField();
     DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const PureState& state);
     DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list);
+    DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list, const uvec& exclude_idx);
     ~DipolarField();
 protected:
 private:

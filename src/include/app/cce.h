@@ -55,13 +55,14 @@ private:
     virtual void     set_parameters()=0;
     void             prepare_center_spin();
     void             create_bath_spins();
+    virtual void     prepare_bath_state()=0;
     void             create_spin_clusters();
     void             job_distribution();
     void             run_each_clusters();
     void             DataGathering(mat& resMat, int cce_order, int clst_num);
 
     virtual vec      cluster_evolution(int cce_order, int index)=0;
-    virtual vec      calc_observables(QuantumEvolutionAlgorithm* ker)=0;
+    //virtual vec      calc_observables(QuantumEvolutionAlgorithm* ker)=0;
     void             post_treatment();
     void             cce_coherence_reduction();
     void             compuate_final_coherence();
@@ -84,11 +85,45 @@ protected:
 
 private:
     void set_parameters();
+    void prepare_bath_state();
     vec cluster_evolution(int cce_order, int index);
     Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
+
+    vec _bath_polarization;
     vec calc_observables(QuantumEvolutionAlgorithm* ker);
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{  SingleSampleCCE
+class SingleSampleCCE:public CCE
+{
+public:
+    SingleSampleCCE() {};
+    SingleSampleCCE(int my_rank, int worker_num, DefectCenter* defect, const ConfigXML& cfg):CCE(my_rank, worker_num, defect, cfg) {};
+    ~SingleSampleCCE() {};
+protected:
+private:
+    void set_parameters();
+    void prepare_bath_state();
+    vec cluster_evolution(int cce_order, int index);
+    Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list, const cClusterIndex& clstIndex);
+    Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
+    PureState create_cluster_state(const cClusterIndex& clstIndex);
+
+    void cache_dipole_field();
+    vec calc_observables(QuantumEvolutionAlgorithm* ker1, QuantumEvolutionAlgorithm* ker2);
+
+    int _bath_state_seed;
+    vector< vector<vec> > _dipole_field_data;
+    vector<PureState>     _bath_state_list;
+
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
