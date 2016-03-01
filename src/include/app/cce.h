@@ -114,17 +114,15 @@ private:
     vec cluster_evolution(int cce_order, int index);
     Hamiltonian create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_stat, const vector<cSPIN>& spin_list, const cClusterIndex& clstIndex);
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
-    DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
     PureState create_cluster_state(const cClusterIndex& clstIndex);
 
     void cache_dipole_field();
-
-    vec _bath_polarization;
-    vector< vector<vec> > _dipole_field_data;
-    int _bath_state_seed;
-    vector<PureState> _bath_state_list;
-
     vec calc_observables(QuantumEvolutionAlgorithm* ker1, QuantumEvolutionAlgorithm* ker2);
+
+    int _bath_state_seed;
+    vector< vector<vec> > _dipole_field_data;
+    vector<PureState>     _bath_state_list;
+
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

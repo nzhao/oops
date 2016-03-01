@@ -382,7 +382,6 @@ void SingleSampleCCE::set_parameters()
     _time_list = linspace<vec>(_t0, _t1, _nTime);
 }/*}}}*/
 
-
 void SingleSampleCCE::prepare_bath_state()
 {/*{{{*/
     vector<cSPIN> sl = _bath_spins.getSpinList();
@@ -394,9 +393,7 @@ void SingleSampleCCE::prepare_bath_state()
         _bath_state_list.push_back(psi_i);
     }
 
-    cache_dipole_field();
-    
-    _bath_polarization = zeros<vec>(3);
+    //cache_dipole_field();
 }/*}}}*/
 
 vec SingleSampleCCE::cluster_evolution(int cce_order, int index)
@@ -451,17 +448,6 @@ Liouvillian SingleSampleCCE::create_spin_liouvillian(const Hamiltonian& hami0, c
     Liouvillian lv1(hami1, FLAT);
     Liouvillian lv = lv0 - lv1;
     return lv;
-}/*}}}*/
-
-DensityOperator SingleSampleCCE::create_spin_density_state(const vector<cSPIN>& spin_list)
-{/*{{{*/
-    SpinPolarization p(spin_list, _bath_polarization);
-
-    DensityOperator ds(spin_list);
-    ds.addStateComponent(p);
-    ds.make();
-    ds.makeVector();
-    return ds;
 }/*}}}*/
 
 PureState SingleSampleCCE::create_cluster_state(const cClusterIndex& clstIndex)
