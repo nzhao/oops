@@ -34,7 +34,12 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
     // create defect center
-    NVCenter nv(NVCenter::N14);
+    double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
+    double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
+    double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
+    vec coord; coord << x << y << z;
+    NVCenter nv(NVCenter::N14, coord);
+    
     double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
     double magBy = cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
     double magBz = cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");

@@ -25,6 +25,7 @@ protected:
     cx_mat _eigen_vectors;
     vec _eigen_vals;
 private:
+    void  add_spin_member();
 };
 
 class NVCenter:public DefectCenter
@@ -33,10 +34,13 @@ public:
     enum NVNuclearSpin { N14, N15 };
     
     NVCenter(NVNuclearSpin nuc);
+    NVCenter(NVNuclearSpin nuc, vec coord);
     ~NVCenter() {};
+    
     void  make_espin_hamiltonian();
 
 protected:
 private:
+        void  add_spin_member(NVNuclearSpin nuc, vec coord);
 };
 #endif
