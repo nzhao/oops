@@ -8,7 +8,7 @@ int  main(int argc, char* argv[])
 {
 
     test_small_mat();
-    test_large_mat();
+//    test_large_mat();
     return 0;
 }
 
@@ -20,13 +20,27 @@ void test_small_mat()
     H << 6.0        << 1.0 + 1.0*II << endr
       << 1.0-1.0*II << 3.0;
 
-    cx_double prefactor = 3.0;
+    cx_double prefactor = 300.0;
 
-    MatExp expM(H, prefactor, MatExp::ArmadilloExpMat);
+    cout << "input data: " << endl;
+    cout << II*prefactor * H << endl;
+    cx_mat resArma, resPade;
+    
+    MatExp expM(H, II*prefactor, MatExp::ArmadilloExpMat);
     expM.run();
+    resArma = expM.getResultMatrix();
+    cout << "arma output: " << endl;
+    cout << resArma << endl;
+    
+    MatExp expM2(H, II*prefactor, MatExp::PadeApproximation);
+    expM2.run();
 
-    cx_mat res = expM.getResultMatrix();
-    cout << res << endl;
+    resPade = expM2.getResultMatrix();
+    cout << "pade output: " << endl;
+    cout << resPade << endl;
+
+    cout << "diff" << endl;
+    cout << resArma-resPade << endl; 
 }
 
 void test_large_mat()
@@ -56,4 +70,5 @@ void test_large_mat()
         cout << kp_list[i] << endl;
 
     cout << kp_list.size() << endl;
+
 }

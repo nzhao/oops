@@ -5,6 +5,7 @@
 #include "include/quantum/QuantumState.h"
 #include "include/quantum/MixedState.h"
 #include "include/quantum/PureState.h"
+#include "include/math/MatExp.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ QuantumEvolutionAlgorithm
