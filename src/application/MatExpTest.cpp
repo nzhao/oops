@@ -12,10 +12,22 @@ int  main(int argc, char* argv[])
 
     cx_double prefactor = 3.0;
 
+    cout << "input data: " << endl;
+    cout << prefactor * H << endl;
+    cx_mat res;
+    
     MatExp expM(H, prefactor, MatExp::ArmadilloExpMat);
     expM.run();
-
-    cx_mat res = expM.getResultMatrix();
+    res = expM.getResultMatrix();
+    cout << "arma output: " << endl;
     cout << res << endl;
+    
+    MatExp expM2(H, prefactor, MatExp::PadeApproximation);
+    expM2.run();
+
+    res = expM2.getResultMatrix();
+    cout << "pade output: " << endl;
+    cout << res << endl;
+    
     return 0;
 }

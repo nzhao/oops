@@ -19,7 +19,7 @@ CPPFLAGS = $(addprefix -I,$(INCLUDES))
 
 ifeq ($(USE_MKL), true)
 	LIBS := 
-	CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm
+	CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm -ldl
 	CPPFLAGS  +=  -DARMA_BLAS_LONG -DMKL_ILP64 -I${MKLROOT}/include -O2 -DARMA_DONT_USE_WRAPPER 
 else
 	LIBS :=  $(ARMA_LIB) 
@@ -42,6 +42,13 @@ APP_OBJ := $(addsuffix .o, $(addprefix $(OBJPATH)/, $(APP)) )
 
 vpath %.cpp $(sort $(dir $(SOURCE)))
 
+EXPOKIT_SRC := $(wildcard expokit/*.f)
+EXPOKIT_OBJ := ../obj/expokit.o ../obj/mataid.o
+vpath %.f $(sort $(dir $(EXPOKIT_SRC)))
+FC          := mpifort
+FFLAGS      := -I${MKLROOT}/include
+FLINKS      := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -nofor-main -cxxlib
+
 .PHONY : all clean
 
 all : $(DESTINATION)
@@ -61,8 +68,8 @@ $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
 
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) | $(BINPATH)
-	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS)) ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) | $(BINPATH)
+	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)
 	$(CC) -c $< -o $@ $(CPPFLAGS)
@@ -73,3 +80,8 @@ $(OBJPATH) :
 $(BINPATH) :
 	@mkdir -p $(BINPATH)
 
+$(OBJPATH)/expokit.o : expokit.f | $(OBJPATH)
+	$(FC) -c $< -o $@ $(FFLAGS)
+
+$(OBJPATH)/mataid.o : mataid.f | $(OBJPATH)
+	$(FC) -c $< -o $@ $(FFLAGS)
