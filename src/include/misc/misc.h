@@ -39,4 +39,35 @@ template<class T> vector<T> riffle(T obj1, T obj2, int n)
     return res;
 }
 
+template <typename T>
+std::vector<T> operator+(const std::vector<T> &A, const std::vector<T> &B)
+{
+    std::vector<T> AB;
+    AB.reserve( A.size() + B.size() );                // preallocate memory
+    AB.insert( AB.end(), A.begin(), A.end() );        // add A;
+    AB.insert( AB.end(), B.begin(), B.end() );        // add B;
+    return AB;
+}
+
+template <typename T>
+std::vector<T> &operator+=(std::vector<T> &A, const std::vector<T> &B)
+{
+    A.reserve( A.size() + B.size() );                // preallocate memory without erase original data
+    A.insert( A.end(), B.begin(), B.end() );         // add B;
+    return A;                                        // here A could be named AB
+}
+
+template <typename T>
+T join_all(const std::vector<T> &list)
+{
+    T res;
+    if( !list.empty() )
+    {
+        res = list[0];
+        for(int i=1; i<list.size(); ++i)
+            res += list[i];
+    }
+    return res;
+}
+
 #endif

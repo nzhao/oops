@@ -44,6 +44,11 @@ KronProd::~KronProd()
 KronProd::KronProd(DIM_LIST dim_list)
 {
     _dim_list = dim_list;
+    _kron_num = dim_list.size();
+
+    _dim  = 1;
+    for(int i=0; i<_dim_list.size(); ++i)
+        _dim *= _dim_list[i];
 }
 
 void KronProd::fill(INDICES idx, MULTIPLIER coeff, TERM mat)
@@ -145,7 +150,11 @@ SumKronProd::SumKronProd(const vector<KronProd>& kp_lst)
 { //LOG(INFO) << "Constructor: SumKronProd with KronProd list.";
     _kron_prod_list = kp_lst;
     if( !_kron_prod_list.empty() )
+    {
         _dim_list = _kron_prod_list[0].getDimList();
+        _dim = _kron_prod_list[0].getDim();
+        _kron_num = _kron_prod_list[0].getKronNum();
+    }
 }
 SumKronProd::~SumKronProd()
 { //LOG(INFO) << "Default destructor: SumKronProd.";
@@ -176,6 +185,37 @@ SumKronProd Expand(const SumKronProd& skp, MatExpanFunc* expan_func)
         new_kp_list.push_back( Expand(skp._kron_prod_list[i], expan_func) );
 
     SumKronProd res(new_kp_list);
+    return res;
+}
+
+vector<MULTIPLIER> SumKronProd::getCoeffList() const
+{
+    vector<MULTIPLIER> res;
+    for(int i=0; i<_kron_prod_list.size(); ++i)
+        res.push_back( _kron_prod_list[i].getCoeff() );
+    return res;
+}
+
+vector<INDICES> SumKronProd::getIndicesList() const
+{
+    vector<INDICES> res;
+    for(int i=0; i<_kron_prod_list.size(); ++i)
+        res.push_back( _kron_prod_list[i].getIndices() );
+    return res;
+}
+
+vector<TERM> SumKronProd::getTermList() const
+{
+    vector<TERM> res;
+    for(int i=0; i<_kron_prod_list.size(); ++i)
+        res.push_back( _kron_prod_list[i].getTermMat() );
+    return res;
+}
+vector<int> SumKronProd::getMatNumList() const
+{
+    vector<int> res;
+    for(int i=0; i<_kron_prod_list.size(); ++i)
+        res.push_back( _kron_prod_list[i].getMatNum() );
     return res;
 }
 
