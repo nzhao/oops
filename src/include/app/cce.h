@@ -32,7 +32,7 @@ protected:
     double           _t1;
     int              _nTime;
     vec              _time_list;
-    int              _cut_off_dist;
+    double           _cut_off_dist;
     int              _max_order;
     vec              _magB;
     string           _pulse_name;

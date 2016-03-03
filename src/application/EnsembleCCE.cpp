@@ -65,7 +65,7 @@ ConfigXML set_parameters(const string& xml_file_name)
     INPUT_PATH  = PROJECT_PATH + "/dat/input/";
     OUTPUT_PATH = PROJECT_PATH + "/dat/output/";
     CONFIG_PATH = PROJECT_PATH + "/dat/config/";
-    DEBUG_PATH  = PROJECT_PATH = "/dat/debug/";
+    DEBUG_PATH  = PROJECT_PATH + "/dat/debug/";
 
     ConfigXML cfg( CONFIG_PATH+xml_file_name );
     return cfg;
