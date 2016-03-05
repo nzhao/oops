@@ -17,7 +17,7 @@ class PureState:public QuantumState
 {
 public:
     PureState();
-    PureState(const int& dim);
+    PureState(const int dim);
     PureState(const cx_vec& v);
     PureState(const cSPIN& spin);
     PureState(const vector<cSPIN>& spin_list);

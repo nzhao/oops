@@ -11,7 +11,7 @@ PureState::~PureState()
 { //LOG(INFO) << "Default destructor: PureState";
 }
 
-PureState::PureState(const int& dim)
+PureState::PureState(const int dim)
 {
     _is_pure=true;
     _dimension = dim; 

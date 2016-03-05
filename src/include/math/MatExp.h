@@ -45,7 +45,7 @@ class MatExpVector
 {
 public:
     MatExpVector() {};
-    MatExpVector(const SumKronProd& skp, cx_double prefactor, const vec& time_list);
+    MatExpVector(const SumKronProd& skp, cx_double prefactor, const cx_vec& v, const vec& time_list);
     ~MatExpVector() {};
 
     void run();
@@ -53,6 +53,7 @@ public:
 protected:
 private:
     SumKronProd _skp;
+    cx_vec      _vector;
     cx_double   _prefactor;
     vec         _time_list;
     size_t         _nTime;

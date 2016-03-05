@@ -59,8 +59,13 @@ void test_large_mat()
 
     SumKronProd skp = hami.getKronProdForm();
 
+    PureState psi( skp.getDim() );
+    psi.setComponent(0, 1.0);
+    cout << psi.getVector() << endl;
+
     vec time_list = linspace<vec>(0, 1, 11);
-    MatExpVector expM(hami.getKronProdForm(), -1.0*II, time_list);  
+    MatExpVector expM(hami.getKronProdForm(), -1.0*II, psi.getVector(), time_list);  
     expM.run();
+
 
 }

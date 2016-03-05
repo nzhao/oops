@@ -83,9 +83,10 @@ cx_mat MatExp::pade_exp_mat()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  MatExpVector
-MatExpVector::MatExpVector(const SumKronProd& skp, cx_double prefactor, const vec& time_list)
+MatExpVector::MatExpVector(const SumKronProd& skp, cx_double prefactor, const cx_vec& v, const vec& time_list)
 {
     _skp = skp;
+    _vector = v;
     _prefactor = prefactor;
     _time_list = time_list;
 
@@ -100,50 +101,36 @@ MatExpVector::MatExpVector(const SumKronProd& skp, cx_double prefactor, const ve
 
 void MatExpVector::run()
 {
-    size_t            dim = _skp.getDim();
-    DIM_LIST   spinDim = _skp.getDimList();  //spin_dim
-    size_t      factor_num = _skp.getKronNum();  //nspin
-    size_t       prod_size = _skp.getKronProdSize();  //nTerm
+    //////////////////////////////////////////////////////////////////////////////
+    //parameter preparation
+    DIM_LIST           spinDim = _skp.getDimList();
+    vector<MULTIPLIER> coeff = _skp.getCoeffList();
+    vector<size_t>     nBody = _skp.getMatNumList();
+    vector<INDICES>    indices_list = _skp.getIndicesList(); 
+    vector<TERM>       term_list = _skp.getTermList();
+    INDICES            full_indices = join_all(indices_list);
+    TERM               full_term = join_all(term_list);
 
-    vector<MULTIPLIER> coeff = _skp.getCoeffList();  //coeff_list
-    vector<size_t>        nBody = _skp.getMatNumList(); //nBody_list
-    vector<INDICES>  indices_list = _skp.getIndicesList(); 
-    vector<TERM>        term_list = _skp.getTermList();
-
-    INDICES full_indices = join_all(indices_list); //pos_list
-    TERM       full_term = join_all(term_list);    //matC
-
-    vector<size_t> dim_vector; //dim_list
+    vector<size_t> dim_vector;
     for(size_t i=0; i<full_term.size(); ++i)
         dim_vector.push_back( full_term[i].n_cols );
 
-    //////////////////////////////////////////////////////////////////////////////
-    //parameter preparation
-    size_t nSpin = factor_num;
-    size_t nTerm = prod_size;
+    size_t nSpin = _skp.getKronNum();
+    size_t nTerm = _skp.getKronProdSize();
     double * coeff_list = coeff.data();
     size_t * nBody_list = nBody.data();
-    //double * coeff_list = new double [nTerm];
-    //size_t * nBody_list = new size_t [nTerm];
+    
     size_t * pos_offset = new size_t [nTerm+1];
-    //for(int i=0; i<nTerm;++i)
-    //{
-        //coeff_list[i] = coeff[i];
-        //nBody_list[i] = nBody[i];
-    //}
     pos_offset[0]=0; partial_sum (nBody_list, nBody_list+nTerm, pos_offset+1);
     size_t total_nbody = pos_offset[nTerm];
 
-    size_t * pos_list   = new size_t [total_nbody];
-    size_t * dim_list   = new size_t [total_nbody];
-    size_t * mat_offset = new size_t [total_nbody+1];
+    size_t * pos_list   = full_indices.data();
+    size_t * dim_list   =  dim_vector.data();
     size_t * dim2 = new size_t [total_nbody];
     for(int i=0; i<total_nbody; ++i)
-    {
-        pos_list[i] = full_indices[i];
-        dim_list[i] = dim_vector[i];
         dim2[i] = dim_list[i]*dim_list[i];
-    }
+    
+    size_t * mat_offset = new size_t [total_nbody+1];
     mat_offset[0]=0; partial_sum(dim2, dim2+total_nbody, mat_offset+1);
     size_t total_dim = mat_offset[total_nbody];
 
@@ -155,20 +142,13 @@ void MatExpVector::run()
             matC[count] = full_term[i](j);
             count ++;
         }
-    size_t nDim = dim;
-    size_t * spin_dim   = new size_t [nSpin];
-    for(int i=0; i<nSpin; ++i)
-        spin_dim[i] = spinDim[i];
+    size_t nDim = _skp.getDim();
+    size_t * spin_dim   = spinDim.data();
 
-    complex<double> * vecC = new complex<double> [ nDim ];
-    for (int i=0; i<nDim; ++i )
-        vecC[i] = 0.0;
-    vecC[0] = 1.0;
+    complex<double> * vecC = _vector.memptr();
     
     size_t nt = _time_list.n_elem; 
-    double * tlist = new double [nt];
-    for(int i=0; i<nt; ++i)
-        tlist[i] = _time_list(i);
+    double * tlist =  _time_list.memptr();
 
     complex<double> * w_seq;
     size_t w_seq_len= nDim * nt;
