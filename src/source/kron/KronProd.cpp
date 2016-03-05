@@ -211,9 +211,9 @@ vector<TERM> SumKronProd::getTermList() const
         res.push_back( _kron_prod_list[i].getTermMat() );
     return res;
 }
-vector<int> SumKronProd::getMatNumList() const
+vector<size_t> SumKronProd::getMatNumList() const
 {
-    vector<int> res;
+    vector<size_t> res;
     for(int i=0; i<_kron_prod_list.size(); ++i)
         res.push_back( _kron_prod_list[i].getMatNum() );
     return res;

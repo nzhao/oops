@@ -7,13 +7,13 @@ void test_small_mat();
 int  main(int argc, char* argv[])
 {
 
-    test_small_mat();
-//    test_large_mat();
+    //test_small_mat();
+    test_large_mat();
     return 0;
 }
 
 void test_small_mat()
-{
+{/*{{{*/
     cx_double II = cx_double(0.0, 1.0);
 
     cx_mat H; 
@@ -41,18 +41,16 @@ void test_small_mat()
 
     cout << "diff" << endl;
     cout << resArma-resPade << endl; 
-}
+}/*}}}*/
 
 void test_large_mat()
 {
     //please run this application in "oops/" direcotry 
-    cSpinSourceFromFile spin_file("./dat/input/magR16E.xyz");
+    cSpinSourceFromFile spin_file("./dat/input/RoyCoord.xyz4");
     cSpinCollection spins(&spin_file);
     spins.make();
 
     vector<cSPIN> sl = spins.getSpinList();
-    for(int i=0; i<sl.size(); ++i)
-        cout << sl[i].get_coordinate() << endl;
 
     SpinDipolarInteraction dip(sl);
     Hamiltonian hami(sl);
@@ -61,14 +59,8 @@ void test_large_mat()
 
     SumKronProd skp = hami.getKronProdForm();
 
-    vector<int> dim_list=skp.getDimList();
-    for(int i=0; i<dim_list.size();++i)
-        cout << dim_list[i] << endl;
-
-    vector<KronProd> kp_list = skp.getKronProdList();
-    for(int i=0; i<kp_list.size(); ++i)
-        cout << kp_list[i] << endl;
-
-    cout << kp_list.size() << endl;
+    vec time_list = linspace<vec>(0, 1, 11);
+    MatExpVector expM(hami.getKronProdForm(), -1.0*II, time_list);  
+    expM.run();
 
 }

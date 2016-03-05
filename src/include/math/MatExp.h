@@ -6,6 +6,7 @@
 #include <armadillo>
 #include "include/misc/misc.h"
 #include "include/kron/KronProd.h"
+#include <numeric>      // std::partial_sum
 
 using namespace arma;
 
@@ -54,10 +55,15 @@ private:
     SumKronProd _skp;
     cx_double   _prefactor;
     vec         _time_list;
-    int         _nTime;
-    int         _dim; 
+    size_t         _nTime;
+    size_t         _dim; 
     
     vector<cx_vec>  _resVectorList;
+
+    size_t _klim;
+    size_t _krylov_m;
+    double _krylov_tol;
+    size_t _itrace;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
