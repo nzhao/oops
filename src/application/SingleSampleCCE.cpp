@@ -1,6 +1,7 @@
 #include "include/app/cce.h"
 #include "include/misc/xmlreader.h"
 #include <cstdlib>
+#include "include/misc/lattice.h"
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -16,6 +17,30 @@ ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
+    int dim = 2;
+    vec base1, base2;
+    base1 << 1.0 << 0.0; base2 << 0.0 << 1.0;
+    vector<vec> bases; bases.push_back(base1); bases.push_back(base2);
+    int atom_num = 3;
+    vec coord1, coord2, coord3;
+    coord1 << 0.0 << 0.0;
+    coord2 << 0.3 << 0.6;
+    coord3 << 0.6 << 0.3;
+    vector<vec> pos; pos.push_back(coord1); pos.push_back(coord2); pos.push_back(coord3);
+    Lattice latt(dim, bases, atom_num, pos);
+
+    umat range; range << -10 << 10 << endr << -5 << 5;
+    latt.setRange(range);
+    for(int kk = 0; kk <200; ++kk)
+    {
+        vector<int> idx = latt.getIndex(kk);
+        for(int i=0; i<idx.size(); ++i)
+            cout << idx[i] << ",\t";
+        cout << endl;
+    }
+    assert(0);
+
+
     ConfigXML cfg = set_parameters("SingleSampleCCE.xml");
 
     string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");
