@@ -66,6 +66,6 @@ void test_large_mat()
     vec time_list = linspace<vec>(0, 1, 11);
     MatExpVector expM(hami.getKronProdForm(), -1.0*II, psi.getVector(), time_list);  
     expM.run();
-
+    expM.run_gpu();
 
 }

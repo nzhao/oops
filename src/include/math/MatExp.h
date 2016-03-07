@@ -49,6 +49,7 @@ public:
     ~MatExpVector() {};
 
     void run();
+    void run_gpu();
     vector<cx_vec> getResult() const {return _resVectorList;}; 
 protected:
 private:
