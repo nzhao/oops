@@ -17,28 +17,42 @@ ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
+    //cout << "begin" << endl;
+    //vector<int> base;
+    //base.push_back(4);
+    //base.push_back(3);
+    //base.push_back(2);
+    //vector<int> res = base_transform( 20, base);
+    //for(int i=0; i<res.size(); ++i)
+        //cout << res[i] << endl;
+    //cout << "back = " << base_number(res, base) << endl;
+    //cout << "end" << endl;
     int dim = 2;
     vec base1, base2;
-    base1 << 1.0 << 0.0; base2 << 0.0 << 1.0;
+    base1 << 1.0 << 0.0 << 0.0; base2 << 0.0 << 1.0 << 0.0;
     vector<vec> bases; bases.push_back(base1); bases.push_back(base2);
     int atom_num = 3;
     vec coord1, coord2, coord3;
-    coord1 << 0.0 << 0.0;
-    coord2 << 0.3 << 0.6;
-    coord3 << 0.6 << 0.3;
+    coord1 << 0.0 << 0.0 << 0.0;
+    coord2 << 0.3 << 0.6 << 0.0;
+    coord3 << 0.6 << 0.3 << 0.0;
+    cout << "abc" << endl;
     vector<vec> pos; pos.push_back(coord1); pos.push_back(coord2); pos.push_back(coord3);
-    Lattice latt(dim, bases, atom_num, pos);
+    vector<double> latt_const;
+    latt_const.push_back(1.0); latt_const.push_back(1.0);
+    Lattice latt(dim, bases, latt_const, atom_num, pos);
 
-    umat range; range << -10 << 10 << endr << -5 << 5;
+    umat range; range << -3 << 3 << endr << -2 << 2;
     latt.setRange(range);
-    for(int kk = 0; kk <200; ++kk)
+    for(int kk = 0; kk <72; ++kk)
     {
         vector<int> idx = latt.getIndex(kk);
         for(int i=0; i<idx.size(); ++i)
             cout << idx[i] << ",\t";
-        cout << endl;
+        cout << endl << latt.getCoordinate(kk) << endl;
     }
-    assert(0);
+    return 0;
+
 
 
     ConfigXML cfg = set_parameters("SingleSampleCCE.xml");

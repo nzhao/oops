@@ -39,4 +39,7 @@ template<class T> vector<T> riffle(T obj1, T obj2, int n)
     return res;
 }
 
+vector<int> base_transform(int num, const vector<int>& base);
+int base_number(const vector<int>& num_in_base, const vector<int> base);
+
 #endif
