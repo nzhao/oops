@@ -1,5 +1,6 @@
 #include "include/math/MatExp.h" 
 #include "include/math/expokit.h" 
+#include "include/math/main_mkl.h" 
 #include <complex>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,8 +94,8 @@ MatExpVector::MatExpVector(const SumKronProd& skp, cx_double prefactor, const cx
     _nTime = time_list.n_elem;
     _dim = skp.getDim();
 
-    _klim = 1;
-    _krylov_m = 30;
+    _klim = 10;//  Lanczos factorization length;
+    _krylov_m = 30;// _krylov_m = 30, optimized in Expokit;
     _krylov_tol = 1e-7;
     _itrace = 1;
 }
@@ -215,28 +216,28 @@ void MatExpVector::run()
 
     }/*}}}*/
     
-    //main_mkl_(  &nSpin,
-                //&nTerm, 
-                //coeff_list, 
-                //nBody_list, 
-                //pos_offset, 
-                //pos_list, 
-                //dim_list, 
-                //mat_offset, 
-                //matC, 
-                //&nDim, 
-                //spin_dim, 
-                //vecC, 
-                //&total_nbody, 
-                //&total_dim, 
-                //&klim, 
-                //&nt, 
-                //tlist,
-                //&m, 
-                //&tol, 
-                //&itrace,
-                //w_seq,
-                //&w_seq_len );
+    main_mkl_(  &nSpin,
+                &nTerm, 
+                coeff_list, 
+                nBody_list, 
+                pos_offset, 
+                pos_list, 
+                dim_list, 
+                mat_offset, 
+                matC, 
+                &nDim, 
+                spin_dim, 
+                vecC, 
+                &total_nbody, 
+                &total_dim, 
+                &_klim, 
+                &nt, 
+                tlist,
+                &_krylov_m, 
+                &_krylov_tol, 
+                &_itrace,
+                w_seq,
+                &w_seq_len );
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
