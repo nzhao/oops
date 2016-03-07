@@ -157,6 +157,15 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
     subgraph2index( speye(_nspin, _nspin), empty );
 }
 
+cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder, const sp_mat& init_graph)
+{
+    _max_order = maxOrder;
+    _nspin     = connection_matrix.n_cols;
+    _connection_matrix=connection_matrix;
+    vector<int> empty (0);
+    subgraph2index(init_graph, empty);
+}
+
 cDepthFirstPathTracing::~cDepthFirstPathTracing()
 { //LOG(INFO) << "Default destructor: cDepthFirstPathTracing.";
 }

@@ -51,6 +51,11 @@ int  main(int argc, char* argv[])
             cout << idx[i] << ",\t";
         cout << endl << latt.getCoordinate(kk) << endl;
     }
+    vector<string> s;
+    s.push_back("13C");
+    s.push_back("13C");
+    for(int i=0; i<s.size(); ++i)
+        cout << s[i] << endl;
     return 0;
 
 
