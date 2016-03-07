@@ -44,9 +44,9 @@ APP_OBJ := $(addsuffix .o, $(addprefix $(OBJPATH)/, $(APP)) )
 vpath %.cpp $(sort $(dir $(SOURCE)))
 
 EXPOKIT_SRC := $(wildcard expokit/*.f)
-EXPOKIT_OBJ := ../obj/expokit.o ../obj/mataid.o
+EXPOKIT_OBJ := $(OBJPATH)/expokit.o $(OBJPATH)/mataid.o
 vpath %.f $(sort $(dir $(EXPOKIT_SRC)))
-FC          := mpifort
+FC          := mpif77
 ifeq ($(MPI_INTEL), true)
   FFLAGS      := -I${MKLROOT}/include
   FLINKS      := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -nofor-main -cxxlib
@@ -57,8 +57,19 @@ else
 endif
 
 ZKMV_MKL_SRC  := $(wildcard source/math/*.f)
-ZKMV_MKL_OBJ  := ../obj/main_mkl.o ../obj/hamvec_zgexpv_w_mkl_profile.o
+ZKMV_MKL_OBJ  := $(OBJPATH)/main_mkl.o $(OBJPATH)/hamvec_zgexpv_w_mkl_profile.o
 vpath %.f $(sort $(dir $(ZKMV_MKL_SRC)))
+ZKMV_GPU_SRC  := $(wildcard source/math/*.cu)
+ZKMV_GPU_OBJ  := $(OBJPATH)/main_cache.o $(OBJPATH)/zgexpv_cache.o $(OBJPATH)/hamvec_cuda3.o $(OBJPATH)/get_grid.o
+CUDAAPI_DIR   := /usr/local/cuda-6.0/src
+CUDAAPI_SRC   := fortran.c cusparse_fortran.c
+CUDAAPI_OBJ   := $(OBJPATH)/fortran.o $(OBJPATH)/cusparse_fortran.o
+NCC         := nvcc
+NCFLAGS     := -arch=sm_30 -O3 -DCUBLAS_GFORTRAN -ccbin g++ -Xcompiler "$(CPPFLAGS)"
+NCLINKER    := -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse
+vpath %.cu $(sort $(dir $(ZKMV_GPU_SRC)))
+vpath %.c  $(CUDAAPI_DIR)
+CXXLINKS    += $(NCLINKER)
 
 .PHONY : all clean
 
@@ -80,11 +91,11 @@ $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
 ifeq ($(MPI_INTEL), true)
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) | $(BINPATH)
-	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) | $(BINPATH)
+	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
 else
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) | $(BINPATH)
-	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) | $(BINPATH)
+	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
 endif
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)
@@ -107,4 +118,22 @@ $(OBJPATH)/main_mkl.o : main_mkl.f | $(OBJPATH)
 
 $(OBJPATH)/hamvec_zgexpv_w_mkl_profile.o : hamvec_zgexpv_w_mkl_profile.f | $(OBJPATH)
 	$(FC) $< -c -o $@ $(FFLAGS)
+
+$(OBJPATH)/main_cache.o : main_cache.f | $(OBJPATH)
+	$(FC) $< -c -o $@ $(FFLAGS)
+
+$(OBJPATH)/zgexpv_cache.o : zgexpv_cache.f | $(OBJPATH)
+	$(FC) $< -c -o $@ $(FFLAGS)
+
+$(OBJPATH)/hamvec_cuda3.o : hamvec_cuda3.cu | $(OBJPATH)
+	$(NCC) $< -c -o $@ $(NCFLAGS)
+
+$(OBJPATH)/get_grid.o : get_grid.cu | $(OBJPATH)
+	$(NCC) $< -c -o $@ $(NCFLAGS)
+
+$(OBJPATH)/fortran.o : $(CUDAAPI_DIR)/fortran.c | $(OBJPATH)
+	$(NCC) $< -c -o $@ $(NCFLAGS)
+
+$(OBJPATH)/cusparse_fortran.o : $(CUDAAPI_DIR)/cusparse_fortran.c | $(OBJPATH)
+	$(NCC) $< -c -o $@ $(NCFLAGS)
 
