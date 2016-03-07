@@ -52,8 +52,13 @@ ifeq ($(MPI_INTEL), true)
   FLINKS      := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -nofor-main -cxxlib
 else
   FFLAGS      := -m64 
-  CXXLINKS    :=  -L${GFORTRAN_PATH} -lpthread -lm -ldl -lgfortran
+#  CXXLINKS    :=  -L${GFORTRAN_PATH} -lpthread -lm -ldl -lgfortran
+  CXXLINKS    := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -lgfortran
 endif
+
+ZKMV_MKL_SRC  := $(wildcard source/math/*.f)
+ZKMV_MKL_OBJ  := ../obj/main_mkl.o ../obj/hamvec_zgexpv_w_mkl_profile.o
+vpath %.f $(sort $(dir $(ZKMV_MKL_SRC)))
 
 .PHONY : all clean
 
@@ -75,11 +80,11 @@ $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
 ifeq ($(MPI_INTEL), true)
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) | $(BINPATH)
-	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) | $(BINPATH)
+	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
 else
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) | $(BINPATH)
-	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) | $(BINPATH)
+	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
 endif
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)
@@ -96,3 +101,10 @@ $(OBJPATH)/expokit.o : expokit.f | $(OBJPATH)
 
 $(OBJPATH)/mataid.o : mataid.f | $(OBJPATH)
 	$(FC) -c $< -o $@ $(FFLAGS)
+
+$(OBJPATH)/main_mkl.o : main_mkl.f | $(OBJPATH)
+	$(FC) $< -c -o $@ $(FFLAGS)
+
+$(OBJPATH)/hamvec_zgexpv_w_mkl_profile.o : hamvec_zgexpv_w_mkl_profile.f | $(OBJPATH)
+	$(FC) $< -c -o $@ $(FFLAGS)
+
