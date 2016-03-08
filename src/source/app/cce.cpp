@@ -161,8 +161,8 @@ void CCE::cce_coherence_reduction()
         {
             vec res_j = _cce_evovle_result[cce_order].col(j);
             
-            set<CluserPostion > sub_pos = _spin_clusters.getSubClusters(cce_order, j);
-            for(set<CluserPostion >::iterator it=sub_pos.begin(); it!=sub_pos.end(); ++it)
+            set<ClusterPostion > sub_pos = _spin_clusters.getSubClusters(cce_order, j);
+            for(set<ClusterPostion >::iterator it=sub_pos.begin(); it!=sub_pos.end(); ++it)
             {
                 vec sub_res = _cce_evovle_result_tilder[it->first].col(it->second);
                 res_j = res_j / sub_res;

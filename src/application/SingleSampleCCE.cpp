@@ -2,6 +2,7 @@
 #include "include/misc/xmlreader.h"
 #include <cstdlib>
 #include "include/misc/lattice.h"
+#include "include/spin/SpinClusterFromLattice.h"
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -44,7 +45,7 @@ int  main(int argc, char* argv[])
     iso.push_back("13C"); iso.push_back("13C"); iso.push_back("13C"); 
     //Lattice latt(dim, bases, latt_const, atom_num, pos, iso);
     
-    umat range; range << -3 << 3 << endr << -3 << 3;
+    umat range; range << -1 << 1 << endr << -1 << 1;
     //for(int kk = 0; kk <72; ++kk)
     //{
         //vector<int> idx = latt.getIndex(kk);
@@ -58,14 +59,20 @@ int  main(int argc, char* argv[])
     cSpinCollection _bath_spins(&spin_on_lattice);
     _bath_spins.make();
 
-    cout << _bath_spins.getSpinNum() <<endl;
     sp_mat c=_bath_spins.getConnectionMatrix(1.0);
-    cout << c << endl;
-    mat initmat = zeros<mat>(1, _bath_spins.getSpinNum() ); initmat(1) = 1;
-    cDepthFirstPathTracing dfpt(c, 5, initmat);
-    cSpinCluster _spin_clusters(_bath_spins, &dfpt);
+
+    //mat cf= conv_to<mat>::from(c);
+    
+    //cout << cf << endl;
+    //c(span::all, span(1, 3)) = zeros<mat>(cf.n_rows,3);
+    //mat cff = conv_to<mat>::from(c);
+    //cout << cff << endl;
+    
+    int maxOrder = 5;
+    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins);
+    cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
-    cout << _spin_clusters << endl;
+
     
     return 0;
 

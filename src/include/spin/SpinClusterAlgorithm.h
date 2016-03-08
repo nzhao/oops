@@ -9,7 +9,9 @@
 #include <armadillo>
 #include "include/easylogging++.h"
 #include "include/spin/Spin.h"
-//#include "include/spin/SpinCluster.h"
+//#include "include/misc/lattice.h"
+#include "include/spin/SpinCollection.h"
+#include "include/spin/SpinClusterIndex.h"
 
 using namespace std;
 using namespace arma;
@@ -23,35 +25,6 @@ typedef pair<size_t, size_t> CluserPostion;
 /// \addtogroup SpinCluster
 /// @{
 
-////////////////////////////////////////////////////////////////////////////////
-//{{{ cClusterIndex
-/// This class defines index list of a cluster.
-///
-class cClusterIndex
-{
-public:
-    cClusterIndex();
-    cClusterIndex(const uvec& idx);
-    ~cClusterIndex();
-
-    mat get_array(size_t nspin);
-    uvec getIndex() const {return _index;};
-    size_t getNum() const {return _spin_num;};
-    size_t getOrder() const {return _spin_num-1;};
-    set< CluserPostion > getSubClstPos() const;
-
-    void appendSubClstPos(int pos) const  {_sub_clst_pos.push_back( pos );};
-
-    friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
-    friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
-    friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
-private:
-    uvec _index;
-    size_t _spin_num;
-    mutable vector<size_t> _sub_clst_pos;
-};
-//}}}
-////////////////////////////////////////////////////////////////////////////////
 
 /// \defgroup SpinGrouping
 /// @{
@@ -109,6 +82,10 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 /// @}
 /// @}
 /// @}

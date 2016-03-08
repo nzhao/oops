@@ -69,16 +69,16 @@ umat cSpinCluster::getClusterIndex(size_t order) const
         res.row( distance(clusters.begin(), it ) ) = trans( it->getIndex() );
     return res;
 }
-set<CluserPostion > cSpinCluster::getSubClusters(size_t order, size_t index) const
+set<ClusterPostion > cSpinCluster::getSubClusters(size_t order, size_t index) const
 {
     cClusterIndex clst = getClusterIndex(order, index);
-    set<CluserPostion > sub_pos = clst.getSubClstPos();
-    set<CluserPostion >::iterator it;
+    set<ClusterPostion > sub_pos = clst.getSubClstPos();
+    set<ClusterPostion >::iterator it;
     for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
     {
         cClusterIndex sub_cluster = getClusterIndex(it->first, it->second); 
-        set<CluserPostion > sub_sub_pos = getSubClusters(it->first, it->second);//sub_cluster.getSubClstPos();
-        set<CluserPostion >::iterator sub_it;
+        set<ClusterPostion > sub_sub_pos = getSubClusters(it->first, it->second);//sub_cluster.getSubClstPos();
+        set<ClusterPostion >::iterator sub_it;
         for(sub_it=sub_sub_pos.begin(); sub_it!=sub_sub_pos.end(); ++sub_it)
             sub_pos.insert( *sub_it );
     }
@@ -124,7 +124,7 @@ vector<umat> cSpinCluster::getMPI_Cluster(int worker_id)
     return res;
 }
 
-CluserPostion cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) const
+ClusterPostion cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) const
 {
     size_t pos1, pos2;
     pos1 = 0;
@@ -132,7 +132,7 @@ CluserPostion cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) con
         pos1 += _data.jobTable(cce_order, id); 
     pos2 = pos1 + _data.jobTable(cce_order, worker_id);
 
-    CluserPostion res(pos1, pos2);
+    ClusterPostion res(pos1, pos2);
     return res;
 }
 
@@ -161,8 +161,8 @@ ostream&  operator << (ostream& outs, const cSpinCluster& clst)
                 cClusterIndex vIdx = *pos;
                 outs << "{ " << order << ", " << j << " } = "  <<  vIdx << "\t";
 
-                set<CluserPostion > sub_pos = clst.getSubClusters(order, j);//vIdx.getSubClstPos();
-                set<CluserPostion >::iterator it;
+                set<ClusterPostion > sub_pos = clst.getSubClusters(order, j);//vIdx.getSubClstPos();
+                set<ClusterPostion >::iterator it;
                 for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
                     outs << "{ " << it->first << ", " << it->second << " }\t" ;
                 cout << endl;

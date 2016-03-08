@@ -2,87 +2,11 @@
 #include <armadillo>
 #include <iomanip> 
 #include "include/spin/SpinClusterAlgorithm.h"
+#include "include/spin/SpinCluster.h"
 
 using namespace std;
 using namespace arma;
 
-////////////////////////////////////////////////////////////////////
-//{{{ cClusterIndex
-cClusterIndex::cClusterIndex()
-{ //LOG(INFO) << "Default constructor of cClusterIndex.";
-}
-
-cClusterIndex::cClusterIndex(const uvec& idx)
-{
-    _index = idx;
-    sort(_index.begin(), _index.end());
-    _spin_num = idx.n_elem;
-}
-
-cClusterIndex::~cClusterIndex()
-{ //LOG(INFO) << "Default destructor of cClusterIndex.";
-}
-
-mat cClusterIndex::get_array(size_t nspin)
-{
-    mat idx_array=zeros(1, nspin);
-    size_t nnz = _index.size();
-
-    for(int i=0; i<nnz; ++i)
-        idx_array[_index[i]]=1;
-    return idx_array;
-}
-set< CluserPostion > cClusterIndex::getSubClstPos() const
-{
-    set< CluserPostion > res;
-    size_t order = getOrder();
-    if(order >0)
-    {
-        for(int i=0; i<_sub_clst_pos.size(); ++i)
-        {
-            CluserPostion p ( order-1, _sub_clst_pos[i] );
-            res.insert( p );
-        }
-    }
-    return res;
-}
-
-bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2)
-{
-    if(idx1._index.size() == idx2._index.size())
-        for(int i=0; i<idx1._index.size(); ++i)
-        { if(idx1._index[i] != idx2._index[i]) return 0; }
-    else
-        return 0;
-    return 1;
-}
-
-
-bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2)
-{
-    size_t sz1=idx1._index.size(); size_t sz2=idx2._index.size();
-    if( sz1 == sz2 )
-        for(int i=0; i<sz1; ++i)
-        { if(idx1._index[i] != idx2._index[i]) return idx1._index[i] < idx2._index[i]; }
-    else
-        return (sz1 < sz2);
-    return 0;// idx1 equals to idx2
-}
-
-ostream&  operator << (ostream& outs, const cClusterIndex& idx)
-{
-    outs << "[" ;
-    for(int i=0; i<idx._index.size(); ++i)
-    {
-        outs << idx._index(i);
-        if(i<idx._index.size()-1)
-            outs <<", ";
-    }
-    outs << "];\t";
-    return outs;
-}
-//}}}
-////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -157,22 +81,14 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
     subgraph2index( speye(_nspin, _nspin), empty );
 }
 
-<<<<<<< HEAD
-cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder, const sp_mat& init_graph)
-=======
 cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder, const mat& init)
->>>>>>> 958754630a5551a194c0f9a5feca1c9fc63421b3
 {
     _max_order = maxOrder;
     _nspin     = connection_matrix.n_cols;
     _connection_matrix=connection_matrix;
     vector<int> empty (0);
-<<<<<<< HEAD
-    subgraph2index(init_graph, empty);
-=======
     sp_mat init_spmat=conv_to<sp_mat>::from( init );
     subgraph2index( init_spmat, empty );
->>>>>>> 958754630a5551a194c0f9a5feca1c9fc63421b3
 }
 
 cDepthFirstPathTracing::~cDepthFirstPathTracing()
@@ -233,3 +149,4 @@ pair<sp_mat, vector<int> >  cDepthFirstPathTracing::subgraph_growth(const sp_mat
 
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
