@@ -40,17 +40,33 @@ int  main(int argc, char* argv[])
     vector<vec> pos; pos.push_back(coord1); pos.push_back(coord2); pos.push_back(coord3);
     vector<double> latt_const;
     latt_const.push_back(1.0); latt_const.push_back(1.0);
-    Lattice latt(dim, bases, latt_const, atom_num, pos);
+    vector<string> iso; 
+    iso.push_back("13C"); iso.push_back("13C"); iso.push_back("13C"); 
+    //Lattice latt(dim, bases, latt_const, atom_num, pos, iso);
+    
+    umat range; range << -3 << 3 << endr << -3 << 3;
+    //for(int kk = 0; kk <72; ++kk)
+    //{
+        //vector<int> idx = latt.getIndex(kk);
+        //for(int i=0; i<idx.size(); ++i)
+            //cout << idx[i] << ",\t";
+        //cout << endl << latt.getCoordinate(kk) << endl;
+    //}
+    //latt.generate_spins();
 
-    umat range; range << -3 << 3 << endr << -2 << 2;
-    latt.setRange(range);
-    for(int kk = 0; kk <72; ++kk)
-    {
-        vector<int> idx = latt.getIndex(kk);
-        for(int i=0; i<idx.size(); ++i)
-            cout << idx[i] << ",\t";
-        cout << endl << latt.getCoordinate(kk) << endl;
-    }
+    cSpinSourceFromLattice spin_on_lattice(dim, bases, latt_const, atom_num, pos, iso, range);
+    cSpinCollection _bath_spins(&spin_on_lattice);
+    _bath_spins.make();
+
+    cout << _bath_spins.getSpinNum() <<endl;
+    sp_mat c=_bath_spins.getConnectionMatrix(1.0);
+    cout << c << endl;
+    mat initmat = zeros<mat>(1, _bath_spins.getSpinNum() ); initmat(1) = 1;
+    cDepthFirstPathTracing dfpt(c, 5, initmat);
+    cSpinCluster _spin_clusters(_bath_spins, &dfpt);
+    _spin_clusters.make();
+    cout << _spin_clusters << endl;
+    
     return 0;
 
 

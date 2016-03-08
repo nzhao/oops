@@ -97,6 +97,7 @@ class cDepthFirstPathTracing:public cSpinGrouping
 public:
     cDepthFirstPathTracing();
     cDepthFirstPathTracing(const sp_mat& connection_matrix, size_t maxOrder);
+    cDepthFirstPathTracing(const sp_mat& connection_matrix, size_t maxOrder, const mat& init);
     virtual ~cDepthFirstPathTracing();
 
     void generate();
