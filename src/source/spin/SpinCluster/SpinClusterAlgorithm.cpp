@@ -157,13 +157,22 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
     subgraph2index( speye(_nspin, _nspin), empty );
 }
 
+<<<<<<< HEAD
 cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder, const sp_mat& init_graph)
+=======
+cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder, const mat& init)
+>>>>>>> 958754630a5551a194c0f9a5feca1c9fc63421b3
 {
     _max_order = maxOrder;
     _nspin     = connection_matrix.n_cols;
     _connection_matrix=connection_matrix;
     vector<int> empty (0);
+<<<<<<< HEAD
     subgraph2index(init_graph, empty);
+=======
+    sp_mat init_spmat=conv_to<sp_mat>::from( init );
+    subgraph2index( init_spmat, empty );
+>>>>>>> 958754630a5551a194c0f9a5feca1c9fc63421b3
 }
 
 cDepthFirstPathTracing::~cDepthFirstPathTracing()

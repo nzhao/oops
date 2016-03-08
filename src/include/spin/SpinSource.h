@@ -4,6 +4,7 @@
 #include <string>
 #include "include/easylogging++.h"
 #include "include/spin/Spin.h"
+#include "include/misc/lattice.h"
 
 using namespace std;
 /// \addtogroup SpinCollection
@@ -48,7 +49,22 @@ private:
     string _filename;
 };
 //}}}
-////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{ cSpinSourceFromLattice
+class cSpinSourceFromLattice:public cSpinSource
+{
+public:
+    cSpinSourceFromLattice(){};
+    cSpinSourceFromLattice(int dim, const vector<vec>& bases, const vector<double>& lattice_const, int atom_num, const vector<vec>& pos, const vector<string>& isotope, const umat& range);
+    ~cSpinSourceFromLattice(){};
+
+    vector<cSPIN>& generate();
+protected:
+private:
+    Lattice _lattice;
+};
+///}}} 
+////////////////////////////////////////////////////////////////////////////////
 /// @}
 #endif
