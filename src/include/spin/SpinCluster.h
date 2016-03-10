@@ -46,6 +46,7 @@ public:
     cClusterIndex getClusterIndex(const ClusterPostion& pos) const {return getClusterIndex(pos.first, pos.second);};
     cClusterIndex getClusterIndex(size_t order, size_t index) const ;
     vector<cSPIN> getCluster(size_t order, size_t index) const ;
+    vector<vec>   getClusterCoord(size_t order, size_t index) const ;
     size_t        getMaxOrder() const {return _max_order;};
     size_t        getClusterNum(int order) const {return _cluster_index_list[order].size();};
     set<ClusterPostion > getSubClusters(size_t order, size_t index) const;

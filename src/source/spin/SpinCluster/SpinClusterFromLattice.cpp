@@ -27,4 +27,8 @@ void cUniformBathOnLattice::generate_primitive_clusters()
     _primitive_spin_clusters = cSpinCluster(_bath_spins, &_primitive_dfpt);
     _primitive_spin_clusters.make();
     cout << _primitive_spin_clusters << endl;
+
+    vector<cSPIN> sl = _bath_spins.getSpinList();
+    cout <<sl[_bath_center_index].get_coordinate() << endl;
+    _primitive_spin_clusters.getClusterCoord(2, 3);
 }

@@ -142,6 +142,18 @@ vector<cSPIN> cSpinCluster::getCluster(size_t order, size_t index) const
     return _spin_collection.getSpinList(clst);
 }
 
+vector<vec> cSpinCluster::getClusterCoord(size_t order, size_t index) const
+{
+    vector<vec> coord_list;
+    vector<cSPIN> sl = getCluster(order, index);
+    for(int i=0; i<sl.size(); ++i)
+    {
+        cout << sl[i].get_coordinate() << endl;
+        coord_list.push_back( sl[i].get_coordinate() );
+    }
+    return coord_list;
+}
+
 ostream&  operator << (ostream& outs, const cSpinCluster& clst)
 {/*{{{*/
 /// Operator << is reloaded to display the cluster index one by one.

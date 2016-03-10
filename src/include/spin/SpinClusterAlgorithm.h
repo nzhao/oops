@@ -16,8 +16,6 @@
 using namespace std;
 using namespace arma;
 
-typedef pair<size_t, size_t> CluserPostion;
-
  
 /// \addtogroup SpinList
 /// @{
