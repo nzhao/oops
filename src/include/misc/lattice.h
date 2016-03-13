@@ -19,11 +19,19 @@ public:
     vector<int> getIndex(int i) const;
     vec         getCoordinate(int i) const;
     vec         getCoordinate(const vector<int>& idx) const;
-    vector<cSPIN> getSpinList() const {return _spin_list;};
+    vector<vec> getBases() const {return _bases;};
+    vector<int> getRangeWidth() const {return _range_width;};
+    string      getIsotope(int i) const;
+    int         getTotalAtomNumber() const {return _total_atom_num;};
+    int         getSingleIndex(const vector<int>& idx) const;
+    vector< vector<int> > getCenterIndex() const;
+    vector<int> getCenterSingleIndex() const;
 
     void        setRange(const umat& range);
-    void        generate_spins();
-    int         getSpinNum() const {return _spin_list.size();};
+    void        save_to_file(string filename);
+
+    friend ostream&  operator << (ostream& outs, const Lattice& lattice);
+
 protected:
 private:
     int                 _dimension;
@@ -35,6 +43,5 @@ private:
     vector<int>         _range_width;
     vector<double>      _lattice_constant;
     vector<string>      _isotope;
-    vector<cSPIN>       _spin_list;
 };
 #endif

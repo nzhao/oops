@@ -42,4 +42,17 @@ template<class T> vector<T> riffle(T obj1, T obj2, int n)
 vector<int> base_transform(int num, const vector<int>& base);
 int base_number(const vector<int>& num_in_base, const vector<int> base);
 
+template<typename T>
+void print_vector(const vector<T>& v)
+{
+    cout << "[ ";
+    for(int i=0; i<v.size(); ++i)
+    {
+        cout << v[i] ;
+        if(i<v.size()-1) 
+            cout << ", ";
+    }
+    cout << " ]" ;
+}
+
 #endif

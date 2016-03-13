@@ -26,6 +26,7 @@ void cSpinCluster::make()
 /// This function calls the 'generate' method of the grouping algorithm.
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
+    _sub_cluster_position_valid = true;
 }
 
 cSpinCluster::cSpinCluster(const cSpinCluster& clst)
@@ -148,7 +149,7 @@ vector<vec> cSpinCluster::getClusterCoord(size_t order, size_t index) const
     vector<cSPIN> sl = getCluster(order, index);
     for(int i=0; i<sl.size(); ++i)
     {
-        cout << sl[i].get_coordinate() << endl;
+        //cout << sl[i].get_coordinate() << endl;
         coord_list.push_back( sl[i].get_coordinate() );
     }
     return coord_list;
@@ -173,10 +174,13 @@ ostream&  operator << (ostream& outs, const cSpinCluster& clst)
                 cClusterIndex vIdx = *pos;
                 outs << "{ " << order << ", " << j << " } = "  <<  vIdx << "\t";
 
-                set<ClusterPostion > sub_pos = clst.getSubClusters(order, j);//vIdx.getSubClstPos();
-                set<ClusterPostion >::iterator it;
-                for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
-                    outs << "{ " << it->first << ", " << it->second << " }\t" ;
+                if(clst._sub_cluster_position_valid)
+                {
+                    set<ClusterPostion > sub_pos = clst.getSubClusters(order, j);//vIdx.getSubClstPos();
+                    set<ClusterPostion >::iterator it;
+                    for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
+                        outs << "{ " << it->first << ", " << it->second << " }\t" ;
+                }
                 cout << endl;
                 j++;
             }

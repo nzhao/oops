@@ -26,14 +26,19 @@ void Lattice::setRange(const umat& range)
         cout << "error range" <<endl;
     else
     {
+        vector<int> temp_range_width;
+        vector< pair<int, int> > temp_range;
+
         _total_atom_num = _atom_num_in_cell;
         for(int i=0; i<_dimension; ++i)
         {
             int range_width_i = range(i,1) - range(i,0);
             _total_atom_num *= range_width_i;
-            _range_width.push_back( range_width_i );
-            _range.push_back( make_pair(range(i, 0), range(i, 1) ) );
+            temp_range_width.push_back( range_width_i );
+            temp_range.push_back( make_pair(range(i, 0), range(i, 1) ) );
         }
+        _range_width = temp_range_width;
+        _range = temp_range;
     }
 }
 
@@ -47,6 +52,17 @@ vector<int> Lattice::getIndex(int num) const
     return res;
 }
 
+int Lattice::getSingleIndex(const vector<int>& idx) const
+{
+    
+    vector<int> base = _range_width;
+    base.push_back( _atom_num_in_cell );
+    vector<int> idx1;
+    for(int i=0; i<_dimension; ++i)
+        idx1.push_back( idx[i] - _range[i].first);
+    idx1.push_back(idx[_dimension]);
+    return base_number(idx1, base);
+}
 vec Lattice::getCoordinate(const vector<int>& idx) const
 {
     vec coord = zeros<vec>(3);
@@ -61,14 +77,100 @@ vec Lattice::getCoordinate(int i) const
     vec coord = getCoordinate(idx);
     return coord; 
 }
-
-void Lattice::generate_spins()
+string Lattice::getIsotope(int i) const
 {
+    vector<int> idx = getIndex(i);
+    return _isotope[ idx[_dimension] ];
+}
+
+vector< vector<int> > Lattice::getCenterIndex() const
+{
+    vector< vector<int> > res;
+    for(int i=0; i<_atom_num_in_cell; ++i)
+    {
+        vector<int> res_i;
+        for(int j=0; j<_dimension; ++j)
+            res_i.push_back( _range[j].first + _range_width[j]/2 ); 
+        res_i.push_back(i);
+        res.push_back( res_i );
+    }
+    return res;
+}
+
+vector<int> Lattice::getCenterSingleIndex() const
+{
+    vector<int> res;
+    vector< vector<int> > idx_list =  getCenterIndex();
+    for(int i=0; i< idx_list.size(); ++i)
+        res.push_back( getSingleIndex(idx_list[i]) );
+    return res;
+}
+
+void Lattice::save_to_file(string filename)
+{
+    ofstream xyz(filename.c_str());
+    if(!xyz) assert(0);
+
+    xyz << _total_atom_num << endl;
     for(int i=0; i<_total_atom_num; ++i)
     {
-        vector<int> idx = getIndex(i);
-        int idx_in_cell = idx[_dimension];
-        cSPIN s(getCoordinate(idx), _isotope[idx_in_cell]);
-        _spin_list.push_back(s);
+        xyz << getIsotope(i) << "\t";
+        vec coord = getCoordinate(i); 
+        xyz << coord(0) << "\t" <<  coord(1) << "\t" << coord(2);
+        xyz << endl;
     }
+    xyz.close();
+
 }
+
+ostream&  operator << (ostream& outs, const Lattice& lattice)
+{
+    outs << "dimension = " << lattice._dimension << endl;;
+    for(int i=0; i<lattice._dimension; ++i)
+        outs << "\t dim_" << i << " = [ " << lattice._range[i].first << ", " << lattice._range[i].second << " ), range_width = " << lattice._range_width[i]  << endl;
+
+    outs<< "atom number per unit cell = " << lattice._atom_num_in_cell << endl;
+    outs << "\t total atom number = " << lattice._total_atom_num << " = [ ";
+    for(int i=0; i<lattice._dimension; ++i)
+        outs << lattice._range_width[i] << " * ";
+    outs << lattice._atom_num_in_cell << " ]" << endl;
+
+    int num;
+    if(lattice._total_atom_num > 100)
+    {
+        outs << "fisrt 100 atoms are listed below" << endl;
+        num = 100;
+    }
+    else
+    {
+        outs << "all atoms are listed below" << endl;
+        num = lattice._total_atom_num;
+    }
+
+    for(int i=0; i<num; ++i)
+    {
+        outs << "\t" << i << ": [ ";
+        vector<int> idx = lattice.getIndex(i);
+        for(int j=0; j<idx.size(); ++j)
+        {
+            outs<< idx[j] ; 
+            if(j<idx.size() -1)
+                outs << ", ";
+        }
+        outs << " ] = ";
+        outs << lattice.getCoordinate(i).t();
+        outs << endl;
+    }
+
+    outs << "Lattice is centered at = " ;
+    vector< vector<int> > idxC = lattice.getCenterIndex();
+    for(int j=0; j<idxC.size(); ++j)
+    {
+        print_vector(idxC[j]);
+        outs << " ";
+    }
+    outs <<  " = ";
+    print_vector(lattice.getCenterSingleIndex() );
+    return outs;
+}
+

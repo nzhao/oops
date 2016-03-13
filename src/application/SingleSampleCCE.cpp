@@ -18,58 +18,35 @@ ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
-    //cout << "begin" << endl;
-    //vector<int> base;
-    //base.push_back(4);
-    //base.push_back(3);
-    //base.push_back(2);
-    //vector<int> res = base_transform( 20, base);
-    //for(int i=0; i<res.size(); ++i)
-        //cout << res[i] << endl;
-    //cout << "back = " << base_number(res, base) << endl;
-    //cout << "end" << endl;
     int dim = 2;
     vec base1, base2;
     base1 << 1.0 << 0.0 << 0.0; base2 << 0.0 << 1.0 << 0.0;
     vector<vec> bases; bases.push_back(base1); bases.push_back(base2);
-    int atom_num = 3;
+    int atom_num = 2;
     vec coord1, coord2, coord3;
     coord1 << 0.0 << 0.0 << 0.0;
-    coord2 << 0.3 << 0.6 << 0.0;
-    coord3 << 0.6 << 0.3 << 0.0;
-    cout << "abc" << endl;
-    vector<vec> pos; pos.push_back(coord1); pos.push_back(coord2); pos.push_back(coord3);
+    coord2 << 0.5*3.57 << 0.5*3.57 << 0.0;
+    coord3 << 0.15 << 0.1 << 0.0;
+    vector<vec> pos; pos.push_back(coord1); pos.push_back(coord2);// pos.push_back(coord3);
     vector<double> latt_const;
-    latt_const.push_back(1.0); latt_const.push_back(1.0);
+    latt_const.push_back(3.57); latt_const.push_back(3.57);
     vector<string> iso; 
-    iso.push_back("13C"); iso.push_back("13C"); iso.push_back("13C"); 
-    //Lattice latt(dim, bases, latt_const, atom_num, pos, iso);
-    
-    umat range; range << -1 << 1 << endr << -1 << 1;
-    //for(int kk = 0; kk <72; ++kk)
-    //{
-        //vector<int> idx = latt.getIndex(kk);
-        //for(int i=0; i<idx.size(); ++i)
-            //cout << idx[i] << ",\t";
-        //cout << endl << latt.getCoordinate(kk) << endl;
-    //}
-    //latt.generate_spins();
+    iso.push_back("13C"); iso.push_back("13C");// iso.push_back("13C"); 
+    Lattice latt(dim, bases, latt_const, atom_num, pos, iso);
+    umat range; range << -7 << 8 << endr << -7 << 8;
+    latt.setRange(range);
 
-    cSpinSourceFromLattice spin_on_lattice(dim, bases, latt_const, atom_num, pos, iso, range);
+    cout << latt << endl;
+    latt.save_to_file("tst.xyz");
+    
+    //umat range; range << -1 << 1 << endr << -1 << 1;
+    cSpinSourceFromLattice spin_on_lattice(latt, range);
     cSpinCollection _bath_spins(&spin_on_lattice);
     _bath_spins.make();
 
-    sp_mat c=_bath_spins.getConnectionMatrix(1.0);
-
-    //mat cf= conv_to<mat>::from(c);
-    
-    //cout << cf << endl;
-    //c(span::all, span(1, 3)) = zeros<mat>(cf.n_rows,3);
-    //mat cff = conv_to<mat>::from(c);
-    //cout << cff << endl;
-    
-    int maxOrder = 5;
-    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins);
+    int maxOrder = 6;
+    sp_mat c=_bath_spins.getConnectionMatrix(4.0);
+    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
 

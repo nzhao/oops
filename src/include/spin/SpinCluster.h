@@ -40,6 +40,8 @@ public:
 
     void make();
     void MPI_partition(int nWorker);
+    void diable_sub_cluster_position() {_sub_cluster_position_valid = false;};
+    void enable_sub_cluster_position() {_sub_cluster_position_valid = true;};
 
     CLST_IDX_LIST getClusterIndex() const {return _cluster_index_list;};
     umat          getClusterIndex(size_t order) const ;
@@ -62,6 +64,7 @@ private:
     CLST_IDX_LIST    _cluster_index_list;
     cSpinCollection  _spin_collection;
     MPI_Cluster_Data _data;
+    bool             _sub_cluster_position_valid;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////
