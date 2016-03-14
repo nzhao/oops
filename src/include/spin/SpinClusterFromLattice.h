@@ -33,6 +33,7 @@ public:
     uvec getPrimitiveClusterIndex(int corner, int order, int idx) const {return _primitive_spin_clusters[corner].getClusterIndex(order, idx).getIndex();}
     vector<vec> getPrimitiveClusterCoord(const primitive_position& pos) const { return _primitive_spin_clusters[pos.getCorner()].getClusterCoord( pos.getOrder(), pos.getIndex() );}
     int getPrimitiveClusterNumber(int corner, int order) const { return _primitive_spin_clusters[corner].getClusterNum(order);}
+    int global_position(int unit_cell_index, const primitive_position& pos);
 private:
     void generate_primitive_clusters();
 
@@ -40,6 +41,8 @@ private:
     vector<cSPIN>          _spin_list;
     cDepthFirstPathTracing _primitive_dfpt;
     vector<cSpinCluster>   _primitive_spin_clusters;
+    umat                   _primitive_cluster_size;
+    urowvec                _primitive_cluster_size_fix_order;
     Lattice                _lattice;
 
     primitive_position compute_sub_pos(const primitive_position& pos, size_t remove_k);

@@ -27,6 +27,7 @@ void cSpinCluster::make()
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
     _sub_cluster_position_valid = true;
+    _has_cluster_index_list = _grouping->has_cluster_index_list();
 }
 
 cSpinCluster::cSpinCluster(const cSpinCluster& clst)
@@ -148,10 +149,7 @@ vector<vec> cSpinCluster::getClusterCoord(size_t order, size_t index) const
     vector<vec> coord_list;
     vector<cSPIN> sl = getCluster(order, index);
     for(int i=0; i<sl.size(); ++i)
-    {
-        //cout << sl[i].get_coordinate() << endl;
         coord_list.push_back( sl[i].get_coordinate() );
-    }
     return coord_list;
 }
 

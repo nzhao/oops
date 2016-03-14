@@ -16,6 +16,7 @@ cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, si
     _lattice   = lattice;
     _bath_spins = bath_spins;
     _spin_list = bath_spins.getSpinList();
+    _has_cluster_index_list = false;
 }
 
 void cUniformBathOnLattice::generate()
@@ -61,6 +62,14 @@ void cUniformBathOnLattice::generate_primitive_clusters()
         cout << spin_clusters_i << endl;
         _primitive_spin_clusters.push_back(spin_clusters_i);
     }
+    cout << "here" << endl;
+    _primitive_cluster_size = zeros<umat>(center.size(), _max_order);
+    for(int i=0; i<center.size(); ++i)
+        for(int j=0; j<_max_order; ++j)
+            _primitive_cluster_size(i, j) = getPrimitiveClusterNumber(i, j);
+    cout << _primitive_cluster_size;
+    _primitive_cluster_size_fix_order = sum(_primitive_cluster_size, 0);
+    cout << _primitive_cluster_size_fix_order;
 
 }
 
@@ -141,5 +150,13 @@ double cUniformBathOnLattice::patten_diff(const vector<vec>& v1, const vector<ve
     assert( v1.size() == v2.size() );
     for(int i=0; i<v1.size(); ++i)
         res += norm( v1[i] - v2[i] );
+    return res;
+}
+
+int cUniformBathOnLattice::global_position(int unit_cell_index, const primitive_position& pos)
+{
+    int order = pos.getOrder(); int corner = pos.getCorner(); int idx = pos.getIndex();
+    int res = unit_cell_index * _primitive_cluster_size_fix_order(order)
+        + corner * _primitive_cluster_size(corner, order) + idx;
     return res;
 }

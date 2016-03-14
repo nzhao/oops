@@ -44,7 +44,7 @@ int  main(int argc, char* argv[])
     cSpinCollection _bath_spins(&spin_on_lattice);
     _bath_spins.make();
 
-    int maxOrder = 6;
+    int maxOrder = 3;
     sp_mat c=_bath_spins.getConnectionMatrix(4.0);
     cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);

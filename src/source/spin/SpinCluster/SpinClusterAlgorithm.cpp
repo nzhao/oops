@@ -79,6 +79,7 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
     _connection_matrix=connection_matrix;
     vector<int> empty (0);
     subgraph2index( speye(_nspin, _nspin), empty );
+    _has_cluster_index_list = true;
 }
 
 cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix, size_t maxOrder, const mat& init)
@@ -89,6 +90,7 @@ cDepthFirstPathTracing::cDepthFirstPathTracing(const sp_mat&  connection_matrix,
     vector<int> empty (0);
     sp_mat init_spmat=conv_to<sp_mat>::from( init );
     subgraph2index( init_spmat, empty );
+    _has_cluster_index_list = true;
 }
 
 cDepthFirstPathTracing::~cDepthFirstPathTracing()

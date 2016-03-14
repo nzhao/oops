@@ -65,6 +65,7 @@ private:
     cSpinCollection  _spin_collection;
     MPI_Cluster_Data _data;
     bool             _sub_cluster_position_valid;
+    bool             _has_cluster_index_list;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////
