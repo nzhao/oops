@@ -46,14 +46,11 @@ public:
     size_t         getMaxOrder() const {return _max_order;};
     CLST_IDX_LIST& get_cluster_index() {return _cluster_index_list;};
 
-    bool           has_cluster_index_list() const {return _has_cluster_index_list;};
 protected:
     size_t        _nspin;
     size_t        _max_order;
     sp_mat        _connection_matrix;
     CLST_IDX_LIST _cluster_index_list;
-
-    bool          _has_cluster_index_list;
 
     void subgraph2index(const sp_mat& subgraph, const vector<int> sub_pos_list);
     sp_mat index2subgraph(int order);

@@ -29,14 +29,15 @@ void Lattice::setRange(const umat& range)
         vector<int> temp_range_width;
         vector< pair<int, int> > temp_range;
 
-        _total_atom_num = _atom_num_in_cell;
+        _unit_cell_num = 1;
         for(int i=0; i<_dimension; ++i)
         {
             int range_width_i = range(i,1) - range(i,0);
-            _total_atom_num *= range_width_i;
+            _unit_cell_num *= range_width_i;
             temp_range_width.push_back( range_width_i );
             temp_range.push_back( make_pair(range(i, 0), range(i, 1) ) );
         }
+        _total_atom_num = _atom_num_in_cell*_unit_cell_num;
         _range_width = temp_range_width;
         _range = temp_range;
     }
@@ -124,11 +125,12 @@ void Lattice::save_to_file(string filename)
 }
 
 ostream&  operator << (ostream& outs, const Lattice& lattice)
-{
+{/*{{{*/
     outs << "dimension = " << lattice._dimension << endl;;
     for(int i=0; i<lattice._dimension; ++i)
         outs << "\t dim_" << i << " = [ " << lattice._range[i].first << ", " << lattice._range[i].second << " ), range_width = " << lattice._range_width[i]  << endl;
 
+    outs<< "unit cell number = " << lattice._unit_cell_num << endl;
     outs<< "atom number per unit cell = " << lattice._atom_num_in_cell << endl;
     outs << "\t total atom number = " << lattice._total_atom_num << " = [ ";
     for(int i=0; i<lattice._dimension; ++i)
@@ -172,5 +174,5 @@ ostream&  operator << (ostream& outs, const Lattice& lattice)
     outs <<  " = ";
     print_vector(lattice.getCenterSingleIndex() );
     return outs;
-}
+}/*}}}*/
 

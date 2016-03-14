@@ -39,7 +39,6 @@ public:
     ~cSpinCluster();
 
     void make();
-    void MPI_partition(int nWorker);
     void diable_sub_cluster_position() {_sub_cluster_position_valid = false;};
     void enable_sub_cluster_position() {_sub_cluster_position_valid = true;};
 
@@ -53,8 +52,9 @@ public:
     size_t        getClusterNum(int order) const {return _cluster_index_list[order].size();};
     set<ClusterPostion > getSubClusters(size_t order, size_t index) const;
 
-    uvec          getMPI_ClusterLength(int worker_id) const {return _data.jobTable.col(worker_id);};
-    vector<umat>  getMPI_Cluster(int worker_id);
+    void           MPI_partition(int nWorker);
+    uvec           getMPI_ClusterLength(int worker_id) const {return _data.jobTable.col(worker_id);};
+    vector<umat>   getMPI_Cluster(int worker_id);
     ClusterPostion getMPI_ClusterSize(int cce_order, int worker_id) const;
 
     friend ostream&  operator << (ostream& outs, const cSpinCluster& clst);
@@ -65,7 +65,6 @@ private:
     cSpinCollection  _spin_collection;
     MPI_Cluster_Data _data;
     bool             _sub_cluster_position_valid;
-    bool             _has_cluster_index_list;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////

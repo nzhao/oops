@@ -23,6 +23,8 @@ public:
     vector<int> getRangeWidth() const {return _range_width;};
     string      getIsotope(int i) const;
     int         getTotalAtomNumber() const {return _total_atom_num;};
+    int         getUnitCellNumber() const {return _unit_cell_num;};
+    int         getUnitCellAtomNumber() const {return _atom_num_in_cell;};
     int         getSingleIndex(const vector<int>& idx) const;
     vector< vector<int> > getCenterIndex() const;
     vector<int> getCenterSingleIndex() const;
@@ -36,6 +38,7 @@ protected:
 private:
     int                 _dimension;
     int                 _atom_num_in_cell;
+    int                 _unit_cell_num;
     int                 _total_atom_num;
     vector<vec>         _pos_in_cell;
     vector<vec>         _bases;

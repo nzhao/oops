@@ -49,6 +49,7 @@ int  main(int argc, char* argv[])
     cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
+    //cout << _spin_clusters << endl;
 
     
     return 0;

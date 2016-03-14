@@ -27,7 +27,6 @@ void cSpinCluster::make()
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
     _sub_cluster_position_valid = true;
-    _has_cluster_index_list = _grouping->has_cluster_index_list();
 }
 
 cSpinCluster::cSpinCluster(const cSpinCluster& clst)

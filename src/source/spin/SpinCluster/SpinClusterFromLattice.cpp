@@ -16,44 +16,45 @@ cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, si
     _lattice   = lattice;
     _bath_spins = bath_spins;
     _spin_list = bath_spins.getSpinList();
-    _has_cluster_index_list = false;
 }
 
 void cUniformBathOnLattice::generate()
 {
     generate_primitive_clusters();
+    generate_cluster_index_list();
 
-    //for(int corner=0; corner<_primitive_spin_clusters.size(); ++corner)
-        //for(int order = 0; order<_max_order; ++order)
-            //for(int idx = 0; idx < getPrimitiveClusterNumber(corner, order); ++idx)
-            //{
-                ////int corner = 0; int order =3; int idx = 2;
-                //primitive_position pos(corner, order, idx);
-                //cout << "pos= " << getPrimitiveClusterIndex(pos).t() ;
-                //vector<primitive_position> pos_list = find_sub_position(pos);
-                //for(int i=0; i< pos_list.size(); ++i)
-                //{
-                    //if(pos_list[i].getIndex() >=0)
-                        //cout << "\t" << "sub_pos ="  << getPrimitiveClusterIndex(pos_list[i]).t();
-                    //else
-                    //{
-                        //cout << "not found" <<endl;
-                        //assert(0);
-                    //}
-                //}
-            //}
+    for(int corner=0; corner<_primitive_spin_clusters.size(); ++corner)
+        for(int order = 0; order<_max_order; ++order)
+            for(int idx = 0; idx < getPrimitiveClusterNumber(corner, order); ++idx)
+            {
+                //int corner = 0; int order =3; int idx = 2;
+                primitive_position pos(corner, order, idx);
+                cout << "pos= " << getPrimitiveClusterIndex(pos).t() ;
+                vector<primitive_position> pos_list = find_sub_position(pos);
+                for(int i=0; i< pos_list.size(); ++i)
+                {
+                    if(pos_list[i].getIndex() >=0)
+                        cout << "\t" << "sub_pos ="  << getPrimitiveClusterIndex(pos_list[i]).t();
+                    else
+                    {
+                        cout << "not found" <<endl;
+                        assert(0);
+                    }
+                }
+            }
 }
 
 void cUniformBathOnLattice::generate_primitive_clusters()
 {
-    vector<int> center = _lattice.getCenterSingleIndex();
-    for(int i=0; i<center.size(); ++i)
+    _center = _lattice.getCenterSingleIndex();
+    _atom_num_in_cell = _lattice.getUnitCellAtomNumber();
+    for(int i=0; i<_center.size(); ++i)
     {
         mat init_mat = zeros<mat>(1, _nspin);
-        init_mat(0, center[i]) = 1;
+        init_mat(0, _center[i]) = 1;
     
-        _connection_matrix(span(0, center[i]-1), span::all) = zeros<mat>(center[i], _nspin);
-        _connection_matrix(span::all, span(0, center[i]-1)) = zeros<mat>(_nspin, center[i]);
+        _connection_matrix(span(0, _center[i]-1), span::all) = zeros<mat>(_center[i], _nspin);
+        _connection_matrix(span::all, span(0, _center[i]-1)) = zeros<mat>(_nspin, _center[i]);
 
         cDepthFirstPathTracing dfpt_i(_connection_matrix, _max_order, init_mat);
         cSpinCluster spin_clusters_i(_bath_spins, &dfpt_i);
@@ -62,15 +63,41 @@ void cUniformBathOnLattice::generate_primitive_clusters()
         cout << spin_clusters_i << endl;
         _primitive_spin_clusters.push_back(spin_clusters_i);
     }
-    cout << "here" << endl;
-    _primitive_cluster_size = zeros<umat>(center.size(), _max_order);
-    for(int i=0; i<center.size(); ++i)
+    _primitive_cluster_size = zeros<umat>(_center.size(), _max_order);
+    for(int i=0; i<_center.size(); ++i)
         for(int j=0; j<_max_order; ++j)
             _primitive_cluster_size(i, j) = getPrimitiveClusterNumber(i, j);
     cout << _primitive_cluster_size;
     _primitive_cluster_size_fix_order = sum(_primitive_cluster_size, 0);
     cout << _primitive_cluster_size_fix_order;
 
+    _unit_cell_num = _lattice.getUnitCellNumber();
+}
+
+void cUniformBathOnLattice::generate_cluster_index_list()
+{
+    for(int order=0; order<_max_order; ++order)
+    {
+        cout << "order = " << order << " has " << getGlobalClusterNumber(order) << " clusters." << endl;
+        for(int i=0; i<_unit_cell_num; ++i)
+        {
+            for(int j=0; j<_atom_num_in_cell; ++j)
+            {
+                for(int k=0; k<_primitive_cluster_size(j, order); ++k)
+                {
+                    cClusterIndex cIdx( getClusterIndex(i, j, order, k) );
+                    _cluster_index_list[order].insert(cIdx);
+                }
+            }
+        }
+    }
+}
+
+uvec cUniformBathOnLattice::getClusterIndex(int unit_cell, int corner_idx, int order, int idx)
+{
+    uvec pr_v = getPrimitiveClusterIndex(corner_idx, order, idx);
+    uvec v = pr_v - _center[0] + unit_cell*_atom_num_in_cell;
+    return v;
 }
 
 vector<primitive_position> cUniformBathOnLattice::find_sub_position(const primitive_position& pos)
@@ -153,10 +180,11 @@ double cUniformBathOnLattice::patten_diff(const vector<vec>& v1, const vector<ve
     return res;
 }
 
-int cUniformBathOnLattice::global_position(int unit_cell_index, const primitive_position& pos)
+int cUniformBathOnLattice::getGlobalPosition(int unit_cell_index, const primitive_position& pos)
 {
     int order = pos.getOrder(); int corner = pos.getCorner(); int idx = pos.getIndex();
     int res = unit_cell_index * _primitive_cluster_size_fix_order(order)
         + corner * _primitive_cluster_size(corner, order) + idx;
     return res;
 }
+
