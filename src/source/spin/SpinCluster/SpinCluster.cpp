@@ -77,7 +77,6 @@ set<ClusterPostion > cSpinCluster::getSubClusters(size_t order, size_t index) co
     set<ClusterPostion >::iterator it;
     for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
     {
-        cClusterIndex sub_cluster = getClusterIndex(it->first, it->second); 
         set<ClusterPostion > sub_sub_pos = getSubClusters(it->first, it->second);//sub_cluster.getSubClstPos();
         set<ClusterPostion >::iterator sub_it;
         for(sub_it=sub_sub_pos.begin(); sub_it!=sub_sub_pos.end(); ++sub_it)
@@ -178,7 +177,7 @@ ostream&  operator << (ostream& outs, const cSpinCluster& clst)
                     for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
                         outs << "{ " << it->first << ", " << it->second << " }\t" ;
                 }
-                cout << endl;
+                outs << endl;
                 j++;
             }
             outs << endl;

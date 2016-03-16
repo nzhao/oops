@@ -37,7 +37,8 @@ int  main(int argc, char* argv[])
     latt.setRange(range);
 
     cout << latt << endl;
-    latt.save_to_file("tst.xyz");
+    getchar();
+    //latt.save_to_file("tst.xyz");
     
     //umat range; range << -1 << 1 << endr << -1 << 1;
     cSpinSourceFromLattice spin_on_lattice(latt, range);
@@ -49,8 +50,21 @@ int  main(int argc, char* argv[])
     cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
+    
+    _spin_clusters.enable_sub_cluster_position();
+    //_spin_clusters.diable_sub_cluster_position();
     //cout << _spin_clusters << endl;
+    for(int order=0; order<maxOrder; ++order)
+    {
+        int num = _spin_clusters.getClusterNum(order);
+        for(int i=0; i<num; ++i)
+        {
+            cout << "order = " << order << ", " << i << "/" << num << endl;
+            _spin_clusters.getSubClusters(order, i);
+        }
+    }
 
+    //set<ClusterPostion > sub_pos = _spin_clusters.getSubClusters(1, 0);
     
     return 0;
 

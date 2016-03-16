@@ -29,6 +29,7 @@ public:
     set< ClusterPostion > getSubClstPos() const;
 
     void appendSubClstPos(int pos) const  {_sub_clst_pos.push_back( pos );};
+    void setSubClstPos(vector<size_t> pos_lst) const {_sub_clst_pos = pos_lst;};
 
     friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
     friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);

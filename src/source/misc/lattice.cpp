@@ -138,10 +138,10 @@ ostream&  operator << (ostream& outs, const Lattice& lattice)
     outs << lattice._atom_num_in_cell << " ]" << endl;
 
     int num;
-    if(lattice._total_atom_num > 100)
+    if(lattice._total_atom_num > 20)
     {
-        outs << "fisrt 100 atoms are listed below" << endl;
-        num = 100;
+        outs << "fisrt 20 atoms are listed below" << endl;
+        num = 20;
     }
     else
     {
@@ -161,7 +161,7 @@ ostream&  operator << (ostream& outs, const Lattice& lattice)
         }
         outs << " ] = ";
         outs << lattice.getCoordinate(i).t();
-        outs << endl;
+        //outs << endl;
     }
 
     outs << "Lattice is centered at = " ;
