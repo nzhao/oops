@@ -31,10 +31,10 @@ void cUniformBathOnLattice::generate_primitive_clusters()
         cout << "generating primitive clusters of atom " << i << "/" << _atom_num_in_cell << " ..." << endl;
         mat init_mat = zeros<mat>(1, _nspin);
         init_mat(0, _center[i]) = 1;
-    
+        
         _connection_matrix(span(0, _center[i]-1), span::all) = zeros<mat>(_center[i], _nspin);
         _connection_matrix(span::all, span(0, _center[i]-1)) = zeros<mat>(_nspin, _center[i]);
-
+        
         cDepthFirstPathTracing dfpt_i(_connection_matrix, _max_order, init_mat);
         cSpinCluster spin_clusters_i(_bath_spins, &dfpt_i);
         spin_clusters_i.make();
@@ -145,131 +145,5 @@ void cUniformBathOnLattice::generate_cluster_index_list()
         }
         _cluster_index_list.push_back( sub_pos_set );
     }
-
 }
-
-///{{{
-//void cUniformBathOnLattice::generate_cluster_index_list()
-//{
-    //for(int order=0; order<_max_order; ++order)
-    //{
-        //cout << "order = " << order << " has " << getGlobalClusterNumber(order) << " clusters." << endl;
-        //for(int i=0; i<_unit_cell_num; ++i)
-        //{
-            //for(int j=0; j<_atom_num_in_cell; ++j)
-            //{
-                //for(int k=0; k<_primitive_cluster_size(j, order); ++k)
-                //{
-                    //cClusterIndex cIdx( getClusterIndex(i, j, order, k) );
-                    //_cluster_index_list[order].insert(cIdx);
-                //}
-            //}
-        //}
-    //}
-//}
-//uvec cUniformBathOnLattice::getClusterIndex(int unit_cell, int corner_idx, int order, int idx)
-//{
-    //uvec pr_v = getPrimitiveClusterIndex(corner_idx, order, idx);
-    //uvec v = pr_v - _center[0] + unit_cell*_atom_num_in_cell;
-    //return v;
-//}
-
-//vector<primitive_position> cUniformBathOnLattice::find_sub_position(const primitive_position& pos)
-//{
-    //vector<primitive_position> pos_list;
-    //if(pos.getOrder() > 0)
-        //for(int i=0; i<pos.getOrder()+1; ++i)
-            //pos_list.push_back( compute_sub_pos(pos, i) );
-    //return pos_list;
-//}
-//pair<int, int>  cUniformBathOnLattice::match_pos(const urowvec& idx)
-//{
-    //int order = idx.n_elem;
-    //int vertex, pos;
-
-    //int corner_idx = _lattice.getIndex( idx(0) ).back();
-    //umat m = _primitive_spin_clusters[corner_idx].getClusterIndex(order);
-    //for(int i=0; i< m.n_rows; ++i)
-    //{
-        //urowvec row_i = m.row(i) - m(i, 0);
-        //urowvec idx0  = idx - idx(0);
-        
-    //}
-    //return make_pair( vertex, pos);
-//}
-
-//primitive_position cUniformBathOnLattice::compute_sub_pos(const primitive_position& pos, size_t k)
-//{
-    //int corner = pos.getCorner(); int order = pos.getOrder(); int idx = pos.getIndex();
-    //pair< vector<int>, vector<vec> > p = remove_k(pos, k);
-    //vector<int> sub_idx = p.first;   vector<vec> sub_coord = p.second;
-
-    //int corner_idx = _lattice.getIndex( sub_idx[0]).back();
-    //int num_to_be_matched = getPrimitiveClusterNumber(corner_idx, order-1);
-
-    //int sub_pos = 1;
-    //for(int i=0; i<num_to_be_matched; ++i)
-    //{
-        //primitive_position pos_i(corner_idx, order-1, i);
-        //double diff = patten_diff( relative_coordinates(pos_i), sub_coord );
-        //if(diff < PATTEN_EPS)
-        //{
-            //sub_pos = i;
-            //break;
-        //}
-    //}
-
-    //primitive_position pos1( corner_idx,  order-1,  sub_pos);
-    //return pos1;
-//}
-
-//uvec cUniformBathOnLattice::getPrimitiveClusterIndex(const primitive_position& pos) const
-//{
-    //int corner = pos.getCorner(); int order = pos.getOrder(); int index = pos.getIndex();
-    //return getPrimitiveClusterIndex(corner, order, index);
-//}
-//vector<vec> cUniformBathOnLattice::relative_coordinates(const primitive_position& pos)
-//{
-    //vector<vec> res;
-    //vector<vec> clst_coord = getPrimitiveClusterCoord(pos);
-    //for(int i=0; i<clst_coord.size(); ++i)
-        //res.push_back( clst_coord[i] - clst_coord[0] );
-    //return res;
-//}
-
-//pair< vector<int>, vector<vec> >  cUniformBathOnLattice::remove_k(const primitive_position& pos, size_t k)
-//{
-    //uvec index = getPrimitiveClusterIndex(pos);
-    //vector<int> index_remove_k;
-    //for(int i=0; i<index.n_elem; ++i)
-        //if(i!=k)
-            //index_remove_k.push_back( index(i) );
-
-    //vec coord0 = _spin_list[index_remove_k[0]].get_coordinate();
-
-    //vector<vec> coord_remove_k;
-    //for(int i=0; i<index_remove_k.size(); ++i)
-    //{
-        //vec coord_i =  _spin_list[index_remove_k[i]].get_coordinate();
-        //coord_remove_k.push_back( coord_i - coord0 );
-    //}
-    //return make_pair( index_remove_k, coord_remove_k);
-//}
-
-//double cUniformBathOnLattice::patten_diff(const vector<vec>& v1, const vector<vec>& v2)
-//{
-    //double res = 0.0;
-    //assert( v1.size() == v2.size() );
-    //for(int i=0; i<v1.size(); ++i)
-        //res += norm( v1[i] - v2[i] );
-    //return res;
-//}
-//int cUniformBathOnLattice::getGlobalPosition(int unit_cell_index, const primitive_position& pos)
-//{
-    //int order = pos.getOrder(); int corner = pos.getCorner(); int idx = pos.getIndex();
-    //int res = unit_cell_index * _primitive_cumsum_size(_atom_num_in_cell, order)
-        //+ corner * _primitive_cluster_size(corner, order) + idx;
-    //return res;
-//}
-//}}}
 
