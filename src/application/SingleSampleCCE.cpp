@@ -33,7 +33,7 @@ int  main(int argc, char* argv[])
     vector<string> iso; 
     iso.push_back("13C"); iso.push_back("13C");// iso.push_back("13C"); 
     Lattice latt(dim, bases, latt_const, atom_num, pos, iso);
-    umat range; range << -7 << 8 << endr << -7 << 8;
+    imat range; range << -20 << 21 << endr << -20 << 21;
     latt.setRange(range);
 
     cout << latt << endl;
@@ -47,7 +47,8 @@ int  main(int argc, char* argv[])
 
     int maxOrder = 3;
     sp_mat c=_bath_spins.getConnectionMatrix(4.0);
-    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt);
+    imat root_range; root_range << -7 << 8 << endr << -7 << 8;
+    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt, root_range);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
     

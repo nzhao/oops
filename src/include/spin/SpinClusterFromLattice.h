@@ -12,7 +12,7 @@ class cUniformBathOnLattice:public cSpinGrouping
 {
 public:
     cUniformBathOnLattice(){};
-    cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice);
+    cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice, const imat& root_range);
     ~cUniformBathOnLattice(){};
 
     void generate();
@@ -24,6 +24,8 @@ private:
     vector<int>            _center;
     int                    _unit_cell_num;
     int                    _atom_num_in_cell;
+    imat                   _root_range;
+    vector<int>            _root_index_list;
 
     cSpinCollection        _bath_spins;
     vector<cSPIN>          _spin_list;
@@ -37,6 +39,7 @@ private:
     vector< SubPosLst_FixOrder> _sub_pos;
 
 
+    void      generate_root_index();
     void      generate_primitive_clusters();
     void      generate_sub_primitive_position();
     void      generate_cluster_index_list();

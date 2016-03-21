@@ -63,13 +63,13 @@ vector<cSPIN>& cSpinSourceFromFile::generate()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{
-cSpinSourceFromLattice::cSpinSourceFromLattice(const Lattice& lattice,  const umat& range)
+cSpinSourceFromLattice::cSpinSourceFromLattice(const Lattice& lattice,  const imat& range)
 {
     _lattice = lattice;
     _lattice.setRange(range);
 }
 
-cSpinSourceFromLattice::cSpinSourceFromLattice(int dim, const vector<vec>& bases, const vector<double>& lattice_const, int atom_num, const vector<vec>& pos, const vector<string>& isotope, const umat& range)
+cSpinSourceFromLattice::cSpinSourceFromLattice(int dim, const vector<vec>& bases, const vector<double>& lattice_const, int atom_num, const vector<vec>& pos, const vector<string>& isotope, const imat& range)
 {
     _lattice = Lattice(dim, bases, lattice_const, atom_num, pos, isotope); 
     _lattice.setRange(range);

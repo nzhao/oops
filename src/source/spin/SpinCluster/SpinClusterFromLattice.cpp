@@ -2,7 +2,7 @@
 
 double PATTEN_EPS = 1e-10;
 
-cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice)
+cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice, const imat& root_range)
 {
     _max_order         = maxOrder;
     _bath_spins        = bath_spins;
@@ -14,14 +14,20 @@ cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, si
     _center           = lattice.getCenterSingleIndex();
     _atom_num_in_cell = lattice.getUnitCellAtomNumber();
     _unit_cell_num    = lattice.getUnitCellNumber();
+    _root_range       = root_range;
 }
 
 void cUniformBathOnLattice::generate()
 {
+    generate_root_index();
     generate_primitive_clusters();
     generate_sub_primitive_position();
     generate_cluster_index_list();
 
+}
+
+void cUniformBathOnLattice::generate_root_index()
+{
 }
 
 void cUniformBathOnLattice::generate_primitive_clusters()
@@ -65,7 +71,7 @@ void cUniformBathOnLattice::generate_primitive_clusters()
 }/*}}}*/
 
 void cUniformBathOnLattice::generate_sub_primitive_position()
-{
+{/*{{{*/
     for(int order=1; order<_max_order; ++order)
     {
         cout << "generating sub_primitive_position of order = " << order << "/" << _max_order << " ... " << endl;
@@ -90,10 +96,10 @@ void cUniformBathOnLattice::generate_sub_primitive_position()
         }
         _sub_pos.push_back( sp_fix_order );
     }
-}
+}/*}}}*/
 
 int cUniformBathOnLattice::locate_primitive_sub_clusters(const urowvec& v)
-{
+{/*{{{*/
     int order = v.n_elem-1;
     int idx_in_unit_cell = _lattice.getIndex( v(0) ).back();
     int unit_cell_pos    = ( v(0) - idx_in_unit_cell ) / _atom_num_in_cell;
@@ -112,7 +118,7 @@ int cUniformBathOnLattice::locate_primitive_sub_clusters(const urowvec& v)
         }
     //cout << "not found" << endl << endl;
     return -1;
-}
+}/*}}}*/
 void cUniformBathOnLattice::generate_cluster_index_list()
 {
     _cluster_index_list.clear();

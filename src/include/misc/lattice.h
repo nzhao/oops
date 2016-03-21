@@ -29,7 +29,7 @@ public:
     vector< vector<int> > getCenterIndex() const;
     vector<int> getCenterSingleIndex() const;
 
-    void        setRange(const umat& range);
+    void        setRange(const imat& range);
     void        save_to_file(string filename);
 
     friend ostream&  operator << (ostream& outs, const Lattice& lattice);

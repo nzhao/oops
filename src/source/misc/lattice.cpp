@@ -20,7 +20,7 @@ Lattice::Lattice(int dim, const vector<vec>& bases, const vector<double>& lattic
     _isotope = isotope;
 }
 
-void Lattice::setRange(const umat& range)
+void Lattice::setRange(const imat& range)
 {
     if(range.n_rows < _dimension)
         cout << "error range" <<endl;
