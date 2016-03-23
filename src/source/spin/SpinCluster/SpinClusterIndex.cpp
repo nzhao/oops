@@ -72,7 +72,14 @@ ostream&  operator << (ostream& outs, const cClusterIndex& idx)
         if(i<idx._index.size()-1)
             outs <<", ";
     }
-    outs << "];\t";
+    outs << "];";
+    //for(int i=0; i<idx._sub_clst_pos.size(); ++i)
+    //{
+        //outs << idx._sub_clst_pos[i];
+        //if(i<idx._sub_clst_pos.size()-1)
+            //outs <<", ";
+    //}
+    //outs << "};\t";
     return outs;
 }
 //}}}

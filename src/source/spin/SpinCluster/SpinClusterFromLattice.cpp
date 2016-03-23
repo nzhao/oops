@@ -13,13 +13,18 @@ cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, si
     _lattice          = lattice;
     _center           = lattice.getCenterSingleIndex();
     _atom_num_in_cell = lattice.getUnitCellAtomNumber();
-    _unit_cell_num    = lattice.getUnitCellNumber();
     _root_range       = root_range;
+
+    _root_lattice = _lattice;
+    _root_lattice.setRange(_root_range); 
+    _root_center = _root_lattice.getCenterSingleIndex();
+    _unit_cell_num = _root_lattice.getUnitCellNumber();
+    cout << _root_lattice << endl;
 }
 
 void cUniformBathOnLattice::generate()
 {
-    generate_root_index();
+    //generate_root_index();
     generate_primitive_clusters();
     generate_sub_primitive_position();
     generate_cluster_index_list();
@@ -27,8 +32,19 @@ void cUniformBathOnLattice::generate()
 }
 
 void cUniformBathOnLattice::generate_root_index()
-{
-}
+{/*{{{*/
+    Lattice root_lattice(_lattice);
+    root_lattice.setRange(_root_range); 
+    cout << _lattice.getUnitCellNumber() << endl;
+    cout << root_lattice.getUnitCellNumber() << endl;
+
+    for(int i=0; i<root_lattice.getTotalAtomNumber(); ++i)
+    {
+        vector<int> vIdx = root_lattice.getIndex(i);
+        print_vector(vIdx); cout << endl;
+        cout << "root_idx = (" << root_lattice.getSingleIndex(vIdx) << ", " << _lattice.getSingleIndex(vIdx) << ")"<< endl;
+    }
+}/*}}}*/
 
 void cUniformBathOnLattice::generate_primitive_clusters()
 {/*{{{*/
@@ -55,6 +71,7 @@ void cUniformBathOnLattice::generate_primitive_clusters()
         for(int i=1; i<_atom_num_in_cell; ++i)
             m_order = join_vert(m_order, _primitive_spin_clusters[i].getClusterIndex(order) );
         _primitive_cluster_mat.push_back( m_order);
+        //cout << m_order << endl;
     }
 
     _primitive_cluster_size = zeros<umat>(_atom_num_in_cell, _max_order);
@@ -87,7 +104,8 @@ void cUniformBathOnLattice::generate_sub_primitive_position()
                 urowvec v_rm_j = v; v_rm_j.shed_cols(rm_j, rm_j);
                 //cout << "sub_v(" << rm_j << ") = " << v_rm_j;
                 int pos = locate_primitive_sub_clusters(v_rm_j); 
-                if(pos>0)
+                //cout << "pos = " << pos << endl;
+                if(pos>=0)
                     pos_list.push_back( (size_t) pos );
             }
             //print_vector(pos_list);
@@ -100,25 +118,26 @@ void cUniformBathOnLattice::generate_sub_primitive_position()
 
 int cUniformBathOnLattice::locate_primitive_sub_clusters(const urowvec& v)
 {/*{{{*/
-    int order = v.n_elem-1;
-    int idx_in_unit_cell = _lattice.getIndex( v(0) ).back();
-    int unit_cell_pos    = ( v(0) - idx_in_unit_cell ) / _atom_num_in_cell;
-    int res              = unit_cell_pos * _primitive_cumsum_size( _atom_num_in_cell, order);
+    vector<int> global_lattice_idx = _lattice.getIndex( v(0) );
 
-    urowvec v_shift = v - v(0) + _center[idx_in_unit_cell];
+    int order = v.n_elem-1;
+    int idx_in_unit_cell = global_lattice_idx.back();
+    int root_single_idx = _root_lattice.getSingleIndex(global_lattice_idx);
+
+    int cell_diff = (root_single_idx - _root_center[idx_in_unit_cell]) / _atom_num_in_cell;
+    urowvec v_shift = v - v(0) + _center[idx_in_unit_cell]; 
     int i0 = _primitive_cumsum_size(idx_in_unit_cell, order);
     int i1 = _primitive_cumsum_size(idx_in_unit_cell+1, order);
 
-    //cout << "unit_cell_pos = " << unit_cell_pos << ", v_shift = " << v_shift;
+    int res = cell_diff * _primitive_cumsum_size( _atom_num_in_cell, order);
     for(int i=i0; i<i1; ++i)
         if( all( v_shift==_primitive_cluster_mat[order].row(i) ) )
         {
-            //cout << "( " << res << ", " << i << ")" << endl << endl;;
             return res + i;
         }
-    //cout << "not found" << endl << endl;
     return -1;
 }/*}}}*/
+
 void cUniformBathOnLattice::generate_cluster_index_list()
 {
     _cluster_index_list.clear();
@@ -126,19 +145,26 @@ void cUniformBathOnLattice::generate_cluster_index_list()
     {
         cout << "generating cluster index list of order " << order << "/" << _max_order << " ... " << endl;
         FIX_ORDER_INDEX_SET sub_pos_set;
-        for(int cell_idx=0; cell_idx<_unit_cell_num; ++cell_idx)
+        //for(int cell_idx=0; cell_idx<_unit_cell_num; ++cell_idx)
+        for(int cell_idx=0; cell_idx<_root_lattice.getUnitCellNumber(); ++cell_idx)
         {
-            int cell_shift = cell_idx*_atom_num_in_cell - _center[0];
+            vector<int> vIdx = _root_lattice.getIndex(cell_idx*_atom_num_in_cell);
+            int cell_shift = _lattice.getSingleIndex(vIdx) - _center[0];
+            //int cell_shift = cell_idx*_atom_num_in_cell - _center[0];
             for(int i=0; i<_primitive_cluster_mat[order].n_rows; ++i)
             {
                urowvec idx = _primitive_cluster_mat[order].row(i) + cell_shift;
                cClusterIndex cIdx( idx.t() );
+               //cout << _primitive_cluster_mat[order].row(i) << " + " <<  cell_shift << " = " << idx << endl;
                if(order > 0)
                {
                    vector<size_t> shift_sub_pos;
                    for(int q=0; q<_sub_pos[order-1][i].size(); ++q)
                    {
-                       int pos = _sub_pos[order-1][i][q]+ cell_shift;
+                       //cout << _sub_pos[order-1][i][q] << ", " << cell_idx << endl;
+                       int pos = _sub_pos[order-1][i][q] + cell_idx*_primitive_cumsum_size(_atom_num_in_cell, order-1);
+                       //cout << "ppos = " << pos << endl;
+                       //cout << "tot = " << _total_cluster_number[order-1] << endl;
                        if(pos < _total_cluster_number[order-1])
                            shift_sub_pos.push_back( pos ); 
                    }

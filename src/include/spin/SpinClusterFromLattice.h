@@ -21,10 +21,12 @@ public:
 
 private:
     Lattice                _lattice;
+    Lattice                _root_lattice;
     vector<int>            _center;
     int                    _unit_cell_num;
     int                    _atom_num_in_cell;
     imat                   _root_range;
+    vector<int>            _root_center;
     vector<int>            _root_index_list;
 
     cSpinCollection        _bath_spins;

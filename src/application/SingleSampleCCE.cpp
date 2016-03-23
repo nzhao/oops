@@ -36,36 +36,21 @@ int  main(int argc, char* argv[])
     imat range; range << -20 << 21 << endr << -20 << 21;
     latt.setRange(range);
 
-    cout << latt << endl;
-    getchar();
-    //latt.save_to_file("tst.xyz");
-    
-    //umat range; range << -1 << 1 << endr << -1 << 1;
     cSpinSourceFromLattice spin_on_lattice(latt, range);
     cSpinCollection _bath_spins(&spin_on_lattice);
     _bath_spins.make();
 
-    int maxOrder = 3;
+    int maxOrder = 6;
     sp_mat c=_bath_spins.getConnectionMatrix(4.0);
-    imat root_range; root_range << -7 << 8 << endr << -7 << 8;
+    imat root_range; root_range << -6 << 7 << endr << -6 << 7;
     cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt, root_range);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
     
     _spin_clusters.enable_sub_cluster_position();
-    //_spin_clusters.diable_sub_cluster_position();
-    //cout << _spin_clusters << endl;
-    //for(int order=0; order<maxOrder; ++order)
-    //{
-        //int num = _spin_clusters.getClusterNum(order);
-        //for(int i=0; i<num; ++i)
-        //{
-            //cout << "order = " << order << ", " << i << "/" << num << endl;
-            //_spin_clusters.getSubClusters(order, i);
-        //}
-    //}
+    cout << _spin_clusters << endl;
 
-    //set<ClusterPostion > sub_pos = _spin_clusters.getSubClusters(1, 0);
+    _spin_clusters.MPI_partition(200);
     
     return 0;
 
