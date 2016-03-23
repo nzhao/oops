@@ -50,7 +50,7 @@ int  main(int argc, char* argv[])
     _spin_clusters.enable_sub_cluster_position();
     cout << _spin_clusters << endl;
 
-    _spin_clusters.MPI_partition(200);
+    //_spin_clusters.MPI_partition(200);
     
     return 0;
 

@@ -39,6 +39,7 @@ private:
 
     vector<int>                 _total_cluster_number;
     vector< SubPosLst_FixOrder> _sub_pos;
+    vector<umat>                _cluster_index_mat;
 
 
     void      generate_root_index();
