@@ -8,6 +8,8 @@
 using namespace arma;
 using namespace std;
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Lattice
 class Lattice
 {
 public:
@@ -35,7 +37,6 @@ public:
     friend ostream&  operator << (ostream& outs, const Lattice& lattice);
 
 protected:
-private:
     int                 _dimension;
     int                 _atom_num_in_cell;
     int                 _unit_cell_num;
@@ -46,5 +47,18 @@ private:
     vector<int>         _range_width;
     vector<double>      _lattice_constant;
     vector<string>      _isotope;
+private:
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+class TwoDimFaceCenterLattice:public Lattice
+{
+public:
+    TwoDimFaceCenterLattice(){};
+    TwoDimFaceCenterLattice(double lattice_const, const vector<string>& isotops);
+    ~TwoDimFaceCenterLattice(){};
+protected:
+private:
 };
 #endif

@@ -18,21 +18,9 @@ ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
-    int dim = 2;
-    vec base1, base2;
-    base1 << 1.0 << 0.0 << 0.0; base2 << 0.0 << 1.0 << 0.0;
-    vector<vec> bases; bases.push_back(base1); bases.push_back(base2);
-    int atom_num = 2;
-    vec coord1, coord2, coord3;
-    coord1 << 0.0 << 0.0 << 0.0;
-    coord2 << 0.5*3.57 << 0.5*3.57 << 0.0;
-    coord3 << 0.15 << 0.1 << 0.0;
-    vector<vec> pos; pos.push_back(coord1); pos.push_back(coord2);// pos.push_back(coord3);
-    vector<double> latt_const;
-    latt_const.push_back(3.57); latt_const.push_back(3.57);
-    vector<string> iso; 
-    iso.push_back("13C"); iso.push_back("13C");// iso.push_back("13C"); 
-    Lattice latt(dim, bases, latt_const, atom_num, pos, iso);
+    double lattice_const = 3.57;
+    vector<string> iso; iso.push_back("13C"); iso.push_back("13C");
+    TwoDimFaceCenterLattice latt(lattice_const, iso);
     imat range; range << -20 << 21 << endr << -20 << 21;
     latt.setRange(range);
 

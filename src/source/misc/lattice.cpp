@@ -1,5 +1,6 @@
 #include "include/misc/lattice.h"
-
+////////////////////////////////////////////////////////////////////////////////
+//{{{ Lattice
 Lattice::Lattice(int dim, const vector<vec>& bases, const vector<double>& lattice_const)
 {
     _dimension = dim;
@@ -175,4 +176,22 @@ ostream&  operator << (ostream& outs, const Lattice& lattice)
     print_vector(lattice.getCenterSingleIndex() );
     return outs;
 }/*}}}*/
+
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+TwoDimFaceCenterLattice::TwoDimFaceCenterLattice(double lattice_const, const vector<string>& isotope)
+{
+    _dimension = 2;
+    vec base1, base2; base1 << 1.0 << 0.0 << 0.0; base2 << 0.0 << 1.0 << 0.0;
+    _bases.push_back(base1); _bases.push_back(base2);
+    _atom_num_in_cell = 2;
+    vec coord1, coord2;
+    coord1 << 0.0 << 0.0 << 0.0;
+    coord2 << 0.5*lattice_const << 0.5*lattice_const<< 0.0;
+    _pos_in_cell.push_back(coord1); _pos_in_cell.push_back(coord2);
+    _lattice_constant.push_back(lattice_const); _lattice_constant.push_back(lattice_const);
+    _isotope = isotope;
+}
 
