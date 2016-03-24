@@ -26,6 +26,7 @@ void cSpinCluster::make()
 /// This function calls the 'generate' method of the grouping algorithm.
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
+    _cluster_index_mat = _grouping->get_cluster_index_mat();
     _sub_cluster_position_valid = true;
 }
 
@@ -64,10 +65,18 @@ umat cSpinCluster::getClusterIndex(size_t order) const
 {
     umat res = zeros<umat> (getClusterNum(order), order+1);
 
-    FIX_ORDER_INDEX_SET::iterator it;
-    const FIX_ORDER_INDEX_SET& clusters = _cluster_index_list[order];
-    for(it = clusters.begin(); it != clusters.end(); ++it)
-        res.row( distance(clusters.begin(), it ) ) = trans( it->getIndex() );
+    if( order < _cluster_index_mat.size() )
+    {
+        cout << _cluster_index_mat.size() << endl;
+        res = _cluster_index_mat[order];
+    }
+    else
+    {
+        FIX_ORDER_INDEX_SET::iterator it;
+        const FIX_ORDER_INDEX_SET& clusters = _cluster_index_list[order];
+        for(it = clusters.begin(); it != clusters.end(); ++it)
+            res.row( distance(clusters.begin(), it ) ) = trans( it->getIndex() );
+    }
     return res;
 }
 set<ClusterPostion > cSpinCluster::getSubClusters(size_t order, size_t index) const
@@ -101,7 +110,7 @@ void cSpinCluster::MPI_partition(int nWorker)
         _data.clusterNumList.push_back( clstNum );
 
         umat full_clst_idx = getClusterIndex( order_i );
-        cout << full_clst_idx << endl;
+        //cout << full_clst_idx << endl;
         clusterTable clst_tb_i;
 
         int row1 = 0; int row2 = 0;

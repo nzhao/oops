@@ -24,27 +24,11 @@ cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, si
 
 void cUniformBathOnLattice::generate()
 {
-    //generate_root_index();
     generate_primitive_clusters();
     generate_sub_primitive_position();
     generate_cluster_index_list();
 
 }
-
-void cUniformBathOnLattice::generate_root_index()
-{/*{{{*/
-    Lattice root_lattice(_lattice);
-    root_lattice.setRange(_root_range); 
-    cout << _lattice.getUnitCellNumber() << endl;
-    cout << root_lattice.getUnitCellNumber() << endl;
-
-    for(int i=0; i<root_lattice.getTotalAtomNumber(); ++i)
-    {
-        vector<int> vIdx = root_lattice.getIndex(i);
-        print_vector(vIdx); cout << endl;
-        cout << "root_idx = (" << root_lattice.getSingleIndex(vIdx) << ", " << _lattice.getSingleIndex(vIdx) << ")"<< endl;
-    }
-}/*}}}*/
 
 void cUniformBathOnLattice::generate_primitive_clusters()
 {/*{{{*/
@@ -180,7 +164,7 @@ void cUniformBathOnLattice::generate_cluster_index_list()
         }
         _cluster_index_list.push_back( sub_pos_set );
         _cluster_index_mat.push_back(clst_mat);
-        cout << clst_mat.head_rows(100);
+        //cout << clst_mat.head_rows(100);
     }
 }
 

@@ -42,7 +42,7 @@ int  main(int argc, char* argv[])
 
     int maxOrder = 6;
     sp_mat c=_bath_spins.getConnectionMatrix(4.0);
-    imat root_range; root_range << -6 << 7 << endr << -6 << 7;
+    imat root_range; root_range << -8 << 9 << endr << -8 << 9;
     cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt, root_range);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
@@ -50,7 +50,9 @@ int  main(int argc, char* argv[])
     _spin_clusters.enable_sub_cluster_position();
     cout << _spin_clusters << endl;
 
-    //_spin_clusters.MPI_partition(200);
+    _spin_clusters.MPI_partition(200);
+    vector<umat> m = _spin_clusters.getMPI_Cluster(0);
+    cout << m[1] << endl;
     
     return 0;
 

@@ -62,6 +62,7 @@ private:
     size_t           _max_order;
     cSpinGrouping *  _grouping;
     CLST_IDX_LIST    _cluster_index_list;
+    vector<umat>     _cluster_index_mat;
     cSpinCollection  _spin_collection;
     MPI_Cluster_Data _data;
     bool             _sub_cluster_position_valid;
