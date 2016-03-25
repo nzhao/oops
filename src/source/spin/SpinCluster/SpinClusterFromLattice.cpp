@@ -2,6 +2,32 @@
 
 double PATTEN_EPS = 1e-10;
 
+cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice, int root_range_idx)
+{
+    _max_order         = maxOrder;
+    _bath_spins        = bath_spins;
+    _connection_matrix = connection_matrix;
+    _nspin             = connection_matrix.n_cols;
+    _spin_list         = bath_spins.getSpinList();
+
+    _lattice          = lattice;
+    _center           = lattice.getCenterSingleIndex();
+    _atom_num_in_cell = lattice.getUnitCellAtomNumber();
+    
+    _root_range = zeros<imat> (_lattice.getDimension(), 2);
+    for(int i=0; i< _lattice.getDimension(); ++i)
+    {
+        _root_range(i, 0) = -root_range_idx;
+        _root_range(i, 1) = root_range_idx + 1; 
+    }
+
+    _root_lattice = _lattice;
+    _root_lattice.setRange(_root_range); 
+    _root_center = _root_lattice.getCenterSingleIndex();
+    _unit_cell_num = _root_lattice.getUnitCellNumber();
+    cout << _root_lattice << endl;
+}
+
 cUniformBathOnLattice::cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice, const imat& root_range)
 {
     _max_order         = maxOrder;

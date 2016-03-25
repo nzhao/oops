@@ -21,6 +21,19 @@ Lattice::Lattice(int dim, const vector<vec>& bases, const vector<double>& lattic
     _isotope = isotope;
 }
 
+void Lattice::setRange(int max_idx)
+{
+    int absMax = max_idx > 0 ? max_idx : -max_idx;
+
+    imat range(_dimension, 2);
+    for(int i=0; i< _dimension; ++i)
+    {
+        range(i, 0) = -absMax;
+        range(i, 1) = absMax + 1; 
+    }
+    setRange(range);
+}
+
 void Lattice::setRange(const imat& range)
 {
     if(range.n_rows < _dimension)
@@ -181,6 +194,8 @@ ostream&  operator << (ostream& outs, const Lattice& lattice)
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{ TwoDimFaceCenterLattice
 TwoDimFaceCenterLattice::TwoDimFaceCenterLattice(double lattice_const, const vector<string>& isotope)
 {
     _dimension = 2;
@@ -195,3 +210,19 @@ TwoDimFaceCenterLattice::TwoDimFaceCenterLattice(double lattice_const, const vec
     _isotope = isotope;
 }
 
+TwoDimFaceCenterLattice::TwoDimFaceCenterLattice(double lattice_const, const string& isotope)
+{
+    _dimension = 2;
+    vec base1, base2; base1 << 1.0 << 0.0 << 0.0; base2 << 0.0 << 1.0 << 0.0;
+    _bases.push_back(base1); _bases.push_back(base2);
+    _atom_num_in_cell = 2;
+    vec coord1, coord2;
+    coord1 << 0.0 << 0.0 << 0.0;
+    coord2 << 0.5*lattice_const << 0.5*lattice_const<< 0.0;
+    _pos_in_cell.push_back(coord1); _pos_in_cell.push_back(coord2);
+    _lattice_constant.push_back(lattice_const); _lattice_constant.push_back(lattice_const);
+    for(int i=0; i<_atom_num_in_cell; ++i)
+        _isotope.push_back(isotope);
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////

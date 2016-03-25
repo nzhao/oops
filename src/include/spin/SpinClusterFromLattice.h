@@ -12,6 +12,7 @@ class cUniformBathOnLattice:public cSpinGrouping
 {
 public:
     cUniformBathOnLattice(){};
+    cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice, int root_range_idx);
     cUniformBathOnLattice(const sp_mat& connection_matrix, size_t maxOrder, const cSpinCollection& bath_spins, const Lattice& lattice, const imat& root_range);
     ~cUniformBathOnLattice(){};
 

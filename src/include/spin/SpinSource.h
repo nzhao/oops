@@ -56,6 +56,7 @@ class cSpinSourceFromLattice:public cSpinSource
 {
 public:
     cSpinSourceFromLattice(){};
+    cSpinSourceFromLattice(const Lattice& lattice) {_lattice = lattice;};
     cSpinSourceFromLattice(const Lattice& lattice,  const imat& range);
     cSpinSourceFromLattice(int dim, const vector<vec>& bases, const vector<double>& lattice_const, int atom_num, const vector<vec>& pos, const vector<string>& isotope, const imat& range);
     ~cSpinSourceFromLattice(){};

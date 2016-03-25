@@ -18,20 +18,19 @@ ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
-    double lattice_const = 3.57;
-    vector<string> iso; iso.push_back("13C"); iso.push_back("13C");
-    TwoDimFaceCenterLattice latt(lattice_const, iso);
-    imat range; range << -20 << 21 << endr << -20 << 21;
-    latt.setRange(range);
+    double lattice_const = 3.57, cut_off = 4.0;
+    int range_i = 20, root_range_i = 8, maxOrder = 6;
+    string isotope = "13C";
 
-    cSpinSourceFromLattice spin_on_lattice(latt, range);
+    TwoDimFaceCenterLattice latt(lattice_const, isotope);
+    latt.setRange(range_i);
+
+    cSpinSourceFromLattice spin_on_lattice(latt);
     cSpinCollection _bath_spins(&spin_on_lattice);
     _bath_spins.make();
 
-    int maxOrder = 6;
-    sp_mat c=_bath_spins.getConnectionMatrix(4.0);
-    imat root_range; root_range << -8 << 9 << endr << -8 << 9;
-    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt, root_range);
+    sp_mat c=_bath_spins.getConnectionMatrix(cut_off);
+    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt, root_range_i);
     cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
     _spin_clusters.make();
     

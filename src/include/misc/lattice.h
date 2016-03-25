@@ -18,6 +18,7 @@ public:
     Lattice(int dim, const vector<vec>& bases, const vector<double>& lattice_const, int atom_num, const vector<vec>& pos, const vector<string>& isotope);
     ~Lattice() {};
 
+    int         getDimension() const {return _dimension;};
     vector<int> getIndex(int i) const;
     vec         getCoordinate(int i) const;
     vec         getCoordinate(const vector<int>& idx) const;
@@ -31,6 +32,7 @@ public:
     vector< vector<int> > getCenterIndex() const;
     vector<int> getCenterSingleIndex() const;
 
+    void        setRange(int i);
     void        setRange(const imat& range);
     void        save_to_file(string filename);
 
@@ -52,13 +54,19 @@ private:
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ TwoDimFaceCenterLattice
 class TwoDimFaceCenterLattice:public Lattice
 {
 public:
     TwoDimFaceCenterLattice(){};
     TwoDimFaceCenterLattice(double lattice_const, const vector<string>& isotops);
+    TwoDimFaceCenterLattice(double lattice_const, const string& isotope);
     ~TwoDimFaceCenterLattice(){};
 protected:
 private:
 };
+//}}}
+////////////////////////////////////////////////////////////////////////////////
 #endif
