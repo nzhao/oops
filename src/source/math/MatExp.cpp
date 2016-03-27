@@ -96,7 +96,7 @@ MatExpVector::MatExpVector(const SumKronProd& skp, cx_double prefactor, const cx
     _dim = skp.getDim();
 
     _klim = 10;//  Lanczos factorization length;
-    _krylov_m = 30;// _krylov_m = 30, optimized in Expokit;
+    _krylov_m = 10;// _krylov_m = 30, optimized in Expokit;
     _krylov_tol = 1e-7;
     _itrace = 1;
 }
@@ -239,6 +239,8 @@ void MatExpVector::run()
                 &_itrace,
                 w_seq,
                 &w_seq_len );
+    cx_mat res(w_seq, nDim, nt);
+    _resVectorList = res;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
@@ -386,6 +388,8 @@ void MatExpVector::run_gpu()
                 &_itrace,
                 w_seq,
                 &w_seq_len );
+    cx_mat res(w_seq, nDim, nt);
+    _resVectorList = res;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

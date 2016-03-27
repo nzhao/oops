@@ -50,7 +50,7 @@ public:
 
     void run();
     void run_gpu();
-    vector<cx_vec> getResult() const {return _resVectorList;}; 
+    cx_mat getResult() const {return _resVectorList;}; 
 protected:
 private:
     SumKronProd _skp;
@@ -60,7 +60,7 @@ private:
     size_t         _nTime;
     size_t         _dim; 
     
-    vector<cx_vec>  _resVectorList;
+    cx_mat  _resVectorList;
 
     size_t _klim;
     size_t _krylov_m;

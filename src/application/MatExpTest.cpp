@@ -65,7 +65,23 @@ void test_large_mat()
 
     vec time_list = linspace<vec>(0, 1, 11);
     MatExpVector expM(hami.getKronProdForm(), -1.0*II, psi.getVector(), time_list);  
+    MatExpVector expMgpu(hami.getKronProdForm(), -1.0*II, psi.getVector(), time_list);  
     expM.run();
-    expM.run_gpu();
+    expMgpu.run_gpu();
+
+    cx_mat res = expM.getResult();
+    cx_mat resGPU = expMgpu.getResult();
+    cout << res << endl;
+    cout << res - resGPU << endl;
+
+    cx_mat H = hami.getMatrix(); 
+    MatExp expM2(H, -1.0*II, MatExp::PadeApproximation);
+    expM2.run();
+    cx_mat resPade = expM2.getResultMatrix();
+
+    cout << resPade*psi.getVector() << endl;
+
+    
+
 
 }
