@@ -14,37 +14,11 @@ string CONFIG_PATH;
 string DEBUG_PATH;
 
 cSPINDATA SPIN_DATABASE=cSPINDATA();
+NVCenter create_defect_center(const ConfigXML& cfg);
 ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
 {
-    double lattice_const = 3.57, cut_off = 4.0;
-    int range_i = 20, root_range_i = 8, maxOrder = 6;
-    string isotope = "13C";
-
-    TwoDimFaceCenterLattice latt(lattice_const, isotope);
-    latt.setRange(range_i);
-
-    cSpinSourceFromLattice spin_on_lattice(latt);
-    cSpinCollection _bath_spins(&spin_on_lattice);
-    _bath_spins.make();
-
-    sp_mat c=_bath_spins.getConnectionMatrix(cut_off);
-    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt, root_range_i);
-    cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
-    _spin_clusters.make();
-    
-    _spin_clusters.enable_sub_cluster_position();
-    cout << _spin_clusters << endl;
-
-    _spin_clusters.MPI_partition(200);
-    vector<umat> m = _spin_clusters.getMPI_Cluster(0);
-    cout << m[1] << endl;
-    
-    return 0;
-
-
-
     ConfigXML cfg = set_parameters("SingleSampleCCE.xml");
 
     string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");
@@ -63,6 +37,20 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
     // create defect center
+    NVCenter nv = create_defect_center(cfg);
+
+    // CCE
+    SingleSampleCCE sol(my_rank, worker_num, &nv, cfg);
+    sol.run();
+
+    LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
+
+    mpi_status = MPI_Finalize();
+    assert (mpi_status == MPI_SUCCESS);
+}
+
+NVCenter create_defect_center(const ConfigXML& cfg)
+{
     double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
     double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
     double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
@@ -75,14 +63,7 @@ int  main(int argc, char* argv[])
     nv.set_magB(magBx, magBy, magBz);
     nv.make_espin_hamiltonian();
 
-    // CCE
-    SingleSampleCCE sol(my_rank, worker_num, &nv, cfg);
-    sol.run();
-
-    LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
-
-    mpi_status = MPI_Finalize();
-    assert (mpi_status == MPI_SUCCESS);
+    return nv;
 }
 
 ConfigXML set_parameters(const string& xml_file_name)

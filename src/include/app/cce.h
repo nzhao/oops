@@ -44,6 +44,7 @@ protected:
     cSPIN            _center_spin;
     cSpinCollection  _bath_spins;
     cSpinCluster     _my_clusters;
+    Lattice          _lattice;
 
     cSpinCluster     _spin_clusters;
     vector<mat>      _cce_evovle_result;
