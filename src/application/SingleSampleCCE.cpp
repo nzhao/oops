@@ -2,9 +2,12 @@
 #include "include/app/cce.h"
 #include "include/misc/xmlreader.h"
 #include <cstdlib>
+#include "include/misc/lattice.h"
+#include "include/spin/SpinClusterFromLattice.h"
 
 _INITIALIZE_EASYLOGGINGPP
 
+NVCenter create_defect_center(const ConfigXML& cfg);
 ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
@@ -27,6 +30,20 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
     // create defect center
+    NVCenter nv = create_defect_center(cfg);
+
+    // CCE
+    SingleSampleCCE sol(my_rank, worker_num, &nv, cfg);
+    sol.run();
+
+    LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
+
+    mpi_status = MPI_Finalize();
+    assert (mpi_status == MPI_SUCCESS);
+}
+
+NVCenter create_defect_center(const ConfigXML& cfg)
+{
     double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
     double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
     double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
@@ -39,14 +56,7 @@ int  main(int argc, char* argv[])
     nv.set_magB(magBx, magBy, magBz);
     nv.make_espin_hamiltonian();
 
-    // CCE
-    SingleSampleCCE sol(my_rank, worker_num, &nv, cfg);
-    sol.run();
-
-    LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
-
-    mpi_status = MPI_Finalize();
-    assert (mpi_status == MPI_SUCCESS);
+    return nv;
 }
 
 ConfigXML set_parameters(const string& xml_file_name)

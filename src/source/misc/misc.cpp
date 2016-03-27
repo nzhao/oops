@@ -83,3 +83,34 @@ vector<double> Pulse_Interval(string pulsename, int n)
     return res;
 }
 
+vector<int> base_transform(int num, const vector<int>& base)
+{
+    vector<int> res;
+    int max = 1;
+    for(int i=0; i<base.size(); ++i)
+        max *= base[i];
+    if(num>max-1)
+    {
+        cout << "Too large input number" << endl;
+        assert(0);
+    }
+    int i = base.size()-1, q = num;
+    for(int i = base.size()-1; i>=0; --i)
+    {
+        res.push_back( q % base[i] );
+        q = q / base[i];
+    }
+    reverse(res.begin(),res.end()); 
+    return res;
+}
+
+int base_number(const vector<int>& num_in_base, const vector<int> base)
+{
+    int res=0, acc_base = 1;
+    for(int i=base.size()-1; i>=0; --i)
+    {
+        res += num_in_base[i]*acc_base;
+        acc_base *= base[i];
+    }
+    return res;
+}

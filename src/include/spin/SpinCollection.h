@@ -5,7 +5,8 @@
 #include <armadillo>
 #include "include/spin/Spin.h"
 #include "include/spin/SpinSource.h"
-#include "include/spin/SpinClusterAlgorithm.h"
+//#include "include/spin/SpinClusterAlgorithm.h"
+#include "include/spin/SpinClusterIndex.h"
 
 using namespace std;
 using namespace arma;

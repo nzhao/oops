@@ -26,6 +26,8 @@ void cSpinCluster::make()
 /// This function calls the 'generate' method of the grouping algorithm.
     _grouping->generate();
     _cluster_index_list = _grouping->get_cluster_index();
+    _cluster_index_mat = _grouping->get_cluster_index_mat();
+    _sub_cluster_position_valid = true;
 }
 
 cSpinCluster::cSpinCluster(const cSpinCluster& clst)
@@ -63,22 +65,32 @@ umat cSpinCluster::getClusterIndex(size_t order) const
 {
     umat res = zeros<umat> (getClusterNum(order), order+1);
 
-    FIX_ORDER_INDEX_SET::iterator it;
-    const FIX_ORDER_INDEX_SET& clusters = _cluster_index_list[order];
-    for(it = clusters.begin(); it != clusters.end(); ++it)
-        res.row( distance(clusters.begin(), it ) ) = trans( it->getIndex() );
+    if( order < _cluster_index_mat.size() )
+    {
+        cout << _cluster_index_mat.size() << endl;
+        res = _cluster_index_mat[order];
+    }
+    else
+    {
+        FIX_ORDER_INDEX_SET::iterator it;
+        const FIX_ORDER_INDEX_SET& clusters = _cluster_index_list[order];
+        for(it = clusters.begin(); it != clusters.end(); ++it)
+            res.row( distance(clusters.begin(), it ) ) = trans( it->getIndex() );
+    }
     return res;
 }
-set<CluserPostion > cSpinCluster::getSubClusters(size_t order, size_t index) const
+set<ClusterPostion > cSpinCluster::getSubClusters(size_t order, size_t index) const
 {
+    //cout << "{ " << order << ", " << index << " }." << endl;
     cClusterIndex clst = getClusterIndex(order, index);
-    set<CluserPostion > sub_pos = clst.getSubClstPos();
-    set<CluserPostion >::iterator it;
+    //cout << clst << endl;
+    set<ClusterPostion > sub_pos = clst.getSubClstPos();
+    set<ClusterPostion >::iterator it;
     for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
     {
-        cClusterIndex sub_cluster = getClusterIndex(it->first, it->second); 
-        set<CluserPostion > sub_sub_pos = getSubClusters(it->first, it->second);//sub_cluster.getSubClstPos();
-        set<CluserPostion >::iterator sub_it;
+        //cout << "\t  it = {" << it->first << ", " << it->second << "} " << endl;
+        set<ClusterPostion > sub_sub_pos = getSubClusters(it->first, it->second);//sub_cluster.getSubClstPos();
+        set<ClusterPostion >::iterator sub_it;
         for(sub_it=sub_sub_pos.begin(); sub_it!=sub_sub_pos.end(); ++sub_it)
             sub_pos.insert( *sub_it );
     }
@@ -93,10 +105,12 @@ void cSpinCluster::MPI_partition(int nWorker)
     _data.jobTable = umat(_data.nOrder, _data.nWorker, fill::zeros);
     for(int order_i = 0; order_i<_data.nOrder; ++order_i)
     {
+        cout << "partitioning order = " << order_i << endl;
         int clstNum = getClusterNum(order_i);
         _data.clusterNumList.push_back( clstNum );
 
         umat full_clst_idx = getClusterIndex( order_i );
+        //cout << full_clst_idx << endl;
         clusterTable clst_tb_i;
 
         int row1 = 0; int row2 = 0;
@@ -104,6 +118,7 @@ void cSpinCluster::MPI_partition(int nWorker)
 
         for(int wk_id = 0; wk_id<nWorker; ++wk_id)
         {
+            cout << "worker_id = " << wk_id << endl;
             int jobs = wk_id < r ? q + 1: q;
             _data.jobTable(order_i, wk_id) = jobs;
 
@@ -124,7 +139,7 @@ vector<umat> cSpinCluster::getMPI_Cluster(int worker_id)
     return res;
 }
 
-CluserPostion cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) const
+ClusterPostion cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) const
 {
     size_t pos1, pos2;
     pos1 = 0;
@@ -132,7 +147,7 @@ CluserPostion cSpinCluster::getMPI_ClusterSize(int cce_order, int worker_id) con
         pos1 += _data.jobTable(cce_order, id); 
     pos2 = pos1 + _data.jobTable(cce_order, worker_id);
 
-    CluserPostion res(pos1, pos2);
+    ClusterPostion res(pos1, pos2);
     return res;
 }
 
@@ -140,6 +155,15 @@ vector<cSPIN> cSpinCluster::getCluster(size_t order, size_t index) const
 {
     cClusterIndex clst = getClusterIndex(order, index);
     return _spin_collection.getSpinList(clst);
+}
+
+vector<vec> cSpinCluster::getClusterCoord(size_t order, size_t index) const
+{
+    vector<vec> coord_list;
+    vector<cSPIN> sl = getCluster(order, index);
+    for(int i=0; i<sl.size(); ++i)
+        coord_list.push_back( sl[i].get_coordinate() );
+    return coord_list;
 }
 
 ostream&  operator << (ostream& outs, const cSpinCluster& clst)
@@ -156,16 +180,21 @@ ostream&  operator << (ostream& outs, const cSpinCluster& clst)
         if(clst_set.size() > 0)
         {
             outs << "Cluster Order = " << i << ": Number = " << clst_set.size() << ": " << endl;
-            for(set<cClusterIndex>::iterator pos=clst_set.begin(); pos!=clst_set.end(); ++pos)
+            if(clst_set.size() > 100)
+                cout << "first 100 clusters are displayed." << endl;
+            for(set<cClusterIndex>::iterator pos=clst_set.begin(); pos!=clst_set.end() && j<100; ++pos)
             {
                 cClusterIndex vIdx = *pos;
-                outs << "{ " << order << ", " << j << " } = "  <<  vIdx << "\t";
+                outs << "{ " << order << ", " << j << " } = "  <<  vIdx << "\t" ;
 
-                set<CluserPostion > sub_pos = clst.getSubClusters(order, j);//vIdx.getSubClstPos();
-                set<CluserPostion >::iterator it;
-                for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
-                    outs << "{ " << it->first << ", " << it->second << " }\t" ;
-                cout << endl;
+                if(clst._sub_cluster_position_valid)
+                {
+                    set<ClusterPostion > sub_pos = clst.getSubClusters(order, j);//vIdx.getSubClstPos();
+                    set<ClusterPostion >::iterator it;
+                    for(it=sub_pos.begin(); it!=sub_pos.end(); ++it)
+                        outs << "{ " << it->first << ", " << it->second << " }\t" ;
+                }
+                outs << endl;
                 j++;
             }
             outs << endl;

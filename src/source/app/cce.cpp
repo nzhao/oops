@@ -36,22 +36,55 @@ void CCE::prepare_center_spin()
 
 void CCE::create_bath_spins()
 {
-    cSpinSourceFromFile spin_file(_bath_spin_filename);
-    _bath_spins = cSpinCollection(&spin_file);
-    _bath_spins.make();
-
-    if(_my_rank == 0)
-        cout << _bath_spins.getSpinNum() << " spins are read from file: " << _bath_spin_filename << endl << endl;
+    string method = _cfg.getStringParameter("SpinBath", "method");
+    if( method.compare("TwoDimLattice") == 0 )
+    {
+        double lattice_const = _cfg.getDoubleParameter("Lattice", "lattice_const");
+        string isotope = _cfg.getStringParameter("Lattice", "isotope");
+        int range_i = _cfg.getIntParameter("Lattice", "full_range");
+        
+        _lattice = TwoDimFaceCenterLattice(lattice_const, isotope);
+        _lattice.setRange(range_i);
+        
+        cSpinSourceFromLattice spin_on_lattice(_lattice);
+        _bath_spins = cSpinCollection(&spin_on_lattice);
+        _bath_spins.make();
+    }
+    else
+    {
+        cSpinSourceFromFile spin_file(_bath_spin_filename);
+        _bath_spins = cSpinCollection(&spin_file);
+        _bath_spins.make();
+        
+        if(_my_rank == 0)
+            cout << _bath_spins.getSpinNum() << " spins are read from file: " << _bath_spin_filename << endl << endl;
+    }
 }
 
 void CCE::create_spin_clusters()
 {
-    if(_my_rank == 0)
+    string method = _cfg.getStringParameter("SpinBath", "method");
+
+    if( method.compare("TwoDimLattice") == 0 )
     {
-        sp_mat c=_bath_spins.getConnectionMatrix(_cut_off_dist);
-        cDepthFirstPathTracing dfpt(c, _max_order);
-        _spin_clusters=cSpinCluster(_bath_spins, &dfpt);
-        _spin_clusters.make();
+        if(_my_rank == 0)
+        {
+            int root_range = _cfg.getIntParameter("Lattice", "root_range");
+            sp_mat c=_bath_spins.getConnectionMatrix(_cut_off_dist);
+            cUniformBathOnLattice bath_on_lattice(c,  _max_order, _bath_spins, _lattice, root_range);
+            _spin_clusters=cSpinCluster(_bath_spins, &bath_on_lattice);
+            _spin_clusters.make();
+        }
+    }
+    else
+    {
+        if(_my_rank == 0)
+        {
+            sp_mat c=_bath_spins.getConnectionMatrix(_cut_off_dist);
+            cDepthFirstPathTracing dfpt(c, _max_order);
+            _spin_clusters=cSpinCluster(_bath_spins, &dfpt);
+            _spin_clusters.make();
+        }
     }
     
     job_distribution();
@@ -161,8 +194,8 @@ void CCE::cce_coherence_reduction()
         {
             vec res_j = _cce_evovle_result[cce_order].col(j);
             
-            set<CluserPostion > sub_pos = _spin_clusters.getSubClusters(cce_order, j);
-            for(set<CluserPostion >::iterator it=sub_pos.begin(); it!=sub_pos.end(); ++it)
+            set<ClusterPostion > sub_pos = _spin_clusters.getSubClusters(cce_order, j);
+            for(set<ClusterPostion >::iterator it=sub_pos.begin(); it!=sub_pos.end(); ++it)
             {
                 vec sub_res = _cce_evovle_result_tilder[it->first].col(it->second);
                 res_j = res_j / sub_res;

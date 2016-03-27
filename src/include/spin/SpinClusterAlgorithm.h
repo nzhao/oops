@@ -9,12 +9,12 @@
 #include <armadillo>
 #include "include/easylogging++.h"
 #include "include/spin/Spin.h"
-//#include "include/spin/SpinCluster.h"
+//#include "include/misc/lattice.h"
+#include "include/spin/SpinCollection.h"
+#include "include/spin/SpinClusterIndex.h"
 
 using namespace std;
 using namespace arma;
-
-typedef pair<size_t, size_t> CluserPostion;
 
  
 /// \addtogroup SpinList
@@ -23,35 +23,6 @@ typedef pair<size_t, size_t> CluserPostion;
 /// \addtogroup SpinCluster
 /// @{
 
-////////////////////////////////////////////////////////////////////////////////
-//{{{ cClusterIndex
-/// This class defines index list of a cluster.
-///
-class cClusterIndex
-{
-public:
-    cClusterIndex();
-    cClusterIndex(const uvec& idx);
-    ~cClusterIndex();
-
-    mat get_array(size_t nspin);
-    uvec getIndex() const {return _index;};
-    size_t getNum() const {return _spin_num;};
-    size_t getOrder() const {return _spin_num-1;};
-    set< CluserPostion > getSubClstPos() const;
-
-    void appendSubClstPos(int pos) const  {_sub_clst_pos.push_back( pos );};
-
-    friend bool operator == (const cClusterIndex& idx1, const cClusterIndex& idx2);
-    friend bool operator < (const cClusterIndex& idx1, const cClusterIndex& idx2);
-    friend ostream&  operator << (ostream& outs, const cClusterIndex& idx);
-private:
-    uvec _index;
-    size_t _spin_num;
-    mutable vector<size_t> _sub_clst_pos;
-};
-//}}}
-////////////////////////////////////////////////////////////////////////////////
 
 /// \defgroup SpinGrouping
 /// @{
@@ -74,11 +45,14 @@ public:
 
     size_t         getMaxOrder() const {return _max_order;};
     CLST_IDX_LIST& get_cluster_index() {return _cluster_index_list;};
+    vector<umat>   get_cluster_index_mat() const {return _cluster_index_mat;};
+
 protected:
     size_t        _nspin;
     size_t        _max_order;
     sp_mat        _connection_matrix;
     CLST_IDX_LIST _cluster_index_list;
+    vector<umat>  _cluster_index_mat;
 
     void subgraph2index(const sp_mat& subgraph, const vector<int> sub_pos_list);
     sp_mat index2subgraph(int order);
@@ -97,6 +71,7 @@ class cDepthFirstPathTracing:public cSpinGrouping
 public:
     cDepthFirstPathTracing();
     cDepthFirstPathTracing(const sp_mat& connection_matrix, size_t maxOrder);
+    cDepthFirstPathTracing(const sp_mat& connection_matrix, size_t maxOrder, const mat& init);
     virtual ~cDepthFirstPathTracing();
 
     void generate();
@@ -108,6 +83,10 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 /// @}
 /// @}
 /// @}

@@ -59,3 +59,30 @@ vector<cSPIN>& cSpinSourceFromFile::generate()
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{
+cSpinSourceFromLattice::cSpinSourceFromLattice(const Lattice& lattice,  const imat& range)
+{
+    _lattice = lattice;
+    _lattice.setRange(range);
+}
+
+cSpinSourceFromLattice::cSpinSourceFromLattice(int dim, const vector<vec>& bases, const vector<double>& lattice_const, int atom_num, const vector<vec>& pos, const vector<string>& isotope, const imat& range)
+{
+    _lattice = Lattice(dim, bases, lattice_const, atom_num, pos, isotope); 
+    _lattice.setRange(range);
+}
+
+vector<cSPIN>& cSpinSourceFromLattice::generate()
+{
+    for(int i=0; i<_lattice.getTotalAtomNumber(); ++i)
+    {
+        cSPIN s( _lattice.getCoordinate(i), _lattice.getIsotope(i) );
+        spin_list.push_back(s);
+    }
+    return spin_list;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
