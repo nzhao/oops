@@ -8,7 +8,20 @@ int  main(int argc, char* argv[])
 {
 
     //test_small_mat();
-    test_large_mat();
+    //test_large_mat();
+    cx_mat H; mat A(5,5,fill::eye);
+    H << 6.0        << 1.0 + 1.0*II << endr
+      << 1.0-1.0*II << 3.0;
+    cout << H << endl << endl;
+    cout << A << endl << endl;
+    
+    cout << kron(A, H) << endl;
+    cout << kron(H, A) << endl;
+
+    cx_rowvec H1;
+    H1 << 1 << 2 << 3 << 4 << 5 << endr;
+    cx_vec H2= vectorise(repmat(H1, 4, 1));
+    cout << H2 << endl;
     return 0;
 }
 
