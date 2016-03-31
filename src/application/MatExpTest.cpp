@@ -1,27 +1,16 @@
 #include "include/app/app.h"
 #include "include/math/MatExp.h"
 
-void test_large_mat();
 void test_small_mat();
+void test_large_mat();
+void test_very_large_mat();
 
 int  main(int argc, char* argv[])
 {
 
     //test_small_mat();
-    //test_large_mat();
-    cx_mat H; mat A(5,5,fill::eye);
-    H << 6.0        << 1.0 + 1.0*II << endr
-      << 1.0-1.0*II << 3.0;
-    cout << H << endl << endl;
-    cout << A << endl << endl;
-    
-    cout << kron(A, H) << endl;
-    cout << kron(H, A) << endl;
-
-    cx_rowvec H1;
-    H1 << 1 << 2 << 3 << 4 << 5 << endr;
-    cx_vec H2= vectorise(repmat(H1, 4, 1));
-    cout << H2 << endl;
+    test_large_mat();
+    //test_very_large_mat();
     return 0;
 }
 
@@ -70,6 +59,44 @@ void test_large_mat()
     hami.addInteraction(dip);
     hami.make();
 
+    cx_mat H = hami.getMatrix(); 
+    int dim = H.n_cols;
+
+
+    PureState psi(dim);
+    psi.setComponent(0, 1.0);
+    cx_vec v = psi.getVector();
+
+    std::complex<double> * mat = H.memptr();
+    std::complex<double> * vecC = v.memptr();
+
+    cout << "mat = " << endl;
+    for(int i=0; i<dim; ++i)
+    {
+        for(int j=0; j<dim; ++j)
+            cout << mat[i*dim+j] << endl;
+        cout << endl;
+    }
+    cout << "vector = " << endl;
+    for(int i=0; i<dim; ++i)
+        cout << vecC[i] << endl;
+
+}
+
+void test_very_large_mat()
+{/*{{{*/
+    //please run this application in "oops/" direcotry 
+    cSpinSourceFromFile spin_file("./dat/input/RoyCoord.xyz4");
+    cSpinCollection spins(&spin_file);
+    spins.make();
+
+    vector<cSPIN> sl = spins.getSpinList();
+
+    SpinDipolarInteraction dip(sl);
+    Hamiltonian hami(sl);
+    hami.addInteraction(dip);
+    hami.make();
+
     SumKronProd skp = hami.getKronProdForm();
 
     PureState psi( skp.getDim() );
@@ -93,8 +120,4 @@ void test_large_mat()
     cx_mat resPade = expM2.getResultMatrix();
 
     cout << resPade*psi.getVector() << endl;
-
-    
-
-
-}
+}/*}}}*/
