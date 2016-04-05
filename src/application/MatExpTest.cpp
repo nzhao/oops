@@ -1,5 +1,8 @@
 #include "include/app/app.h"
 #include "include/math/MatExp.h"
+//#include <stdlib.h>
+#include <complex>
+#include "include/math/krylov_expv.h"
 
 void test_small_mat();
 void test_large_mat();
@@ -80,7 +83,26 @@ void test_large_mat()
     cout << "vector = " << endl;
     for(int i=0; i<dim; ++i)
         cout << vecC[i] << endl;
-
+    
+    // krylov_zgexpv and krylov_zcooexpv;
+    int                   tn = 2;
+    double                ta[2] = {0.5,1.0};
+    std::complex<double>  *w_seq = NULL;
+    int                   err;
+    w_seq = new std::complex<double> [tn * dim];
+    
+    err = krylov_zgexpv(dim, (double _Complex *)mat, (double _Complex *)vecC, tn, &ta[0], (double _Complex *)w_seq);
+    
+    // for debug;
+    cout << "krylov err = " << err << endl;
+    cout << "krylov_zgexpv works, i, ta:" << endl;
+    for (int i = 0; i < 10; i++) {
+      cout << i;
+      for (int j = 0; j < tn; j++)
+        cout << ", " << w_seq[i + j * dim];
+      cout << endl;
+    }
+      
 }
 
 void test_very_large_mat()
