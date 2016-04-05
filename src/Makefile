@@ -45,7 +45,9 @@ vpath %.cpp $(sort $(dir $(SOURCE)))
 
 EXPOKIT_SRC := $(wildcard expokit/*.f)
 EXPOKIT_OBJ := $(OBJPATH)/expokit.o $(OBJPATH)/mataid.o
+KRYLOV_OBJ  := $(OBJPATH)/krylov_expv_f.o $(OBJPATH)/krylov_expv.o $(OBJPATH)/DLARAN.o
 vpath %.f $(sort $(dir $(EXPOKIT_SRC)))
+vpath %.c $(sort $(dir wildcard source/math/*.c))
 FC          := mpif77
 ifeq ($(MPI_INTEL), true)
   FFLAGS      := -I${MKLROOT}/include
@@ -91,11 +93,11 @@ $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
 ifeq ($(MPI_INTEL), true)
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) | $(BINPATH)
-	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(KRYLOV_OBJ) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) | $(BINPATH)
+	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(KRYLOV_OBJ) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
 else
-$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) | $(BINPATH)
-	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+$(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(KRYLOV_OBJ) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) | $(BINPATH)
+	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) $(KRYLOV_OBJ) $(EXPOKIT_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
 endif
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)
@@ -136,4 +138,13 @@ $(OBJPATH)/fortran.o : $(CUDAAPI_DIR)/fortran.c | $(OBJPATH)
 
 $(OBJPATH)/cusparse_fortran.o : $(CUDAAPI_DIR)/cusparse_fortran.c | $(OBJPATH)
 	$(NCC) $< -c -o $@ $(NCFLAGS)
+
+$(OBJPATH)/krylov_expv_f.o : krylov_expv_f.f | $(OBJPATH)
+	$(FC) -c $< -o $@ $(FFLAGS)
+
+$(OBJPATH)/DLARAN.o : DLARAN.f | $(OBJPATH)
+	$(FC) -c $< -o $@ $(FFLAGS)
+
+$(OBJPATH)/krylov_expv.o : krylov_expv.c | $(OBJPATH)
+	$(CC) -c $< -I./include/math -o $@ $(FFLAGS)
 
