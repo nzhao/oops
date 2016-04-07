@@ -128,9 +128,7 @@ void test_large_mat_sparse()
     sp_cx_mat::const_iterator end   = H_sparse.end();
 
 
-    int nz = 0;
-    for(sp_cx_mat::const_iterator it = start; it != end; ++it)
-        nz ++;
+    int nz = distance(start , end);
 
     int * ia = new int [nz];
     int * ja = new int [nz];
@@ -138,8 +136,8 @@ void test_large_mat_sparse()
     int i=0;
     for(sp_cx_mat::const_iterator it = start; it != end; ++it)
     {
-        ia[i] = it.row();
-        ja[i] = it.col();
+        ia[i] = it.row()+1;
+        ja[i] = it.col()+1;
         a[i] = (*it);
         i++;
     }
