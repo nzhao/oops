@@ -47,8 +47,7 @@ int krylov_zgexpv(const int n, const double _Complex *a, const double _Complex *
 }
 
 int krylov_zcooexpv(const int n, const int nz, const int *ia, const int *ja, const double _Complex *a, const double _Complex *v, const int tn, const double *ta, double _Complex *w_seq) {
-  printf("space");
-  int             m = 30, itrace = 0;
+  int             m = 30, itrace = 1;
   double          tol = 1.0e-12;
   
   int             iflag = 0;
@@ -58,7 +57,6 @@ int krylov_zcooexpv(const int n, const int nz, const int *ia, const int *ja, con
   double _Complex *wsp  = NULL;
   int             *iwsp = NULL;
   
-  printf("space");
   lwsp      = n * (m + 2) + 5 * (m + 2) * (m + 2) + 7;
   liwsp     = m + 2;
   w_seq_len = n * tn;
@@ -71,7 +69,6 @@ int krylov_zcooexpv(const int n, const int nz, const int *ia, const int *ja, con
     return -1;
   }
   
-  printf("call fortran");
   krylov_zcooexpv_(&n, &nz, ia, ja, a, v, &tn, ta, &m, &tol, &anorm, wsp, &lwsp, iwsp, &liwsp, &itrace, &iflag, w_seq, &w_seq_len);
   
   free(iwsp);
