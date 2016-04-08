@@ -85,24 +85,138 @@ cx_mat MatExp::pade_exp_mat()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  MatExpVector
-MatExpVector::MatExpVector(const SumKronProd& skp, cx_double prefactor, const cx_vec& v, const vec& time_list)
+MatExpVector::MatExpVector(const SumKronProd& skp, const cx_vec& v, const vec& time_list, MatExpVectorMethod method)
 {
+    _method = method;
     _skp = skp;
     _vector = v;
-    _prefactor = prefactor;
+    //_prefactor = prefactor;
+    _prefactor = cx_double(0.0, -1.0);
     _time_list = time_list;
 
     _nTime = time_list.n_elem;
     _dim = skp.getDim();
 
     _klim = 10;//  Lanczos factorization length;
-    _krylov_m = 10;// _krylov_m = 30, optimized in Expokit;
-    _krylov_tol = 1e-7;
-    _itrace = 1;
+    _krylov_m = 30;// _krylov_m = 30, optimized in Expokit;
+    _krylov_tol = 1e-12;
+    _itrace = 0;
+    _is_print_skp = false;
+}
+MatExpVector::MatExpVector(const cx_mat& m, const cx_vec& v, const cx_double prefactor, const vec& time_list)
+{
+    _method = Explicit;
+    _prefactor = prefactor;
+    _matrix = _prefactor*m;
+    _vector = v;
+    _time_list = time_list;
+
+    _nTime = time_list.n_elem;
+    _dim = m.n_cols;
+
+    _klim = 10;//  Lanczos factorization length;
+    _krylov_m = 30;// _krylov_m = 30, optimized in Expokit;
+    _krylov_tol = 1e-12;
+    _itrace = 0;
+    _is_print_skp = false;
+}
+MatExpVector::MatExpVector(const sp_cx_mat& m, const cx_vec& v, const cx_double prefactor, const vec& time_list)
+{
+    _method = ExplicitSparse;
+    _prefactor = prefactor;
+    _sp_matrix = _prefactor*m;
+    _vector = v;
+    _time_list = time_list;
+
+    _nTime = time_list.n_elem;
+    _dim = m.n_cols;
+
+    _klim = 10;//  Lanczos factorization length;
+    _krylov_m = 30;// _krylov_m = 30, optimized in Expokit;
+    _krylov_tol = 1e-12;
+    _itrace = 0;
+    _is_print_skp = false;
 }
 
-void MatExpVector::run()
+cx_mat MatExpVector::run()
 {
+    cx_mat res;
+    switch (_method) {
+        case Explicit:
+            res = runExplicit();
+            break;
+        case ExplicitSparse:
+            res = runExplicitSparse();
+            break;
+        case Inexplicit:
+            res = runInexplicit();
+            break;
+        case InexplicitGPU:
+            res = runInexplicitGPU();
+            break;
+        default:
+            cout << "Exp method not sopport." << endl;
+            assert(0);
+    }
+    return res;
+}
+    
+cx_mat MatExpVector::runExplicit()
+{/*{{{*/
+    std::complex<double> * mat = _matrix.memptr();
+    std::complex<double> * vecC = _vector.memptr();
+
+    // krylov_zgexpv and krylov_zcooexpv;
+    std::complex<double> *w_seq = new std::complex<double> [_nTime * _dim];
+    
+    int err = krylov_zgexpv(_dim, (double _Complex *)mat, (double _Complex *)vecC, _nTime, &_time_list[0], (double _Complex *)w_seq, _klim, _krylov_m, _krylov_tol,  _itrace);
+
+    cx_mat res(&w_seq[0], _dim, _nTime);
+    _resVectorList = res;
+
+    delete[] w_seq;
+    return _resVectorList;
+}/*}}}*/
+
+cx_mat MatExpVector::runExplicitSparse()
+{/*{{{*/
+    sp_cx_mat::const_iterator start = _sp_matrix.begin();
+    sp_cx_mat::const_iterator end   = _sp_matrix.end();
+
+    std::complex<double> * vecC = _vector.memptr();
+
+    int nz = distance(start , end);
+
+    int * ia = new int [nz];
+    int * ja = new int [nz];
+    std::complex<double> * a = new std::complex<double> [nz];
+    //int i=0;
+    for(sp_cx_mat::const_iterator it = start; it != end; ++it)
+    {
+        int i = distance(start, it);
+        ia[i] = it.row()+1;
+        ja[i] = it.col()+1;
+        a[i] = (*it);
+        //i++;
+    }
+
+    // krylov_zgexpv and krylov_zcooexpv;
+    std::complex<double> *w_seq = new std::complex<double> [_nTime * _dim];
+    
+    int err = krylov_zcooexpv(_dim, nz, ia, ja, (double _Complex *)a, (double _Complex *)vecC, _nTime, &_time_list[0], (double _Complex *)w_seq, _klim, _krylov_m, _krylov_tol, _itrace);
+
+    cx_mat res(&w_seq[0], _dim, _nTime);
+    _resVectorList = res;
+
+    delete[] ia;
+    delete[] ja;
+    delete[] a;
+    delete[] w_seq;
+    return _resVectorList;
+}/*}}}*/
+
+cx_mat MatExpVector::runInexplicit()
+{/*{{{*/
     //////////////////////////////////////////////////////////////////////////////
     //parameter preparation
     DIM_LIST           spinDim = _skp.getDimList();
@@ -159,6 +273,7 @@ void MatExpVector::run()
 
     //////////////////////////////////////////////////////////////////////////////
     // Print to screen
+    if(_is_print_skp)
     {/*{{{*/
     cout << "#1. nSpin = " << nSpin << endl << endl;
     cout << "#2. nTerm = " << nTerm << endl << endl;
@@ -241,12 +356,18 @@ void MatExpVector::run()
                 &w_seq_len );
     cx_mat res(w_seq, nDim, nt);
     _resVectorList = res;
-}
-//}}}
-////////////////////////////////////////////////////////////////////////////////
 
-void MatExpVector::run_gpu()
-{
+    delete[] pos_offset;
+    delete[] dim2;
+    delete[] mat_offset;
+    delete[] matC;
+    delete[] w_seq;
+
+    return _resVectorList;
+}/*}}}*/
+
+cx_mat MatExpVector::runInexplicitGPU()
+{/*{{{*/
     //////////////////////////////////////////////////////////////////////////////
     //parameter preparation
     DIM_LIST           spinDim = _skp.getDimList();
@@ -303,6 +424,7 @@ void MatExpVector::run_gpu()
 
     //////////////////////////////////////////////////////////////////////////////
     // Print to screen
+    if(_is_print_skp)
     {/*{{{*/
     cout << "#1. nSpin = " << nSpin << endl << endl;
     cout << "#2. nTerm = " << nTerm << endl << endl;
@@ -390,7 +512,15 @@ void MatExpVector::run_gpu()
                 &w_seq_len );
     cx_mat res(w_seq, nDim, nt);
     _resVectorList = res;
-}
+
+    delete[] pos_offset;
+    delete[] dim2;
+    delete[] mat_offset;
+    delete[] matC;
+    delete[] w_seq;
+
+    return _resVectorList;
+}/*}}}*/
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -15,10 +15,8 @@
   #include "omp.h"
 #endif
 
-int krylov_zgexpv(const int n, const double _Complex *a, const double _Complex *v, const int tn, const double *ta, double _Complex *w_seq) {
-  int             m = 30, itrace = 1;
-  double          tol = 1.0e-12;
-  
+int krylov_zgexpv(const int n, const double _Complex *a, const double _Complex *v, const int tn, const double *ta, double _Complex *w_seq, const int klim, const int m, const double tol,  const int itrace)
+{
   int             iflag = 0;
   
   double          anorm = 0.0;
@@ -46,10 +44,8 @@ int krylov_zgexpv(const int n, const double _Complex *a, const double _Complex *
   return iflag;
 }
 
-int krylov_zcooexpv(const int n, const int nz, const int *ia, const int *ja, const double _Complex *a, const double _Complex *v, const int tn, const double *ta, double _Complex *w_seq) {
-  int             m = 30, itrace = 1;
-  double          tol = 1.0e-12;
-  
+int krylov_zcooexpv(const int n, const int nz, const int *ia, const int *ja, const double _Complex *a, const double _Complex *v, const int tn, const double *ta, double _Complex *w_seq, const int klim, const int m, const double tol,  const int itrace)
+{
   int             iflag = 0;
   
   double          anorm = 0.0;

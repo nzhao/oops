@@ -7,6 +7,7 @@ cx_mat MAT;
 cx_vec VEC;
 vec    TIME_LIST;
 SumKronProd SKP;
+cx_double PREFACTOR;
 
 void prepare_data(string filename);
 void test_small_mat();
@@ -46,8 +47,8 @@ void prepare_data(string filename)
     hami.addInteraction(dip);
     hami.make();
 
-    cx_double II = cx_double(0.0, 1.0);
-    MAT = II*hami.getMatrix(); 
+    PREFACTOR = cx_double(0.0, -1.0);
+    MAT = hami.getMatrix(); 
     cout << "hamiltonian mat generated." <<endl;
 
     SKP = hami.getKronProdForm();
@@ -63,13 +64,12 @@ void prepare_data(string filename)
 
 void test_small_mat()
 {/*{{{*/
-    cout << TIME_LIST.size() << endl;
     for(int i=0; i<TIME_LIST.size(); ++i)
     {
-        MatExp expM(MAT, TIME_LIST(i), MatExp::ArmadilloExpMat);
+        MatExp expM(MAT, PREFACTOR*TIME_LIST(i), MatExp::ArmadilloExpMat);
         expM.run();
         
-        MatExp expM2(MAT, TIME_LIST(i), MatExp::PadeApproximation);
+        MatExp expM2(MAT, PREFACTOR*TIME_LIST(i), MatExp::PadeApproximation);
         expM2.run();
         
         cx_mat resArma = expM.getResultMatrix();
@@ -82,104 +82,36 @@ void test_small_mat()
 cx_mat test_large_mat()
 {/*{{{*/
     cout << endl;
-    cout << "begin LARGE DENSE MAT" << endl;
+    cout << "begin LARGE DENSE MAT" <<  endl;
 
-    int dim = MAT.n_cols;
-    std::complex<double> * mat = MAT.memptr();
-    std::complex<double> * vecC = VEC.memptr();
-
-    // krylov_zgexpv and krylov_zcooexpv;
-    int      tn = TIME_LIST.size();
-    double * ta = TIME_LIST.memptr();
-    std::complex<double> *w_seq = new std::complex<double> [tn * dim];
-    
-    int err = krylov_zgexpv(dim, (double _Complex *)mat, (double _Complex *)vecC, tn, &ta[0], (double _Complex *)w_seq);
-
-    cx_mat res(&w_seq[0], dim, tn);
-    return res;
-    
-    // for debug;
-    //cout << "krylov err = " << err << endl;
-    //cout << "krylov_zgexpv works, i, ta:" << endl;
-    //for (int i = 0; i < 10; i++) {
-      //cout << i;
-      //for (int j = 0; j < tn; j++)
-        //cout << ", " << w_seq[i + j * dim];
-      //cout << endl;
-    //}
+    MatExpVector expM(MAT, VEC, PREFACTOR, TIME_LIST);
+    return expM.run();
 }/*}}}*/
 
 cx_mat test_large_mat_sparse()
 {/*{{{*/
     cout << endl;
-    cout << "begin LARGE SPARSE MAT" << endl;
+    cout << "begin LARGE SPARSE MAT" <<  endl;
+
     sp_cx_mat mat_sparse = sp_cx_mat(MAT);
-    sp_cx_mat::const_iterator start = mat_sparse.begin();
-    sp_cx_mat::const_iterator end   = mat_sparse.end();
-
-    std::complex<double> * vecC = VEC.memptr();
-
-    int dim = MAT.n_cols;
-    int nz = distance(start , end);
-
-    int * ia = new int [nz];
-    int * ja = new int [nz];
-    std::complex<double> * a = new std::complex<double> [nz];
-    int i=0;
-    for(sp_cx_mat::const_iterator it = start; it != end; ++it)
-    {
-        ia[i] = it.row()+1;
-        ja[i] = it.col()+1;
-        a[i] = (*it);
-        i++;
-    }
-    cout << nz << " non-zero elements" << endl;
-
-    // krylov_zgexpv and krylov_zcooexpv;
-    int      tn = TIME_LIST.size();
-    double * ta = TIME_LIST.memptr();
-    std::complex<double> *w_seq = new std::complex<double> [tn * dim];
-
-    
-    int err = krylov_zcooexpv(dim, nz, ia, ja, (double _Complex *)a, (double _Complex *)vecC, tn, &ta[0], (double _Complex *)w_seq);
-
-    cx_mat res(&w_seq[0], dim, tn);
-    return res;
-    
-    // for debug;
-    cout << "krylov err = " << err << endl;
-    cout << "krylov_zgexpv works, i, ta:" << endl;
-    for (int i = 0; i < 10; i++) {
-      cout << i;
-      for (int j = 0; j < tn; j++)
-        cout << ", " << w_seq[i + j * dim];
-      cout << endl;
-    }
+    MatExpVector expM(mat_sparse, VEC, PREFACTOR, TIME_LIST);
+    return expM.run();
 }/*}}}*/
 
 cx_mat test_very_large_mat_CPU()
 {/*{{{*/
     cout << endl;
-    cout << "Begin VERY_LARGE_MAT on CPU " << endl;
-    cx_double prefactor = 1.0;
+    cout << "Begin VERY_LARGE_MAT on CPU " <<  endl;
 
-    MatExpVector expM(SKP, prefactor, VEC, TIME_LIST);  
-    expM.run();
-
-    cx_mat res = expM.getResult();
-    return res;
-
+    MatExpVector expM(SKP, VEC, TIME_LIST, MatExpVector::Inexplicit);  
+    return expM.run();
 }/*}}}*/
 
 cx_mat test_very_large_mat_GPU()
 {/*{{{*/
     cout << endl;
-    cout << "Begin VERY_LARGE_MAT on GPU " << endl;
-    cx_double prefactor = 1.0;
+    cout << "Begin VERY_LARGE_MAT on GPU " <<  endl;
 
-    MatExpVector expM(SKP, prefactor, VEC, TIME_LIST);  
-    expM.run_gpu();
-
-    cx_mat res = expM.getResult();
-    return res;
+    MatExpVector expM(SKP, VEC, TIME_LIST, MatExpVector::InexplicitGPU);  
+    return expM.run();
 }/*}}}*/

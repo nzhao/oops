@@ -7,6 +7,7 @@
 #include "include/misc/misc.h"
 #include "include/kron/KronProd.h"
 #include <numeric>      // std::partial_sum
+#include "include/math/krylov_expv.h"
 
 using namespace arma;
 
@@ -44,16 +45,31 @@ private:
 class MatExpVector
 {
 public:
+    enum MatExpVectorMethod {Explicit, ExplicitSparse, Inexplicit, InexplicitGPU};
+
     MatExpVector() {};
-    MatExpVector(const SumKronProd& skp, cx_double prefactor, const cx_vec& v, const vec& time_list);
+    MatExpVector(const SumKronProd& skp, const cx_vec& v, const vec& time_list, MatExpVectorMethod method);
+    MatExpVector(const cx_mat& m, const cx_vec& v, const cx_double prefactor, const vec& time_list);
+    MatExpVector(const sp_cx_mat& m, const cx_vec& v, const cx_double prefactor, const vec& time_list);
     ~MatExpVector() {};
 
-    void run();
-    void run_gpu();
+    cx_mat run();
+    cx_mat runExplicit();
+    cx_mat runExplicitSparse();
+    cx_mat runInexplicit();
+    cx_mat runInexplicitGPU();
     cx_mat getResult() const {return _resVectorList;}; 
+
+    void enable_step_print() {_itrace = 1;}
+    void enable_skp_print() {_is_print_skp = true;}
+    void disable_step_print() {_itrace = 0;}
+    void disable_skp_print() {_is_print_skp = false;}
 protected:
 private:
+    MatExpVectorMethod _method;
     SumKronProd _skp;
+    cx_mat      _matrix;
+    sp_cx_mat   _sp_matrix;
     cx_vec      _vector;
     cx_double   _prefactor;
     vec         _time_list;
@@ -66,6 +82,8 @@ private:
     size_t _krylov_m;
     double _krylov_tol;
     size_t _itrace;
+
+    bool _is_print_skp;
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
