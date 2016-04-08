@@ -24,6 +24,7 @@
 #include "include/spin/SpinInteractionDefine.h"
 #include "include/spin/SpinSource.h"
 #include "include/spin/SpinState.h"
+#include "include/spin/SpinClusterFromLattice.h"
 
 #include "include/kron/KronProd.h"
 #include "include/misc/misc.h"

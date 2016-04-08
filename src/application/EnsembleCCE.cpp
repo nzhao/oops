@@ -1,17 +1,10 @@
+#include "include/app/app.h"
 #include "include/app/cce.h"
 #include "include/misc/xmlreader.h"
 #include <cstdlib>
 
 _INITIALIZE_EASYLOGGINGPP
 
-string PROJECT_PATH;
-string LOG_PATH;
-string INPUT_PATH;
-string OUTPUT_PATH;
-string CONFIG_PATH;
-string DEBUG_PATH;
-
-cSPINDATA SPIN_DATABASE=cSPINDATA();
 ConfigXML set_parameters(const string& xml_file_name);
 
 int  main(int argc, char* argv[])
@@ -72,7 +65,7 @@ ConfigXML set_parameters(const string& xml_file_name)
     INPUT_PATH  = PROJECT_PATH + "/dat/input/";
     OUTPUT_PATH = PROJECT_PATH + "/dat/output/";
     CONFIG_PATH = PROJECT_PATH + "/dat/config/";
-    DEBUG_PATH  = PROJECT_PATH = "/dat/debug/";
+    DEBUG_PATH  = PROJECT_PATH + "/dat/debug/";
 
     ConfigXML cfg( CONFIG_PATH+xml_file_name );
     return cfg;

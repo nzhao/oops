@@ -49,7 +49,7 @@ SpinPair::SpinPair(const vector<cSPIN>& spin_list)
     for(int i=0; i<nspin; ++i)
         for(int j=i+1; j<nspin; ++j)
         {
-            vector<int> x; x.push_back(i); x.push_back(j);
+            vector<size_t> x; x.push_back(i); x.push_back(j);
             _index_list.push_back(x);
         }
 
@@ -79,7 +79,7 @@ SingleSpin::SingleSpin(const vector<cSPIN>& spin_list)
     //    _index_list.push_back( vector<int> {i} );
     for(int i=0; i<nspin; ++i)
     {
-        vector<int> x; x.push_back(i);
+        vector<size_t> x; x.push_back(i);
         _index_list.push_back(x);
     }
 
@@ -102,7 +102,7 @@ SingleSpin::SingleSpin(const vector<cSPIN>& spin_list, const vector<int>& pick_u
     //    _index_list.push_back( vector<int> {i} );
     for(int i=0; i<pick_up_spins.size(); ++i)
     {
-        vector<int> x; x.push_back(i);
+        vector<size_t> x; x.push_back(i);
         _index_list.push_back(x);
     }
 
