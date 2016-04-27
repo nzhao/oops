@@ -60,18 +60,10 @@ void KronProd::fill(INDICES idx, MULTIPLIER coeff, TERM mat)
 
 cx_mat KronProd::full()
 {
-    vector<cx_mat> all_mat;
-    for(int i=0; i<_dim_list.size(); ++i)
-        all_mat.push_back( eye<cx_mat>(_dim_list[i], _dim_list[i]) );
-
-    for(int i=0; i<_spin_index.size(); ++i)
-        all_mat[ _spin_index[i] ] = _mat[i];
-
-    cx_mat res=all_mat[0];
-    for(int i=1; i<all_mat.size(); ++i)
-        res=kron(res, all_mat[i]);
-
-    return _coeff*res;
+    vector<size_t> dimAcc = dim_acc(_dim_list, _spin_index);
+    cooSpMat<cx_double> res = spkron(_dim_list, _spin_index, _mat);
+    cx_mat resMat = res.full_mat();
+    return _coeff*resMat;
 }
 
 cx_vec KronProd::vecterize()

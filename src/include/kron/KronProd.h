@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <armadillo>
-#include "include/kron/KronProd.h"
 #include "include/spin/SpinInteractionDefine.h"
+#include "include/kron/spkron.h"
 
 using namespace std;
 using namespace arma;
