@@ -18,7 +18,7 @@ cx_mat test_very_large_mat_GPU();
 
 int  main(int argc, char* argv[])
 {
-    string filename = "./dat/input/RoyCoord.xyz8";
+    string filename = "./dat/input/RoyCoord.xyz4";
     prepare_data(filename);
 
     test_small_mat();
@@ -47,11 +47,21 @@ void prepare_data(string filename)
     hami.addInteraction(dip);
     hami.make();
 
+    Liouvillian lv0(hami);
+
+    double rate = 1.0;
+    SpinDephasing dephasing(sl, rate);
+    LiouvilleSpaceOperator dephaseOperator(sl);
+    dephaseOperator.addInteraction(dephasing);
+    dephaseOperator.make();
+
+    QuantumOperator lv = lv0 + dephaseOperator;
+
     PREFACTOR = cx_double(0.0, -1.0);
-    MAT = hami.getMatrix(); 
+    MAT = lv.getMatrix(); 
     cout << "hamiltonian mat generated." <<endl;
 
-    SKP = hami.getKronProdForm();
+    SKP =lv.getKronProdForm();
 
     int dim = MAT.n_cols;
     PureState psi(dim);

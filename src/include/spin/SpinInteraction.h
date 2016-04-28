@@ -25,8 +25,11 @@
 class cSpinInteraction
 {
 public:
+    enum Space {Hilbert, Liouville};
+
      cSpinInteraction();
      cSpinInteraction(const vector<cSPIN>& spin_list);
+     cSpinInteraction(const vector<cSPIN>& spin_list, Space sp);
     ~cSpinInteraction();
 
     void make();
@@ -41,6 +44,7 @@ protected:
     cSpinInteractionCoeff  _coeff;
     SumKronProd _sum_kron_prod;
     DIM_LIST _dim_list;    
+    Space _space;
 private:
 };
 //}}}
@@ -95,6 +99,23 @@ private:
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ SpinDephasing
+class SpinDephasing:public cSpinInteraction
+{
+public:
+    SpinDephasing() {};
+    SpinDephasing(const vector<cSPIN>& spin_list, const double dephasing_rate);
+    ~SpinDephasing() {};
+protected:
+private:
+};
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
 /// @}
 
 /// @}

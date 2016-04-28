@@ -30,6 +30,7 @@ public:
     string get_isotope() const { return isotope; };
     int get_multiplicity() const { return multiplicity; };
     int get_dimension() const {return multiplicity; };
+    int get_dimension2() const {return multiplicity*multiplicity; };
     double get_gamma() const { return gamma; };
     double get_omegaQ() const { return omegaQ; };
     double get_eta() const { return eta; };

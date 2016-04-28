@@ -14,6 +14,12 @@ cSpinInteraction::cSpinInteraction()
 cSpinInteraction::cSpinInteraction(const vector<cSPIN>& spin_list)
 { //LOG(INFO) << "Constructor: cSpinInteraction with spin_list.";
     _spin_list=spin_list;
+    _space = Hilbert;
+}
+cSpinInteraction::cSpinInteraction(const vector<cSPIN>& spin_list, Space sp)
+{
+    _spin_list=spin_list;
+    _space = sp;
 }
 
 cSpinInteraction::~cSpinInteraction()
@@ -27,14 +33,18 @@ void cSpinInteraction::make()
     assert(_form.get_nTerm() == _coeff.get_nCoeff() );
 
     if( !_spin_list.empty() )
-        for(int i=0; i<_spin_list.size(); ++i)
-        {
-            cSPIN spin=_spin_list[i];
-            _dim_list.push_back( spin.get_dimension() );
+        switch (_space) {
+            case Hilbert:
+                for(int i=0; i<_spin_list.size(); ++i)
+                    _dim_list.push_back( _spin_list[i].get_dimension() );
+                break;
+            case Liouville:
+                for(int i=0; i<_spin_list.size(); ++i)
+                    _dim_list.push_back( _spin_list[i].get_dimension2() );
+                break;
+            default:
+                assert(0);
         }
-    //if( !_spin_list.empty() )
-    //    for(auto spin: _spin_list)
-    //        _dim_list.push_back( spin.get_dimension() );
 
     INDEX_LIST  idxList=_domain.getIndexList();
     MAT_LIST    matList=_form.getMatList();
@@ -72,6 +82,7 @@ SpinDipolarInteraction::SpinDipolarInteraction()
 
 SpinDipolarInteraction::SpinDipolarInteraction(const vector<cSPIN>& spin_list)
 { //LOG(INFO) << "Constructor: SpinDipolarInteraction with spin_list";
+    _space = Hilbert;
     _spin_list=spin_list;
 
     _domain=SpinPair(spin_list);
@@ -98,6 +109,7 @@ SpinZeemanInteraction::SpinZeemanInteraction()
 SpinZeemanInteraction::SpinZeemanInteraction(const vector<cSPIN>& spin_list, const vec& magB)
 { //LOG(INFO) << "Constructor: SpinZeemanInteraction with spin_list and magB";
 
+    _space = Hilbert;
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);
@@ -124,6 +136,7 @@ DipolarField::DipolarField()
 DipolarField::DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_spin, const PureState& state)
 { //LOG(INFO) << "Constructor: DipolarField with center spin and spin state";
 
+    _space = Hilbert;
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);
@@ -134,6 +147,7 @@ DipolarField::DipolarField(const vector<cSPIN>& spin_list, const cSPIN& center_s
 }
 DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list)
 {
+    _space = Hilbert;
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);
@@ -144,6 +158,7 @@ DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& 
 }
 DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& source_list, const vector<PureState>& state_list, const uvec& exclude_idx)
 {
+    _space = Hilbert;
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);
@@ -159,6 +174,24 @@ DipolarField::DipolarField(const vector<cSPIN>& spin_list, const vector<cSPIN>& 
 
 DipolarField::~DipolarField()
 { //LOG(INFO) << "Default destructor: DipolarField";
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ SpinDephasing
+SpinDephasing::SpinDephasing(const vector<cSPIN>& spin_list, const double dephasing_rate)
+{
+    _space = Liouville;
+    _spin_list=spin_list;
+
+    _domain=SingleSpin(spin_list);
+    _form=SingleSpinDephasing(_domain);
+    _coeff=SpinDephasingRate(_domain, dephasing_rate);
+    
+    make();
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
