@@ -37,7 +37,8 @@ void NVCenter::make_espin_hamiltonian()
     double omegaQ = _electron_spin.get_omegaQ() * 2.0 * datum::pi * 1e6;
     double gamma = _electron_spin.get_gamma();
 
-    cx_mat s111 = 1.0/sqrt(3.0) * (sx + sy + sz);
+    //cx_mat s111 = 1.0/sqrt(3.0) * (sx + sy + sz);
+    cx_mat s111 = sz;
     _espin_hamiltonian = omegaQ * s111 * s111 + gamma * (_magB(0)*sx + _magB(1)*sy + _magB(2)*sz );
 
     eig_sym(_eigen_vals, _eigen_vectors, _espin_hamiltonian);
