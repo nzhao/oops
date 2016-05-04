@@ -280,6 +280,34 @@ SingleSpinInteractionForm::~SingleSpinInteractionForm()
 { //LOG(INFO) << "Default destructor: SingleSpinInteractionForm.";
 }
 //}}}
+//----------------------------------------------------------------------------//
+//{{{ SingleSpinDephasing
+SingleSpinDephasing::SingleSpinDephasing(const cSpinInteractionDomain& domain)
+{
+    _nterm = 1;
+
+    vector< vector<cSPIN> > sag;
+    sag = domain.getSpinAggregate();
+    vector< vector<cSPIN> >::iterator it;
+    for(it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];
+        cx_mat dephase_mat;
+        if (spin0.get_dimension2() == 4) // only spin-1/2 pure dephasing is implemented.
+        {
+            cx_vec diag; diag << 0.0 << -2.0 << -2.0 << 0.0;
+            dephase_mat = diagmat(diag);
+        }
+        else
+            assert(0);
+        
+        vector<TERM> term_list; TERM t; 
+        t.push_back( dephase_mat ); term_list.push_back( t );
+        
+        _mat_list.push_back( term_list );
+    }
+}
+//}}}
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -451,6 +479,23 @@ PolarizationCoeff::PolarizationCoeff(const cSpinInteractionDomain& domain, const
 }
 PolarizationCoeff::~PolarizationCoeff()
 { //LOG(INFO) << "Default destructor: PolarizationCoeff.";
+}
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ SpinDephasingRate
+SpinDephasingRate::SpinDephasingRate(const cSpinInteractionDomain& domain, const double dephasing_rate)
+{
+    _nCoeff = 1;
+
+    vector< vector<cSPIN> > sag;
+    sag = domain.getSpinAggregate();
+    vector< vector<cSPIN> >::iterator it;
+    for(it=sag.begin(); it!=sag.end(); ++it)
+    {
+        cSPIN spin0=(*it)[0];
+        vec coeffs(1); coeffs(0) =  dephasing_rate; 
+        _coeff_list.push_back(coeffs);
+    }
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

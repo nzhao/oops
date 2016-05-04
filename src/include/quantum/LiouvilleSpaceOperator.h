@@ -25,10 +25,17 @@ public:
     LiouvilleSpaceOperator();
     ~LiouvilleSpaceOperator();
 
+    LiouvilleSpaceOperator(const vector<cSPIN>& spin_list);
     LiouvilleSpaceOperator(const HilbertSpaceOperator& op, MatExpanFunc* func);
+
+    void addInteraction(cSpinInteraction& spin_interaction);
+    void make();
 protected:
     bool _is_expanded;
     EXPAN _expan;
+
+    vector<cSPIN>            _spin_list;
+    vector<cSpinInteraction> _interaction_list;
 private:
 };
 //}}}

@@ -10,6 +10,7 @@ void cSpinState::make()
 {
     this->cSpinInteraction::make();
 
+    _space = Hilbert;
     //DIM_LIST dim_list = _sum_kron_prod.getKronProdList()[0].getDimList();
     MULTIPLIER c = 1.0;
     //for(auto d:dim_list) c*=d;
@@ -36,6 +37,7 @@ SpinPolarization::SpinPolarization()
 
 SpinPolarization::SpinPolarization(const vector<cSPIN>& spin_list, const vector<int>& index_list, const vector<vec>& pol_list)
 {
+    _space = Hilbert;
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list, index_list);
@@ -47,6 +49,7 @@ SpinPolarization::SpinPolarization(const vector<cSPIN>& spin_list, const vector<
 
 SpinPolarization::SpinPolarization(const vector<cSPIN>& spin_list, const vec& pol)
 {
+    _space = Hilbert;
     _spin_list=spin_list;
     vector<vec> pol_list;
     for(int i=0; i<spin_list.size(); ++i)

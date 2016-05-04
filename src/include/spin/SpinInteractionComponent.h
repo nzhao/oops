@@ -99,6 +99,15 @@ public:
     ~SingleSpinInteractionForm();
 };
 //}}}
+//----------------------------------------------------------------------------//
+//{{{ SingleSpinDephasing
+class SingleSpinDephasing:public cSpinInteractionForm
+{
+public:
+    SingleSpinDephasing(const cSpinInteractionDomain& domain);
+    ~SingleSpinDephasing(){};
+};
+//}}}
 ////////////////////////////////////////////////////////////////////////////////
 /// @}
 
@@ -162,6 +171,15 @@ class PolarizationCoeff:public cSpinInteractionCoeff
 public:
     PolarizationCoeff(const cSpinInteractionDomain& domain, const vector<vec>& pol);
     ~PolarizationCoeff();
+};
+//}}}
+//----------------------------------------------------------------------------//
+//{{{ SpinDephasingRate
+class SpinDephasingRate:public cSpinInteractionCoeff
+{
+public:
+    SpinDephasingRate(const cSpinInteractionDomain& domain, const double dephasing_rate);
+    ~SpinDephasingRate() {};
 };
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
