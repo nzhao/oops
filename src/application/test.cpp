@@ -80,30 +80,27 @@ void prepare_data(string filename)
 
     Liouvillian lv0(hami0, SHARP);
     Liouvillian lv1(hami1, FLAT);
-    Liouvillian lv = lv0 - lv1;
+    Liouvillian lvH = lv0 - lv1;
 
+
+    double rate = 2.0*datum::pi*1e4;
+    SpinDephasing dephasing(sl, rate);
+    LiouvilleSpaceOperator dephaseOperator(sl);
+    dephaseOperator.addInteraction(dephasing);
+    dephaseOperator.make();
+
+    QuantumOperator lv = lvH + dephaseOperator;
     lv.saveMatrix("lv");
-    //Liouvillian lv0(hami);
 
-    //double rate = 1.0;
-    //SpinDephasing dephasing(sl, rate);
-    //LiouvilleSpaceOperator dephaseOperator(sl);
-    //dephaseOperator.addInteraction(dephasing);
-    //dephaseOperator.make();
 
-    //QuantumOperator lv = lv0 + dephaseOperator;
+    vec _bath_polarization = zeros<vec>(3);
+    SpinPolarization p(sl, _bath_polarization);
+    DensityOperator ds(sl);
+    ds.addStateComponent(p);
+    ds.make();
+    ds.makeVector();
+    cout << ds.getVector() << endl;
+    cout << ds.getMatrix() << endl;
 
-    //PREFACTOR = cx_double(0.0, -1.0);
-    //MAT = lv.getMatrix(); 
-    //cout << "hamiltonian mat generated." <<endl;
 
-    //SKP =lv.getKronProdForm();
-
-    //int dim = MAT.n_cols;
-    //PureState psi(dim);
-    //psi.setComponent(0, 1.0);
-    //VEC = psi.getVector();
-    //cout << "vector generated." <<endl;
-
-    //TIME_LIST = linspace<vec>(0.01, 0.1, 10);
 }/*}}}*/
