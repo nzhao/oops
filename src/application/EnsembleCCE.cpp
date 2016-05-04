@@ -1,11 +1,15 @@
 #include "include/app/app.h"
-#include "include/app/cce.h"
+#include "include/app/ensemble_cce.h"
 #include "include/misc/xmlreader.h"
 #include <cstdlib>
 
 _INITIALIZE_EASYLOGGINGPP
 
 ConfigXML set_parameters(const string& xml_file_name);
+
+NVCenter create_defect_center(const ConfigXML& cfg);
+cSpinSourceFromFile create_spin_source(const ConfigXML& cfg);
+cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const cSpinCollection& bath_spins);
 
 int  main(int argc, char* argv[])
 {
@@ -26,22 +30,26 @@ int  main(int argc, char* argv[])
 
     LOG(INFO) << "my_rank = " << my_rank << "  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Program begins vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"; 
 
-    // create defect center
-    double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
-    double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
-    double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
-    vec coord; coord << x << y << z;
-    NVCenter nv(NVCenter::N14, coord);
-    
-    double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
-    double magBy = cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
-    double magBz = cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
-    nv.set_magB(magBx, magBy, magBz);
-    nv.make_espin_hamiltonian();
+    EnsembleCCE sol(my_rank, worker_num, cfg);
 
-    // CCE
-    EnsembleCCE sol(my_rank, worker_num, &nv, cfg);
-    sol.run();
+    // Step 1: make a defect center
+    NVCenter nv = create_defect_center(cfg);  
+    sol.set_defect_center(&nv);
+
+    // Step 2: make bath spins 
+    cSpinSourceFromFile spin_file = create_spin_source(cfg);
+    sol.set_bath_spin(&spin_file);
+    
+    // Step 3: make clusters
+    cSpinCollection bath_spins = sol.getSpinCollecion();
+    cDepthFirstPathTracing   dfpt = create_spin_cluster_algrithm(cfg, bath_spins);
+    sol.set_bath_cluster(&dfpt);
+
+    // Step 4: run_each_cluster 
+    sol.run_each_clusters();
+
+    // Step 5: post_treatment
+    sol.post_treatment();
 
     LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"; 
 
@@ -71,3 +79,35 @@ ConfigXML set_parameters(const string& xml_file_name)
     return cfg;
 }/*}}}*/
 
+NVCenter create_defect_center(const ConfigXML& cfg)
+{/*{{{*/
+    double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
+    double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
+    double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
+    vec coord; coord << x << y << z;
+    NVCenter nv(NVCenter::N14, coord);
+    
+    double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
+    double magBy = cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
+    double magBz = cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
+    nv.set_magB(magBx, magBy, magBz);
+    nv.make_espin_hamiltonian();
+
+    return nv;
+}/*}}}*/
+
+cSpinSourceFromFile create_spin_source(const ConfigXML& cfg)
+{/*{{{*/
+    string input_filename  = INPUT_PATH + cfg.getStringParameter("Data", "input_file");
+    cSpinSourceFromFile spin_file(input_filename);
+    return spin_file;
+}/*}}}*/
+
+cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const cSpinCollection& bath_spins)
+{/*{{{*/
+    double cut_off_dist = cfg.getDoubleParameter("SpinBath",   "cut_off_dist");
+    int    max_order    = cfg.getIntParameter   ("SpinBath",   "max_order");
+    sp_mat c = bath_spins.getConnectionMatrix(cut_off_dist);
+    cDepthFirstPathTracing dfpt(c, max_order);
+    return dfpt;
+}/*}}}*/

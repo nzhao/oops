@@ -1,5 +1,5 @@
 #include "include/app/app.h"
-#include "include/app/cce.h"
+#include "include/app/single_sample_cce.h"
 #include "include/misc/xmlreader.h"
 #include <cstdlib>
 #include "include/misc/lattice.h"

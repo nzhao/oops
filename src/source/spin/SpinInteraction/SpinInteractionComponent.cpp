@@ -296,7 +296,7 @@ SingleSpinDephasing::SingleSpinDephasing(const cSpinInteractionDomain& domain)
         if (spin0.get_dimension2() == 4) // only spin-1/2 pure dephasing is implemented.
         {
             cx_vec diag; diag << 0.0 << -2.0 << -2.0 << 0.0;
-            dephase_mat = diagmat(diag);
+            dephase_mat = II*diagmat(diag);
         }
         else
             assert(0);

@@ -6,7 +6,8 @@
 BINPATH := ../bin
 OBJPATH := ../obj
 
-APP := EnsembleCCE SingleSampleCCE MatExpTest test
+#APP := EnsembleCCE SingleSampleCCE MatExpTest test
+APP := EnsembleCCE  MatExpTest test
 
 DESTINATION := $(addprefix $(BINPATH)/, $(APP))
 LIBPATH := .  
