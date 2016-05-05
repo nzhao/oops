@@ -14,6 +14,7 @@ public:
 
     virtual void make_espin_hamiltonian()=0;
 
+    void  set_magB(vec b) {_magB = b;}
     void  set_magB(double bx, double by, double bz) {_magB << bx << by << bz;}
     void  set_eleE(double ex, double ey, double ez) {_eleE << ex << ey << ez;}
 protected:

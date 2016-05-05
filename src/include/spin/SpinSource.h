@@ -68,5 +68,21 @@ private:
 };
 ///}}} 
 ////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ cSpinSourceUniformRandom
+class cSpinSourceUniformRandom:public cSpinSource
+{
+public:
+    cSpinSourceUniformRandom(const double range, const int num, const string& isotope, const int seed) {_range = range; _num = num; _isotope = isotope; _seed = seed;}
+    vector<cSPIN>& generate();
+protected:
+private:
+    int _num;
+    double _range;
+    string _isotope;
+    int _seed;
+};
 /// @}
 #endif

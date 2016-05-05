@@ -108,7 +108,7 @@ class SpinDephasing:public cSpinInteraction
 {
 public:
     SpinDephasing() {};
-    SpinDephasing(const vector<cSPIN>& spin_list, const double dephasing_rate);
+    SpinDephasing(const vector<cSPIN>& spin_list, const double dephasing_rate, const vec& axis);
     ~SpinDephasing() {};
 protected:
 private:

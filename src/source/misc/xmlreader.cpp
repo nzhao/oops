@@ -79,3 +79,17 @@ string ConfigXML::getStringParameter(string section_name, string para_name) cons
     }
 }
 
+vec ConfigXML::getVectorParameter(string section_name, string para_name) const
+{
+    pair<string, string> name = make_pair(section_name, para_name);
+    if( !strcmp(_parameters[name].first.c_str(), "vector") )
+    {
+        string vString =  _parameters[name].second;
+        return vec(vString);
+    }
+    else
+    {
+        cout  << "Wrong parameter type: " << name.first << ":" << name.second << " is not CHAR type" << endl;;
+        return DEFAULT_STRING_PARAMETER;
+    }
+}

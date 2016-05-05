@@ -41,12 +41,12 @@ LiouvilleSpaceOperator::LiouvilleSpaceOperator(const HilbertSpaceOperator& op, M
 
 void LiouvilleSpaceOperator::addInteraction(cSpinInteraction& spin_interaction)
 {
-    cout << "dim_list = ";
-    print_vector(_dim_list);
-    cout << endl;
-    cout << "interaction dim_list = ";
-    print_vector(spin_interaction.getDimList());
-    cout << endl;
+    //cout << "dim_list = ";
+    //print_vector(_dim_list);
+    //cout << endl;
+    //cout << "interaction dim_list = ";
+    //print_vector(spin_interaction.getDimList());
+    //cout << endl;
     assert( this->_dim_list == spin_interaction.getDimList() );
     _interaction_list.push_back(spin_interaction);
 }

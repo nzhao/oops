@@ -182,13 +182,13 @@ DipolarField::~DipolarField()
 
 ////////////////////////////////////////////////////////////////////////////////
 //{{{ SpinDephasing
-SpinDephasing::SpinDephasing(const vector<cSPIN>& spin_list, const double dephasing_rate)
+SpinDephasing::SpinDephasing(const vector<cSPIN>& spin_list, const double dephasing_rate, const vec& axis)
 {
     _space = Liouville;
     _spin_list=spin_list;
 
     _domain=SingleSpin(spin_list);
-    _form=SingleSpinDephasing(_domain);
+    _form=SingleSpinDephasing(_domain, axis);
     _coeff=SpinDephasingRate(_domain, dephasing_rate);
     
     make();
