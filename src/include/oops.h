@@ -5,6 +5,7 @@
 #include <mat.h>
 #endif
 
+#include <cstdlib>
 #include <cassert>
 #include <stdlib.h>
 #include <vector>

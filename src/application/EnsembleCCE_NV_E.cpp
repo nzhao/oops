@@ -1,20 +1,17 @@
 #include "include/app/app.h"
 #include "include/app/ensemble_cce.h"
-//#include "include/misc/xmlreader.h"
-#include <cstdlib>
 
 _INITIALIZE_EASYLOGGINGPP
 
 ConfigXML set_parameters(const string& xml_file_name);
 
 NVCenter create_defect_center(const ConfigXML& cfg);
-//cSpinSourceFromFile create_spin_source(const ConfigXML& cfg);
 cSpinSourceUniformRandom create_spin_source(const ConfigXML& cfg);
 cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const cSpinCollection& bath_spins);
 
 int  main(int argc, char* argv[])
 {
-    ConfigXML cfg = set_parameters("EnsembleCCE.xml");
+    ConfigXML cfg = set_parameters("EnsembleCCE_NV_E.xml");
 
     string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");
     _START_EASYLOGGINGPP(argc, argv);
@@ -38,7 +35,6 @@ int  main(int argc, char* argv[])
     sol.set_defect_center(&nv);
 
     // Step 2: make bath spins 
-    //cSpinSourceFromFile spin_file = create_spin_source(cfg);
     cSpinSourceUniformRandom spinUR = create_spin_source(cfg);
     sol.set_bath_spin(&spinUR);
     
@@ -94,21 +90,15 @@ NVCenter create_defect_center(const ConfigXML& cfg)
 }/*}}}*/
 
 cSpinSourceUniformRandom create_spin_source(const ConfigXML& cfg)
-{
-    double range = 1000.0;
-    int num = 100;
-    string isotope = "E";
-    int seed = 1;
+{/*{{{*/
+    double   range = cfg.getDoubleParameter("SpinBath", "range");
+    int        num = cfg.getIntParameter("SpinBath", "spin_number");
+    int       seed = cfg.getIntParameter("SpinBath", "bath_seed");
+    string isotope = cfg.getStringParameter("SpinBath", "isotope");
+
     cSpinSourceUniformRandom spinUR(range, num, isotope, seed);
     return spinUR;
-}
-
-//cSpinSourceFromFile create_spin_source(const ConfigXML& cfg)
-//{[>{{{<]
-    //string input_filename  = INPUT_PATH + cfg.getStringParameter("Data", "input_file");
-    //cSpinSourceFromFile spin_file(input_filename);
-    //return spin_file;
-//}[>}}}<]
+}/*}}}*/
 
 cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const cSpinCollection& bath_spins)
 {/*{{{*/

@@ -29,8 +29,6 @@ void CCE::set_bath_spin(cSpinSource * source)
     _bath_spins.make();
     if(_my_rank == 0)
         cout << _bath_spins.getSpinNum() << " spins are generated." << endl;
-    for(int i=0; i<_bath_spins.getSpinList().size(); ++i)
-        cout << i << ": " << _bath_spins.getSpinList()[i].get_coordinate() << endl;
 
 }
 
