@@ -282,9 +282,12 @@ SingleSpinInteractionForm::~SingleSpinInteractionForm()
 //}}}
 //----------------------------------------------------------------------------//
 //{{{ SingleSpinDephasing
-SingleSpinDephasing::SingleSpinDephasing(const cSpinInteractionDomain& domain)
+SingleSpinDephasing::SingleSpinDephasing(const cSpinInteractionDomain& domain, const vec& axis)
 {
     _nterm = 1;
+    double nx=axis[0], ny=axis[1], nz=axis[2];
+    cx_mat sigma_n; sigma_n << nz << cx_double(nx, -ny) << endr << cx_double(nx, ny) << -nz;
+    cx_mat dephase_mat = II * ( kron(sigma_n.st(), sigma_n) - eye<cx_mat>(4,4) );
 
     vector< vector<cSPIN> > sag;
     sag = domain.getSpinAggregate();
@@ -292,15 +295,7 @@ SingleSpinDephasing::SingleSpinDephasing(const cSpinInteractionDomain& domain)
     for(it=sag.begin(); it!=sag.end(); ++it)
     {
         cSPIN spin0=(*it)[0];
-        cx_mat dephase_mat;
-        if (spin0.get_dimension2() == 4) // only spin-1/2 pure dephasing is implemented.
-        {
-            cx_vec diag; diag << 0.0 << -2.0 << -2.0 << 0.0;
-            dephase_mat = II*diagmat(diag);
-        }
-        else
-            assert(0);
-        
+        assert (spin0.get_dimension2() == 4); // only spin-1/2 pure dephasing is implemented.
         vector<TERM> term_list; TERM t; 
         t.push_back( dephase_mat ); term_list.push_back( t );
         

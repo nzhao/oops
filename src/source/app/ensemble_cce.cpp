@@ -14,11 +14,9 @@ void EnsembleCCE::set_parameters()
 
     _cut_off_dist          = _cfg.getDoubleParameter("SpinBath",   "cut_off_dist");
     _max_order             = _cfg.getIntParameter   ("SpinBath",   "max_order");
-    cout << _max_order << endl;
-    _bath_polarization     
-        << _cfg.getDoubleParameter("SpinBath",  "bath_polarizationX") 
-        << _cfg.getDoubleParameter("SpinBath",  "bath_polarizationY") 
-        << _cfg.getDoubleParameter("SpinBath",  "bath_polarizationZ");
+    _bath_polarization     = _cfg.getVectorParameter("SpinBath",   "bath_polarization");
+    _bath_dephasing_rate   = _cfg.getDoubleParameter("SpinBath",   "dephasing_rate");
+    _bath_dephasing_axis   = _cfg.getVectorParameter("SpinBath",   "dephasing_axis");
 
     _nTime                 = _cfg.getIntParameter   ("Dynamics",   "nTime");
     _t0                    = _cfg.getDoubleParameter("Dynamics",   "t0"); 
@@ -26,9 +24,7 @@ void EnsembleCCE::set_parameters()
 
     _pulse_name            = _cfg.getStringParameter("Condition",  "pulse_name");
     _pulse_num             = _cfg.getIntParameter   ("Condition",  "pulse_number");
-    _magB << _cfg.getDoubleParameter("Condition",  "magnetic_fieldX")
-           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldY")
-           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
+    _magB                  = _cfg.getVectorParameter("Condition",  "magnetic_field");
     
     _bath_spin_filename = INPUT_PATH + input_filename;
     _result_filename    = OUTPUT_PATH + output_filename;
@@ -77,15 +73,17 @@ Hamiltonian EnsembleCCE::create_spin_hamiltonian(const cSPIN& espin, const PureS
 }/*}}}*/
 
 LiouvilleSpaceOperator EnsembleCCE::create_incoherent_operator(const vector<cSPIN>& spin_list)
-{
-    double rate = 2.0*datum::pi*1e1;
-    SpinDephasing dephasing(spin_list, rate);
+{/*{{{*/
+    double rate = 2.0*datum::pi*_bath_dephasing_rate;
+    vec axis = normalise(_bath_dephasing_axis);
+
+    SpinDephasing dephasing(spin_list, rate, axis);
     LiouvilleSpaceOperator dephaseOperator(spin_list);
     dephaseOperator.addInteraction(dephasing);
     dephaseOperator.make();
     return dephaseOperator;
 
-}
+}/*}}}*/
 Liouvillian EnsembleCCE::create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1)
 {/*{{{*/
     Liouvillian lv0(hami0, SHARP);

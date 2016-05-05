@@ -84,7 +84,8 @@ void prepare_data(string filename)
 
 
     double rate = 2.0*datum::pi*1e4;
-    SpinDephasing dephasing(sl, rate);
+    vec axis; axis << 1.0 << 1.0 << 1.0;
+    SpinDephasing dephasing(sl, rate, normalise(axis));
     LiouvilleSpaceOperator dephaseOperator(sl);
     dephaseOperator.addInteraction(dephasing);
     dephaseOperator.make();

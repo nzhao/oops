@@ -9,9 +9,11 @@
 #include <map>
 #include "include/rapidxml-1.13/rapidxml.hpp"
 #include <iomanip>
+#include <armadillo>
 
 using namespace rapidxml;
 using namespace std;
+using namespace arma;
 
 typedef map<pair<string, string>, pair<string, string> > PARA_MAP;
 const int     DEFAULT_INT_PARAMETER = 0;
@@ -30,6 +32,7 @@ public:
     int    getIntParameter(string section_name, string para_name) const;
     double getDoubleParameter(string section_name, string para_name) const;
     string getStringParameter(string section_name, string para_name) const;
+    vec    getVectorParameter(string section_name, string para_name) const;
     PARA_MAP getParameters() const {return _parameters;};
 
 protected:

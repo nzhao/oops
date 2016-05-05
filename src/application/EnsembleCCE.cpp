@@ -1,6 +1,6 @@
 #include "include/app/app.h"
 #include "include/app/ensemble_cce.h"
-#include "include/misc/xmlreader.h"
+//#include "include/misc/xmlreader.h"
 #include <cstdlib>
 
 _INITIALIZE_EASYLOGGINGPP
@@ -8,7 +8,8 @@ _INITIALIZE_EASYLOGGINGPP
 ConfigXML set_parameters(const string& xml_file_name);
 
 NVCenter create_defect_center(const ConfigXML& cfg);
-cSpinSourceFromFile create_spin_source(const ConfigXML& cfg);
+//cSpinSourceFromFile create_spin_source(const ConfigXML& cfg);
+cSpinSourceUniformRandom create_spin_source(const ConfigXML& cfg);
 cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const cSpinCollection& bath_spins);
 
 int  main(int argc, char* argv[])
@@ -37,8 +38,9 @@ int  main(int argc, char* argv[])
     sol.set_defect_center(&nv);
 
     // Step 2: make bath spins 
-    cSpinSourceFromFile spin_file = create_spin_source(cfg);
-    sol.set_bath_spin(&spin_file);
+    //cSpinSourceFromFile spin_file = create_spin_source(cfg);
+    cSpinSourceUniformRandom spinUR = create_spin_source(cfg);
+    sol.set_bath_spin(&spinUR);
     
     // Step 3: make clusters
     cSpinCollection bath_spins = sol.getSpinCollecion();
@@ -81,27 +83,32 @@ ConfigXML set_parameters(const string& xml_file_name)
 
 NVCenter create_defect_center(const ConfigXML& cfg)
 {/*{{{*/
-    double x = cfg.getDoubleParameter("CenterSpin",  "coordinate_x");
-    double y = cfg.getDoubleParameter("CenterSpin",  "coordinate_y");
-    double z = cfg.getDoubleParameter("CenterSpin",  "coordinate_z");
-    vec coord; coord << x << y << z;
+    vec coord = cfg.getVectorParameter("CenterSpin", "coordinate");
+    vec magB = cfg.getVectorParameter("Condition", "magnetic_field");
+
     NVCenter nv(NVCenter::N14, coord);
-    
-    double magBx = cfg.getDoubleParameter("Condition",  "magnetic_fieldX");
-    double magBy = cfg.getDoubleParameter("Condition",  "magnetic_fieldY");
-    double magBz = cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
-    nv.set_magB(magBx, magBy, magBz);
+    nv.set_magB(magB);
     nv.make_espin_hamiltonian();
 
     return nv;
 }/*}}}*/
 
-cSpinSourceFromFile create_spin_source(const ConfigXML& cfg)
-{/*{{{*/
-    string input_filename  = INPUT_PATH + cfg.getStringParameter("Data", "input_file");
-    cSpinSourceFromFile spin_file(input_filename);
-    return spin_file;
-}/*}}}*/
+cSpinSourceUniformRandom create_spin_source(const ConfigXML& cfg)
+{
+    double range = 1000.0;
+    int num = 100;
+    string isotope = "E";
+    int seed = 1;
+    cSpinSourceUniformRandom spinUR(range, num, isotope, seed);
+    return spinUR;
+}
+
+//cSpinSourceFromFile create_spin_source(const ConfigXML& cfg)
+//{[>{{{<]
+    //string input_filename  = INPUT_PATH + cfg.getStringParameter("Data", "input_file");
+    //cSpinSourceFromFile spin_file(input_filename);
+    //return spin_file;
+//}[>}}}<]
 
 cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const cSpinCollection& bath_spins)
 {/*{{{*/

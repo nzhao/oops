@@ -50,7 +50,8 @@ void prepare_data(string filename)
     Liouvillian lv0(hami);
 
     double rate = 1.0;
-    SpinDephasing dephasing(sl, rate);
+    vec axis; axis << 1.0 << 1.0 << 1.0;
+    SpinDephasing dephasing(sl, rate, normalise(axis));
     LiouvilleSpaceOperator dephaseOperator(sl);
     dephaseOperator.addInteraction(dephasing);
     dephaseOperator.make();

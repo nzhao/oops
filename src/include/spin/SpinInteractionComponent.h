@@ -104,7 +104,7 @@ public:
 class SingleSpinDephasing:public cSpinInteractionForm
 {
 public:
-    SingleSpinDephasing(const cSpinInteractionDomain& domain);
+    SingleSpinDephasing(const cSpinInteractionDomain& domain, const vec& axis);
     ~SingleSpinDephasing(){};
 };
 //}}}

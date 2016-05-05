@@ -62,7 +62,7 @@ vector<cSPIN>& cSpinSourceFromFile::generate()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//{{{
+//{{{ cSpinSourceFromLattice
 cSpinSourceFromLattice::cSpinSourceFromLattice(const Lattice& lattice,  const imat& range)
 {
     _lattice = lattice;
@@ -86,3 +86,21 @@ vector<cSPIN>& cSpinSourceFromLattice::generate()
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{ cSpinSourceUniformRandom
+vector<cSPIN>& cSpinSourceUniformRandom::generate()
+{
+    arma_rng::set_seed(_seed);
+    mat coord_mat(3, _num, fill::randu);
+    for(int i=0; i<_num; ++i)
+    {
+        vec coord = 2.0*_range*coord_mat.col(i) - _range;
+        cSPIN s(coord, _isotope );
+        spin_list.push_back(s);
+    }
+    return spin_list;
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+

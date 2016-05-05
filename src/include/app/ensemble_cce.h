@@ -17,6 +17,8 @@ private:
     Liouvillian create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1);
     DensityOperator create_spin_density_state(const vector<cSPIN>& spin_list);
 
+    double _bath_dephasing_rate;
+    vec  _bath_dephasing_axis;
     vec _bath_polarization;
     vec calc_observables(QuantumEvolutionAlgorithm* ker);
 };
