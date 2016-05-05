@@ -5,35 +5,35 @@
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  SingleSampleCCE
 void SingleSampleCCE::set_parameters()
-{/*{{{*/
+{
     string input_filename  = _cfg.getStringParameter("Data",       "input_file");
     string output_filename = _cfg.getStringParameter("Data",       "output_file");
 
     _state_idx0            = _cfg.getIntParameter   ("CenterSpin", "state_index0");
     _state_idx1            = _cfg.getIntParameter   ("CenterSpin", "state_index1");
-    
     _center_spin_name      = _cfg.getStringParameter("CenterSpin", "name");
+
     _cut_off_dist          = _cfg.getDoubleParameter("SpinBath",   "cut_off_dist");
-    _bath_state_seed       = _cfg.getIntParameter   ("SpinBath", "bath_state_seed");
-    _max_order             = _cfg.getIntParameter   ("CCE",        "max_order");
+    _bath_state_seed       = _cfg.getIntParameter   ("SpinBath",   "bath_state_seed");
+    _max_order             = _cfg.getIntParameter   ("SpinBath",   "max_order");
+
     _nTime                 = _cfg.getIntParameter   ("Dynamics",   "nTime");
     _t0                    = _cfg.getDoubleParameter("Dynamics",   "t0"); 
     _t1                    = _cfg.getDoubleParameter("Dynamics",   "t1"); 
+
     _pulse_name            = _cfg.getStringParameter("Condition",  "pulse_name");
     _pulse_num             = _cfg.getIntParameter   ("Condition",  "pulse_number");
 
-    _magB << _cfg.getDoubleParameter("Condition",  "magnetic_fieldX")
-           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldY")
-           << _cfg.getDoubleParameter("Condition",  "magnetic_fieldZ");
+    _magB                  = _cfg.getVectorParameter("Condition",  "magnetic_field");
 
     _bath_spin_filename = INPUT_PATH + input_filename;
     _result_filename    = OUTPUT_PATH + output_filename;
 
     _time_list = linspace<vec>(_t0, _t1, _nTime);
-}/*}}}*/
+}
 
 void SingleSampleCCE::prepare_bath_state()
-{/*{{{*/
+{
     vector<cSPIN> sl = _bath_spins.getSpinList();
     srand(_bath_state_seed);
     for(int i=0; i<sl.size(); ++i)
@@ -42,12 +42,11 @@ void SingleSampleCCE::prepare_bath_state()
         psi_i.setComponent( rand()%2, 1.0);
         _bath_state_list.push_back(psi_i);
     }
-
     //cache_dipole_field();
-}/*}}}*/
+}
 
 vec SingleSampleCCE::cluster_evolution(int cce_order, int index)
-{/*{{{*/
+{
     vector<cSPIN> spin_list = _my_clusters.getCluster(cce_order, index);
     cClusterIndex clstIndex = _my_clusters.getClusterIndex(cce_order, index);
 
@@ -71,7 +70,7 @@ vec SingleSampleCCE::cluster_evolution(int cce_order, int index)
     dynamics2.run();
 
     return calc_observables(&kernel1, &kernel2);
-}/*}}}*/
+}
 
 Hamiltonian SingleSampleCCE::create_spin_hamiltonian(const cSPIN& espin, const PureState& center_spin_state, const vector<cSPIN>& spin_list, const cClusterIndex& clstIndex )
 {/*{{{*/
@@ -90,14 +89,6 @@ Hamiltonian SingleSampleCCE::create_spin_hamiltonian(const cSPIN& espin, const P
     hami.addInteraction(bath_field);
     hami.make();
     return hami;
-}/*}}}*/
-
-Liouvillian SingleSampleCCE::create_spin_liouvillian(const Hamiltonian& hami0, const Hamiltonian hami1)
-{/*{{{*/
-    Liouvillian lv0(hami0, SHARP);
-    Liouvillian lv1(hami1, FLAT);
-    Liouvillian lv = lv0 - lv1;
-    return lv;
 }/*}}}*/
 
 PureState SingleSampleCCE::create_cluster_state(const cClusterIndex& clstIndex)
