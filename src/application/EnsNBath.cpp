@@ -3,8 +3,11 @@
 
 _INITIALIZE_EASYLOGGINGPP
 
-ConfigXML set_parameters(const string& xml_file_name);
+namespace po = boost::program_options;
+po::variables_map OPTIONS;        
 
+void ParseCommandLineOptions(int argc, char* argv[]);
+ConfigXML set_parameters(const string& xml_file_name);
 NVCenter create_defect_center(const ConfigXML& cfg);
 cSpinSourceUniformRandom create_spin_source(const ConfigXML& cfg);
 cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const cSpinCollection& bath_spins);
@@ -54,6 +57,45 @@ int  main(int argc, char* argv[])
     mpi_status = MPI_Finalize();
     assert (mpi_status == MPI_SUCCESS);
 }
+
+void ParseCommandLineOptions(int argc, char* argv[])
+{/*{{{*/
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "Print help message")
+        ("input,i",          po::value<string>()->default_value("C13Bath/RoyCoord.xyz"), "Input .xyz file of bath spins")
+        ("output,o",         po::value<string>()->default_value("Ensemble_NV_C13.mat"),  "Output .mat file of results")
+        ("logfile,l",        po::value<string>()->default_value("EnsembleCCE.conf"),     "Config. file of logging")
+        ("source,u",        po::value<string>()->default_value("file"),                  "Spin source")
+        ("state0,a",         po::value<int>()->default_value(0),                         "Central spin state index - a")
+        ("state1,b",         po::value<int>()->default_value(1),                         "Central spin state index - b")
+        ("cce,c",            po::value<int>()->default_value(3),                         "CCE order")
+        ("cutoff,d",         po::value<double>()->default_value(6.0),                    "Cut-off distance of bath spins")
+        ("dephasing_rate,r", po::value<double>()->default_value(0.0),                    "dephasing rate of bath spins")
+        ("dephasing_axis,x", po::value<string>()->default_value("1.0 1.0 1.0"),          "dephasing axis of bath spins")
+        ("nTime,n",          po::value<int>()->default_value(101),                       "Number of time points")
+        ("start,s",          po::value<double>()->default_value(0.0),                    "Start time (in unit of sec.)")
+        ("finish,f",         po::value<double>()->default_value(0.002),                  "Finish time (in unit of sec.)")
+        ("magnetic_field,B", po::value<string>()->default_value("0.1 0.1 0.1"),          "magnetic field vector in Tesla")
+        ("pulse,p",          po::value<string>()->default_value("CPMG"),                 "Pulse name")
+        ("pulse_num,m",      po::value<int>()->default_value(1),                         "Pulse number")
+        ;
+
+    po::store(parse_command_line(argc, argv, desc), OPTIONS);
+    ifstream ifs("config.cfg");
+    if (ifs!=NULL)
+        po::store(parse_config_file(ifs,desc),OPTIONS);
+    else
+        cout << "No configure file found!" << endl;
+    po::notify(OPTIONS);    
+
+    if (OPTIONS.count("help")) {
+        cout << desc;
+        exit(0);
+    }
+
+    cout << OPTIONS["cce"].as<int>() << endl;
+}/*}}}*/
 
 ConfigXML set_parameters(const string& xml_file_name)
 {/*{{{*/
