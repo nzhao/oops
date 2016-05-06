@@ -6,7 +6,6 @@
 #include <set>
 #include <string>
 #include <armadillo>
-#include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 
 typedef pair<size_t, size_t> ClusterPostion;

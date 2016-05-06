@@ -2,7 +2,6 @@
 #define QUANTUMSTATE_H
 
 #include <armadillo>
-#include "include/easylogging++.h"
 
 using namespace arma;
 /// \addtogroup Quantum 

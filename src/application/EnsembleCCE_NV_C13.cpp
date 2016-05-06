@@ -1,6 +1,7 @@
 #include "include/app/app.h"
 #include "include/app/ensemble_cce.h"
 
+
 _INITIALIZE_EASYLOGGINGPP
 
 ConfigXML set_parameters(const string& xml_file_name);
@@ -11,6 +12,26 @@ cDepthFirstPathTracing create_spin_cluster_algrithm(const ConfigXML& cfg, const 
 
 int  main(int argc, char* argv[])
 {
+    using namespace boost::program_options;
+    //声明需要的选项
+    options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "produce help message")
+        ("person,p", value<string>()->default_value("world"), "who")
+        ;
+
+    variables_map vm;        
+    boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+    notify(vm);    
+
+    if (vm.count("help")) {
+        cout << desc;
+        return 0;
+    }
+    cout << "Hello " << vm["person"].as<string>() << endl;
+
+
+
     ConfigXML cfg = set_parameters("EnsembleCCE_NV_C13.xml");
 
     string log_file = LOG_PATH + cfg.getStringParameter("Data", "log_file");

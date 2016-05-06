@@ -13,7 +13,8 @@
 #include <iostream>
 #include <mpi.h>
 
-#include "include/easylogging++.h"
+#include "include/el/easylogging++.h"
+#include <boost/program_options.hpp>
 
 #include "include/spin/Spin.h"
 #include "include/spin/SpinCluster.h"

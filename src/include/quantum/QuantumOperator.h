@@ -5,7 +5,6 @@
 #endif
 
 #include <armadillo>
-#include "include/easylogging++.h"
 #include "include/kron/KronProd.h"
 
 using namespace std;

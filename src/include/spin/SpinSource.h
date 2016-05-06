@@ -2,7 +2,6 @@
 #define SPINSOURCE_H
 #include <vector>
 #include <string>
-#include "include/easylogging++.h"
 #include "include/spin/Spin.h"
 #include "include/misc/lattice.h"
 
