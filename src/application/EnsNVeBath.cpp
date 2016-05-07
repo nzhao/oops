@@ -13,6 +13,16 @@ cDepthFirstPathTracing create_spin_cluster_algrithm(const po::variables_map& par
 
 int  main(int argc, char* argv[])
 {
+    cout << argc << endl;
+    string a("");
+    for(int i=1; i<argc; ++i)
+    {
+        cout << i << "\t";
+        cout << string(argv[i]) << endl;
+        a += argv[i];
+    }
+    cout << a << endl;
+    exit(0);
     po::variables_map para = ParseCommandLineOptions(argc, argv);
 
     ////////////////////////////////////////////////////////////////////////////////
