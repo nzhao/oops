@@ -1,11 +1,13 @@
 #include "include/app/cce.h"
 
+namespace po = boost::program_options;
+
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  EnsembleCCE
 class EnsembleCCE:public CCE
 {
 public:
-    EnsembleCCE(int my_rank, int worker_num, const ConfigXML& cfg):CCE(my_rank, worker_num, cfg) { set_parameters(); }
+    EnsembleCCE(int my_rank, int worker_num, const po::variables_map& para):CCE(my_rank, worker_num, para) { set_parameters(); }
 
     void set_parameters();
     vec cluster_evolution(int cce_order, int index);
