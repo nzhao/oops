@@ -92,10 +92,16 @@ vector<cSPIN>& cSpinSourceFromLattice::generate()
 vector<cSPIN>& cSpinSourceUniformRandom::generate()
 {
     arma_rng::set_seed(_seed);
-    mat coord_mat(3, _num, fill::randu);
+    mat coord_mat(3, _max_num, fill::randu);
+
+    vec v(_max_num);
+    for(int i=0; i<_max_num; ++i)
+        v[i]=norm(2.0*_range*coord_mat.col(i) - _range);
+    uvec indices = sort_index(v);
+
     for(int i=0; i<_num; ++i)
     {
-        vec coord = 2.0*_range*coord_mat.col(i) - _range;
+        vec coord = 2.0*_range*coord_mat.col( indices[i] ) - _range;
         cSPIN s(coord, _isotope );
         spin_list.push_back(s);
     }

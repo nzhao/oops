@@ -129,7 +129,11 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
         ("polarization,z",   po::value<string>()->default_value("0.0 0.0 0.0"),          "bath spin polarization")
         ("dephasing_rate,r", po::value<double>()->default_value(0.0),                    "dephasing rate of bath spins")
         ("dephasing_axis,x", po::value<string>()->default_value("1.0 1.0 1.0"),          "dephasing axis of bath spins")
-        ("range,g",          po::value<double>()->default_value(892.5),                  "bath range [-g, g]")
+
+        ("length,L",         po::value<double>()->default_value(3.57),                   "size of unit cell in angstrom (default diamond)")
+        ("num_cell,u",       po::value<int>()->default_value(8),                         "atom num in unit cell (default diamond)")
+        ("concentration,C",  po::value<double>()->default_value(1.0),                    "bath concentration in ppm")
+        ("max_number,M",     po::value<int>()->default_value(2000),                      "Max bath spin number")
         ("number,N",         po::value<int>()->default_value(1000),                      "bath spin number")
         ("seed,D",           po::value<int>()->default_value(1),                         "bath seed")
         ("isotope",          po::value<string>()->default_value("E"),                    "bath spin isotope")
@@ -175,12 +179,16 @@ NVCenter create_defect_center(const po::variables_map& para)
 
 cSpinSourceUniformRandom create_spin_source(const po::variables_map& para)
 {/*{{{*/
-    double   range = para["range"].as<double>();
+    double l0 = para["length"].as<double>();
+    int num_in_cell = para["num_cell"].as<int>();
+    double concentration = para["concentration"].as<double>();
+    int    max_num = para["max_number"].as<int>();
     int        num = para["number"].as<int>();
     int       seed = para["seed"].as<int>();
     string isotope = para["isotope"].as<string>();
 
-    cSpinSourceUniformRandom spinUR(range, num, isotope, seed);
+    double range = 0.5e2 * l0 * pow(max_num/concentration/num_in_cell, 1.0/3.0);
+    cSpinSourceUniformRandom spinUR(range, max_num, num, isotope, seed);
     return spinUR;
 }/*}}}*/
 
