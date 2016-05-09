@@ -7,16 +7,16 @@ CCE/
 
 |-dat/
 
-  |-input/
+      |-input/
 
-     |-C13Bath/
+         |-C13Bath/
 
-        |-RoyCoord.xyz
+             |-RoyCoord.xyz
 
-  |-output/
+      |-output/
 
-  |-log/
+      |-log/
 
-     |-EnsembleCCE.conf
+         |-EnsembleCCE.conf
 
 
