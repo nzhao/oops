@@ -51,15 +51,15 @@ void cSpinGrouping::subgraph2index(const sp_mat& subgraph, const vector<int> sub
 {
     for(int i=0; i<subgraph.n_rows; ++i)
     {
-        //cout << "\r" << setw(6) <<  i+1 << "/" << subgraph.n_rows 
-             //<< " subgraphs are inserted.";
+        cout << "\r" << setw(6) <<  i+1 << "/" << subgraph.n_rows 
+             << " subgraphs are inserted.";
         mat r(subgraph.row(i));  uvec nz_r = find(r);  size_t order = nz_r.size()-1;
         cClusterIndex cIdx( nz_r );
         pair<FIX_ORDER_INDEX_SET::iterator, bool> pos = _cluster_index_list[ order ].insert(cIdx);
         if( order > 0)
             pos.first->appendSubClstPos( sub_pos_list[i] );
     }
-    //cout <<endl;
+    cout <<endl;
 }
 //}}}
 ////////////////////////////////////////////////////////////////////////////////

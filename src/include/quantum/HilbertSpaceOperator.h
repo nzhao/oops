@@ -2,7 +2,6 @@
 #define HILBERTSPACEOPERATOR_H
 #include <armadillo>
 #include "include/spin/Spin.h"
-#include "include/easylogging++.h"
 #include "include/quantum/QuantumOperator.h"
 #include "include/spin/SpinInteraction.h"
 /// \addtogroup QuantumOperator

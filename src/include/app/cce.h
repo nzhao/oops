@@ -4,12 +4,15 @@
 extern string INPUT_PATH;
 extern string OUTPUT_PATH;
 
+namespace po = boost::program_options;
+
 ////////////////////////////////////////////////////////////////////////////////
 //{{{  CCE
 class CCE
 {
 public:
     CCE(int my_rank, int worker_num, const ConfigXML& cfg);
+    CCE(int my_rank, int worker_num, const po::variables_map& para);
 
     void set_defect_center(DefectCenter* defect);
     void set_bath_spin(cSpinSource * source);
@@ -24,6 +27,7 @@ public:
 
 protected:
     // I/O
+    po::variables_map _para;
     ConfigXML        _cfg;
     string           _bath_spin_filename;
     string           _result_filename;

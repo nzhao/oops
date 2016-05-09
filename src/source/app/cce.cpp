@@ -13,6 +13,13 @@ CCE::CCE(int my_rank, int worker_num, const ConfigXML& cfg)
 }
 
 
+CCE::CCE(int my_rank, int worker_num, const po::variables_map& para)
+{
+    _my_rank = my_rank;
+    _worker_num = worker_num;
+    _para = para;
+}
+
 void CCE::set_defect_center(DefectCenter* defect) 
 {
     _defect_center = defect;

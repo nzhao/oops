@@ -1,6 +1,5 @@
 #ifndef QUANTUMEVOLUTION_H
 #define QUANTUMEVOLUTION_H
-#include "include/easylogging++.h"
 #include "include/quantum/QuantumEvolutionAlgorithm.h"
 #include <armadillo>
 

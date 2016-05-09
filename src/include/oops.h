@@ -10,10 +10,12 @@
 #include <stdlib.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <iostream>
 #include <mpi.h>
 
-#include "include/easylogging++.h"
+#include "include/el/easylogging++.h"
+#include <boost/program_options.hpp>
 
 #include "include/spin/Spin.h"
 #include "include/spin/SpinCluster.h"
@@ -30,6 +32,7 @@
 #include "include/kron/KronProd.h"
 #include "include/misc/misc.h"
 #include "include/misc/xmlreader.h"
+#include "include/misc/print_program_options.h"
 
 #include "include/quantum/HilbertSpaceOperator.h"
 #include "include/quantum/LiouvilleSpaceOperator.h"

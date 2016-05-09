@@ -5,32 +5,30 @@
 //{{{  EnsembleCCE
 void EnsembleCCE::set_parameters()
 {
-    string input_filename  = _cfg.getStringParameter("Data",       "input_file");
-    string output_filename = _cfg.getStringParameter("Data",       "output_file");
+    string input_filename  = _para["input"].as<string>();
+    string output_filename = _para["output"].as<string>();
 
-    _state_idx0            = _cfg.getIntParameter   ("CenterSpin", "state_index0");
-    _state_idx1            = _cfg.getIntParameter   ("CenterSpin", "state_index1");
-    _center_spin_name      = _cfg.getStringParameter("CenterSpin", "name");
+    _state_idx0            = _para["state0"].as<int>();
+    _state_idx1            = _para["state1"].as<int>();
 
-    _cut_off_dist          = _cfg.getDoubleParameter("SpinBath",   "cut_off_dist");
-    _max_order             = _cfg.getIntParameter   ("SpinBath",   "max_order");
-    _bath_polarization     = _cfg.getVectorParameter("SpinBath",   "bath_polarization");
-    _bath_dephasing_rate   = _cfg.getDoubleParameter("SpinBath",   "dephasing_rate");
-    _bath_dephasing_axis   = _cfg.getVectorParameter("SpinBath",   "dephasing_axis");
+    _max_order             = _para["cce"].as<int>();
+    _cut_off_dist          = _para["cutoff"].as<double>();
+    _bath_polarization     = vec( _para["polarization"].as<string>() );
+    _bath_dephasing_rate   = _para["dephasing_rate"].as<double>();
+    _bath_dephasing_axis   = vec( _para["dephasing_axis"].as<string>() );
 
-    _nTime                 = _cfg.getIntParameter   ("Dynamics",   "nTime");
-    _t0                    = _cfg.getDoubleParameter("Dynamics",   "t0"); 
-    _t1                    = _cfg.getDoubleParameter("Dynamics",   "t1"); 
+    _nTime                 = _para["nTime"].as<int>();
+    _t0                    = _para["start"].as<double>(); 
+    _t1                    = _para["finish"].as<double>(); 
 
-    _pulse_name            = _cfg.getStringParameter("Condition",  "pulse_name");
-    _pulse_num             = _cfg.getIntParameter   ("Condition",  "pulse_number");
-    _magB                  = _cfg.getVectorParameter("Condition",  "magnetic_field");
+    _pulse_name            = _para["pulse"].as<string>();
+    _pulse_num             = _para["pulse_num"].as<int>();
+    _magB                  = vec( _para["magnetic_field"].as<string>() );
     
     _bath_spin_filename = INPUT_PATH + input_filename;
-    _result_filename    = OUTPUT_PATH + output_filename;
+    _result_filename    = OUTPUT_PATH + output_filename + ".mat";
     _time_list = linspace<vec>(_t0, _t1, _nTime);
 }
-
 
 vec EnsembleCCE::cluster_evolution(int cce_order, int index)
 {
