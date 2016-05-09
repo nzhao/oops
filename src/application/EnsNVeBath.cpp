@@ -13,16 +13,6 @@ cDepthFirstPathTracing create_spin_cluster_algrithm(const po::variables_map& par
 
 int  main(int argc, char* argv[])
 {
-    cout << argc << endl;
-    string a("");
-    for(int i=1; i<argc; ++i)
-    {
-        cout << i << "\t";
-        cout << string(argv[i]) << endl;
-        a += argv[i];
-    }
-    cout << a << endl;
-    exit(0);
     po::variables_map para = ParseCommandLineOptions(argc, argv);
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -82,29 +72,52 @@ int  main(int argc, char* argv[])
 
 po::variables_map ParseCommandLineOptions(int argc, char* argv[])
 {/*{{{*/
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //{{{ record command line options
+    string output_filename("EnsNVeBath");
+    string command_opt("");
+    for(int i=1; i<argc; ++i)
+        command_opt += argv[i];
+    cout << "Command line options recieved: " << command_opt << endl;
+    output_filename += command_opt;
+    //}}}
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //{{{ Set path
     char *env_path = std::getenv("CCE_PROJ_PATH");
     if(env_path!=NULL)
+    {
         PROJECT_PATH = env_path;
+        cout << "PROJECT_PATH got from environment varialbe: ";
+    }
     else
     {
         char pwd[500];
         getcwd(pwd, sizeof(pwd));
         PROJECT_PATH = pwd;
+        cout << "PROJECT_PATH set as present working directory (pwd): ";
     }
+    cout << PROJECT_PATH << endl;
 
     LOG_PATH    = PROJECT_PATH + "/dat/log/";
     INPUT_PATH  = PROJECT_PATH + "/dat/input/";
     OUTPUT_PATH = PROJECT_PATH + "/dat/output/";
     CONFIG_PATH = PROJECT_PATH + "/dat/config/";
     DEBUG_PATH  = PROJECT_PATH + "/dat/debug/";
+    //}}}
+    ////////////////////////////////////////////////////////////////////////////////
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    //{{{ Parse command line options
     po::variables_map para;
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "Print help message")
-        ("input,i",          po::value<string>()->default_value("None"),                 "Input file name")
-        ("output,o",         po::value<string>()->default_value("EnsNVeBath"),           "Output .mat file of results")
+        ("input,i",          po::value<string>()->default_value("None"),                 "Input file name (not used)")
+        ("output,o",         po::value<string>()->default_value(output_filename),        "Output .mat file of results")
         ("logfile,l",        po::value<string>()->default_value("EnsembleCCE.conf"),     "Config. file of logging")
         
         ("position,P",       po::value<string>()->default_value("0.0 0.0 0.0"),          "Central spin position")
@@ -112,13 +125,13 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
         ("state1,b",         po::value<int>()->default_value(1),                         "Central spin state index - b")
 
         ("cce,c",            po::value<int>()->default_value(3),                         "CCE order")
-        ("cutoff,d",         po::value<double>()->default_value(300.0),                    "Cut-off distance of bath spins")
-        ("polarization,z",   po::value<string>()->default_value("0.0 0.0 0.0"),          "magnetic field vector in Tesla")
+        ("cutoff,d",         po::value<double>()->default_value(300.0),                  "Cut-off distance of bath spins")
+        ("polarization,z",   po::value<string>()->default_value("0.0 0.0 0.0"),          "bath spin polarization")
         ("dephasing_rate,r", po::value<double>()->default_value(0.0),                    "dephasing rate of bath spins")
         ("dephasing_axis,x", po::value<string>()->default_value("1.0 1.0 1.0"),          "dephasing axis of bath spins")
-        ("range,g",          po::value<double>()->default_value(1000.0),               "bath range [-g, g]")
-        ("number,N",         po::value<int>()->default_value(100),                     "bath spin number")
-        ("seed,D",           po::value<int>()->default_value(1),                       "bath seed")
+        ("range,g",          po::value<double>()->default_value(1000.0),                 "bath range [-g, g]")
+        ("number,N",         po::value<int>()->default_value(100),                       "bath spin number")
+        ("seed,D",           po::value<int>()->default_value(1),                         "bath seed")
         ("isotope",          po::value<string>()->default_value("E"),                    "bath spin isotope")
 
         ("nTime,n",          po::value<int>()->default_value(101),                       "Number of time points")
@@ -134,13 +147,17 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
     if (ifs!=NULL)
         po::store(parse_config_file(ifs,desc),para);
     else
-        cout << "No configure file found!" << endl;
+        cout << "No configure file found." << endl;
     po::notify(para);    
+
+    PrintVariableMap(para);
 
     if (para.count("help")) {
         cout << desc;
         exit(0);
     }
+    //}}}
+    ////////////////////////////////////////////////////////////////////////////////
     return para;
 }/*}}}*/
 

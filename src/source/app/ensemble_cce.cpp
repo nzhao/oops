@@ -26,7 +26,7 @@ void EnsembleCCE::set_parameters()
     _magB                  = vec( _para["magnetic_field"].as<string>() );
     
     _bath_spin_filename = INPUT_PATH + input_filename;
-    _result_filename    = OUTPUT_PATH + output_filename;
+    _result_filename    = OUTPUT_PATH + output_filename + ".mat";
     _time_list = linspace<vec>(_t0, _t1, _nTime);
 }
 
