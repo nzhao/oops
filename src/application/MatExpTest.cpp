@@ -1,7 +1,7 @@
 #include "include/app/app.h"
 #include "include/math/MatExp.h"
 #include <complex>
-#include "include/math/krylov_expv.h"
+#include "expv/include/expv.h"
 
 cx_mat MAT;
 cx_vec VEC;
