@@ -3,6 +3,8 @@
 # and define $(MATLAB_LIB_PATH) and $(MATLAB_INC_PATH) in your .bashrc file.
 # If you want to link the program by INTEL MKL libaray, set $(USE_MKL)=true in your .bashrc file.
 # If you are using INTEL MPI, set $(MPI_INTEL)=true in your .bashrc file.
+ROOT_DIR  :=  $(shell pwd)
+
 BINPATH := ../bin
 OBJPATH := ../obj
 
@@ -98,10 +100,10 @@ EXPV_LIB      :=  libexpv.so
 
 ifeq ($(MPI_INTEL), true)
 $(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(OBJPATH)/$(EXPV_LIB) | $(BINPATH)
-	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
+	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
 else
 $(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(OBJPATH)/$(EXPV_LIB) | $(BINPATH)
-	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
 endif
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)
@@ -113,7 +115,7 @@ $(OBJPATH) :
 $(BINPATH) :
 	@mkdir -p $(BINPATH)
 
-$(EXPV_LIB):
+$(OBJPATH)/$(EXPV_LIB):
 	@make -C expv
 
 #$(OBJPATH)/expokit.o : expokit.f | $(OBJPATH)
