@@ -218,7 +218,7 @@ __global__ void vecrzt_kernel( cuDoubleComplex *x )
   x[ idx ] = make_cuDoubleComplex(0.0,0.0);
 }
 
-#include "include/math/get_grid.h"
+#include "../include/get_grid.h"
 //======================================================================
 // kron_cuda_v4, y = y + coeff * (Ip @ Am @ Iq @ Bn @ Ir) * x;
 //======================================================================

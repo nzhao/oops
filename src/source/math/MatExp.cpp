@@ -1,7 +1,5 @@
 #include "include/math/MatExp.h" 
-#include "include/math/expokit.h" 
-#include "include/math/main_mkl.h" 
-#include "include/math/main_cache.h" 
+#include "expv/include/expv.h" 
 #include <complex>
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -7,7 +7,7 @@
 #include "include/misc/misc.h"
 #include "include/kron/KronProd.h"
 #include <numeric>      // std::partial_sum
-#include "include/math/krylov_expv.h"
+#include "expv/include/expv.h"
 
 using namespace arma;
 
