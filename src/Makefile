@@ -24,7 +24,7 @@ CPPFLAGS = $(addprefix -I,$(INCLUDES))
 ifeq ($(USE_MKL), true)
 	LIBS := 
 	CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm -ldl
-	CPPFLAGS  +=  -DARMA_BLAS_LONG -DMKL_ILP64 -m64 -I${MKLROOT}/include -DARMA_DONT_USE_WRAPPER 
+	CPPFLAGS  +=  -DARMA_BLAS_LONG -DMKL_ILP64 -m64 -I${MKLROOT}/include -DARMA_DONT_USE_WRAPPER -DUSE_MKL
 else
 	LIBS :=  $(ARMA_LIB) 
 	CXXLINKS  := 

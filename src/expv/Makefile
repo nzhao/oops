@@ -12,7 +12,8 @@ else
 endif
 
 CC          :=  mpic++
-CFLAGS      :=  -m64 -I./include -parallel -L${MKLROOT}/lib/intel64
+CFLAGS      :=  -m64 -I./include -L${MKLROOT}/lib/intel64 -DUSE_MKL -I${MKLROOT}/include
+#CFLAGS      :=  -m64 -I./include -parallel -L${MKLROOT}/lib/intel64
 
 CFLAGS        +=  -fPIC
 FFLAGS        +=  -fPIC

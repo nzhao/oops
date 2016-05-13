@@ -7,7 +7,10 @@
 #include <complex>
 #include <cmath>
 
-#include "omp.h"
+//#include "omp.h"
+//#ifdef USE_OMP
+  //#include "omp.h"
+//#endif
 #define MKL_Complex16 std::complex<double>
 #include "mkl.h"
 
@@ -30,7 +33,7 @@ void kron_func_v2( size_t m, size_t s, size_t n, std::complex<double> *A, std::c
   size_t k;
   size_t i, j, p, q, idx1, idx2;
   std::complex<double> res;
-  std::complex<double> y[s];
+  std::complex<double> *y = new std::complex<double> [s];
   #pragma omp for
   for ( k = 0; k < m*n; k++ )
   {
@@ -73,7 +76,7 @@ void kron_func_v3( size_t m, size_t s, size_t n, std::complex<double> *A, std::c
   
   size_t k, p, q, idx2;
   std::complex<double> res;
-  std::complex<double> x_shd[s];
+  std::complex<double> *x_shd = new std::complex<double> [s];
   
 //  #pragma omp parallel for private( res, x_shd, k, idx2, p, q ) firstprivate( A, x, m, n, s, zero )
   for ( k = 0; k < m*n; k++ )
@@ -102,7 +105,7 @@ void kron_func_v32( size_t m, size_t s, size_t n, std::complex<double> *A, std::
   
   size_t k, p, q, idx2;
   std::complex<double> res;
-  std::complex<double> x_shd[s];
+  std::complex<double> *x_shd = new std::complex<double>[s];
   
   for ( k = 0; k < m*n; k++ )
   {
@@ -134,7 +137,8 @@ void kron_func_v4( size_t m, size_t s, size_t n, std::complex<double> *A, std::c
   
   int bdx = s, bds = s * bdy;
   size_t  idy[ bdy ];
-  std::complex<double> x_shd[ bds ], y_shd[ bds ];
+  std::complex<double> *x_shd = new std::complex<double> [ bds ]; 
+  std::complex<double> *y_shd = new std::complex<double> [ bds ];
   
 //  #pragma omp parallel for private( k, idy, x_shd, y_shd, p, q ) firstprivate( A, x, m, n, s, zero, one, bds, bdy )
   for ( k = 0; k < m*n; k += bdy )
@@ -168,7 +172,9 @@ void kron_func_v5( size_t m, size_t s, size_t n, std::complex<double> *A, std::c
   
   int bdx = s, bds = s * bdy;
   size_t  idy[ bdy ];
-  std::complex<double> x_shd[ bds ], y_shd[ bds ];
+  //std::complex<double> x_shd[ bds ], y_shd[ bds ];
+  std::complex<double> *x_shd = new std::complex<double> [ bds ]; 
+  std::complex<double> *y_shd = new std::complex<double> [ bds ];
   
 //  #pragma omp parallel for private( k, p, q, l ) firstprivate( A, x, m, n, s, bdy, idy, x_shd, y_shd, one, zero )
   for ( k = 0; k < m*n; k += bdy )
@@ -209,7 +215,9 @@ void kron_func_v6( size_t m, size_t s, size_t n, std::complex<double> *A, std::c
   
   int bdx = s, bds = s * bdy;
   size_t  idy[ bdy ];
-  std::complex<double> x_shd[ bds ], y_shd[ bds ];
+  //std::complex<double> x_shd[ bds ], y_shd[ bds ];
+  std::complex<double> *x_shd = new std::complex<double> [ bds ]; 
+  std::complex<double> *y_shd = new std::complex<double> [ bds ];
   
 //  #pragma omp parallel for private( k, p, q, l ) firstprivate( A, x, m, n, s, bdy, idy, x_shd, y_shd, one, zero )
 //  #pragma omp parallel private( k, p, q, l, x_shd, y_shd, idy )
@@ -254,7 +262,9 @@ void kron_func_v7( size_t m, size_t s, size_t n, std::complex<double> *A, std::c
   
   int bdx = s, bds = s * bdy;
   size_t  idy[ bdy ];
-  std::complex<double> x_shd[ bds ], y_shd[ bds ];
+  //std::complex<double> x_shd[ bds ], y_shd[ bds ];
+  std::complex<double> *x_shd = new std::complex<double> [ bds ]; 
+  std::complex<double> *y_shd = new std::complex<double> [ bds ];
   
   for ( k = 0; k < m*n; k += bdy )
   {
