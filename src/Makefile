@@ -71,7 +71,7 @@ endif
 #CUDAAPI_OBJ   := $(OBJPATH)/fortran.o $(OBJPATH)/cusparse_fortran.o
 NCC         := nvcc
 NCFLAGS     := -arch=sm_30 -O3 -DCUBLAS_GFORTRAN -ccbin g++ -Xcompiler "$(CPPFLAGS)"
-NCLINKER    := -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse -lboost_program_options -L/usr/local/lib -lboost_system
+NCLINKER    := -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse -lboost_program_options -L/usr/local/lib #-lboost_system
 #vpath %.cu $(sort $(dir $(ZKMV_GPU_SRC)))
 #vpath %.c  $(CUDAAPI_DIR)
 CXXLINKS    += $(NCLINKER)
