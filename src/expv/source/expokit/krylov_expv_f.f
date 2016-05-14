@@ -807,7 +807,7 @@
 !     .  pos_i_idx, pos_i_lst, dim_i_lst, mat_i_idx, mat_i_lst, ham_dim, 
 !     .  nspin_dim, nspin_m_lst, nspin_n_lst, 
 !     .  qj, w, w_med )
-        CALL MKL_ZCOOGEMV('N', n, a, ia, ja, nz, qj, w)
+        !CALL MKL_ZCOOGEMV('N', n, a, ia, ja, nz, qj, w)
         CALL ZDOTC( aj, ham_dim, qj, 1, w, 1 )
         tk( (j-1)*k+j ) = DREAL(aj);
         CALL ZAXPY( ham_dim, -aj, qj, 1, w, 1 )
@@ -950,7 +950,7 @@
 !     .  pos_i_idx, pos_i_lst, dim_i_lst, mat_i_idx, mat_i_lst, ham_dim, 
 !     .  nspin_dim, nspin_m_lst, nspin_n_lst, 
 !     .  wsp(j1v-n), wsp(j1v), w_med )
-      CALL MKL_ZCOOGEMV('N', n, a, ia, ja, nz, wsp(j1v-n), wsp(j1v))
+      !CALL MKL_ZCOOGEMV('N', n, a, ia, ja, nz, wsp(j1v-n), wsp(j1v))
          do i = 1,j
             CALL ZDOTC( hij, n, wsp(iv+(i-1)*n),1, wsp(j1v),1 )
             call ZAXPY( n, -hij, wsp(iv+(i-1)*n),1, wsp(j1v),1 )
@@ -980,7 +980,7 @@
 !     .  pos_i_idx, pos_i_lst, dim_i_lst, mat_i_idx, mat_i_lst, ham_dim, 
 !     .  nspin_dim, nspin_m_lst, nspin_n_lst, 
 !     .  wsp(j1v-n), wsp(j1v), w_med )
-      CALL MKL_ZCOOGEMV('N', n, a, ia, ja, nz, wsp(j1v-n), wsp(j1v))
+      !CALL MKL_ZCOOGEMV('N', n, a, ia, ja, nz, wsp(j1v-n), wsp(j1v))
       avnorm = DZNRM2( n, wsp(j1v),1 )
       
 !      WRITE(*,*) "avnorm = ", avnorm ! for debug;

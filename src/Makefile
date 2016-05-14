@@ -23,7 +23,7 @@ CPPFLAGS = $(addprefix -I,$(INCLUDES))
 
 ifeq ($(USE_MKL), true)
 	LIBS := 
-	CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm -ldl
+	CXXLINKS  :=  -parallel -L${MKLROOT}/lib -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm -ldl
 	CPPFLAGS  +=  -DARMA_BLAS_LONG -DMKL_ILP64 -m64 -I${MKLROOT}/include -DARMA_DONT_USE_WRAPPER -DUSE_MKL
 else
 	LIBS :=  $(ARMA_LIB) 
@@ -54,11 +54,11 @@ vpath %.cpp $(sort $(dir $(SOURCE)))
 FC          := mpif77
 ifeq ($(MPI_INTEL), true)
   FFLAGS      := -I${MKLROOT}/include
-  FLINKS      := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -nofor-main -cxxlib
+  FLINKS      := -L${MKLROOT}/lib
 else
   FFLAGS      := -m64 
 #  CXXLINKS    :=  -L${GFORTRAN_PATH} -lpthread -lm -ldl -lgfortran
-  CXXLINKS    := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -lgfortran
+  CXXLINKS    := -L${MKLROOT}/lib
 endif
 
 #ZKMV_MKL_SRC  := $(wildcard source/math/*.f)
@@ -72,9 +72,12 @@ endif
 NCC         := nvcc
 NCFLAGS     := -arch=sm_30 -O3 -DCUBLAS_GFORTRAN -ccbin g++ -Xcompiler "$(CPPFLAGS)"
 NCLINKER    := -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse -lboost_program_options -L/usr/local/lib #-lboost_system
+NCLINKER    := -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse -lboost_program_options -L/usr/local/lib #-lboost_system
 #vpath %.cu $(sort $(dir $(ZKMV_GPU_SRC)))
 #vpath %.c  $(CUDAAPI_DIR)
-CXXLINKS    += $(NCLINKER)
+#CXXLINKS    += $(NCLINKER)
+#CXXLINKS    +=  -lopenblas -lboost_program_options -L/usr/local/lib -L/usr/local/opt/openblas/lib -L/Applications/MATLAB_R2014b.app/bin/maci64
+CXXLINKS    +=  -lopenblas -lboost_program_options-mt -L/usr/local/lib -L/usr/local/opt/openblas/lib  -L/usr/local/Cellar/boost/1.60.0/lib
 
 .PHONY : all clean
 
@@ -100,10 +103,12 @@ EXPV_LIB      :=  libexpv.so
 
 ifeq ($(MPI_INTEL), true)
 $(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(OBJPATH)/$(EXPV_LIB) | $(BINPATH)
-	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
+	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -lexpv -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
+	#$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
 else
 $(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(OBJPATH)/$(EXPV_LIB) | $(BINPATH)
-	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -lexpv  -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+	#$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
 endif
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)

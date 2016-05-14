@@ -50,9 +50,14 @@ KRYLOV_OBJ    :=  $(KRYLOV_F_OBJ) $(KRYLOV_C_OBJ)
 ZKMV_MKL_OBJ  :=  $(ZKMV_MKL_F_OBJ) $(ZKMV_MKL_C_OBJ)
 ZKMV_GPU_OBJ  :=  $(ZKMV_GPU_F_OBJ) $(ZKMV_GPU_C_OBJ)
 
+ifeq ($(USE_GPU), true) 
 $(EXPV_LIB):$(EXPOKIT_OBJ) $(KRYLOV_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ) | $(OBJPATH)
-	@$(NCC) --shared -o $(OBJPATH)/$(EXPV_LIB) $(EXPOKIT_OBJ) $(KRYLOV_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ)
+	$(NCC) --shared -o $(OBJPATH)/$(EXPV_LIB) $(EXPOKIT_OBJ) $(KRYLOV_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ)
 #	@ar -rcs $(EXPV_LIB) $(EXPOKIT_OBJ) $(KRYLOV_OBJ) $(ZKMV_MKL_OBJ) $(ZKMV_GPU_OBJ) $(CUDAAPI_OBJ)
+else
+$(EXPV_LIB):$(EXPOKIT_OBJ) $(KRYLOV_OBJ) $(ZKMV_MKL_OBJ) | $(OBJPATH)
+	$(CC) --shared -o $(OBJPATH)/$(EXPV_LIB) $(EXPOKIT_OBJ) $(KRYLOV_OBJ) $(ZKMV_MKL_OBJ) -lgfortran -L/usr/local/Cellar/gcc/5.3.0/lib/gcc/5 -L/usr/local/opt/openblas/lib -lopenblas
+endif
 
 $(EXPOKIT_OBJ):$(OBJPATH)/%.o:%.f | $(OBJPATH)
 	$(FC) -c $< -o $@ $(FFLAGS)
@@ -72,9 +77,10 @@ $(ZKMV_MKL_C_OBJ):$(OBJPATH)/%.o:%.cpp | $(OBJPATH)
 $(ZKMV_GPU_F_OBJ):$(OBJPATH)/%.o:%.f | $(OBJPATH)
 	$(FC) -c $< -o $@ $(FFLAGS)
 
-$(ZKMV_GPU_C_OBJ):$(OBJPATH)/%.o:%.cu | $(OBJPATH)
+ifeq ($(USE_GPU), true) 
+$(ZKMV_GPU_C_OBJ):$(OBJPATH)/%.o:%.cu | $(OBJPATH) 
 	$(NCC) -c $< -o $@ $(NCFLAGS)
-
-$(CUDAAPI_OBJ):$(OBJPATH)/%.o:%.c | $(OBJPATH)
+$(CUDAAPI_OBJ):$(OBJPATH)/%.o:%.c | $(OBJPATH) 
 	$(NCC) -c $< -o $@ $(NCFLAGS)
+endif
 
