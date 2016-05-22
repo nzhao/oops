@@ -8,7 +8,6 @@ ROOT_DIR  :=  $(shell pwd)
 BINPATH := ../bin
 OBJPATH := ../obj
 
-#APP := EnsembleCCE SingleSampleCCE MatExpTest test
 APP := EnsNVeBath EnsNVnBath SingleSampleCCE_NV_C13 MatExpTest test 
 
 DESTINATION := $(addprefix $(BINPATH)/, $(APP))
@@ -46,11 +45,6 @@ APP_OBJ := $(addsuffix .o, $(addprefix $(OBJPATH)/, $(APP)) )
 
 vpath %.cpp $(sort $(dir $(SOURCE)))
 
-#EXPOKIT_SRC := $(wildcard expokit/*.f)
-#EXPOKIT_OBJ := $(OBJPATH)/expokit.o $(OBJPATH)/mataid.o
-#KRYLOV_OBJ  := $(OBJPATH)/krylov_expv_f.o $(OBJPATH)/krylov_expv.o $(OBJPATH)/DLARAN.o
-#vpath %.f $(sort $(dir $(EXPOKIT_SRC)))
-#vpath %.c $(sort $(dir wildcard source/math/*.c))
 FC          := mpif77
 ifeq ($(MPI_INTEL), true)
   FFLAGS      := -I${MKLROOT}/include
@@ -61,19 +55,9 @@ else
   CXXLINKS    := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -lgfortran
 endif
 
-#ZKMV_MKL_SRC  := $(wildcard source/math/*.f)
-#ZKMV_MKL_OBJ  := $(OBJPATH)/main_mkl.o $(OBJPATH)/hamvec_zgexpv_w_mkl_profile.o
-#vpath %.f $(sort $(dir $(ZKMV_MKL_SRC)))
-#ZKMV_GPU_SRC  := $(wildcard source/math/*.cu)
-#ZKMV_GPU_OBJ  := $(OBJPATH)/main_cache.o $(OBJPATH)/zgexpv_cache.o $(OBJPATH)/hamvec_cuda3.o $(OBJPATH)/get_grid.o
-#CUDAAPI_DIR   := /usr/local/cuda-6.0/src
-#CUDAAPI_SRC   := fortran.c cusparse_fortran.c
-#CUDAAPI_OBJ   := $(OBJPATH)/fortran.o $(OBJPATH)/cusparse_fortran.o
 NCC         := nvcc
 NCFLAGS     := -arch=sm_30 -O3 -DCUBLAS_GFORTRAN -ccbin g++ -Xcompiler "$(CPPFLAGS)"
 NCLINKER    := -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse -lboost_program_options -L/usr/local/lib #-lboost_system
-#vpath %.cu $(sort $(dir $(ZKMV_GPU_SRC)))
-#vpath %.c  $(CUDAAPI_DIR)
 CXXLINKS    += $(NCLINKER)
 
 .PHONY : all clean
@@ -117,43 +101,3 @@ $(BINPATH) :
 
 $(OBJPATH)/$(EXPV_LIB):
 	@make -C expv
-
-#$(OBJPATH)/expokit.o : expokit.f | $(OBJPATH)
-#	$(FC) -c $< -o $@ $(FFLAGS)
-
-#$(OBJPATH)/mataid.o : mataid.f | $(OBJPATH)
-#	$(FC) -c $< -o $@ $(FFLAGS)
-
-#$(OBJPATH)/main_mkl.o : main_mkl.f | $(OBJPATH)
-#	$(FC) $< -c -o $@ $(FFLAGS)
-
-#$(OBJPATH)/hamvec_zgexpv_w_mkl_profile.o : hamvec_zgexpv_w_mkl_profile.f | $(OBJPATH)
-#	$(FC) $< -c -o $@ $(FFLAGS)
-
-#$(OBJPATH)/main_cache.o : main_cache.f | $(OBJPATH)
-#	$(FC) $< -c -o $@ $(FFLAGS)
-
-#$(OBJPATH)/zgexpv_cache.o : zgexpv_cache.f | $(OBJPATH)
-#	$(FC) $< -c -o $@ $(FFLAGS)
-
-#$(OBJPATH)/hamvec_cuda3.o : hamvec_cuda3.cu | $(OBJPATH)
-#	$(NCC) $< -c -o $@ $(NCFLAGS)
-
-#$(OBJPATH)/get_grid.o : get_grid.cu | $(OBJPATH)
-#	$(NCC) $< -c -o $@ $(NCFLAGS)
-
-#$(OBJPATH)/fortran.o : $(CUDAAPI_DIR)/fortran.c | $(OBJPATH)
-#	$(NCC) $< -c -o $@ $(NCFLAGS)
-
-#$(OBJPATH)/cusparse_fortran.o : $(CUDAAPI_DIR)/cusparse_fortran.c | $(OBJPATH)
-#	$(NCC) $< -c -o $@ $(NCFLAGS)
-
-#$(OBJPATH)/krylov_expv_f.o : krylov_expv_f.f | $(OBJPATH)
-#	$(FC) -c $< -o $@ $(FFLAGS)
-
-#$(OBJPATH)/DLARAN.o : DLARAN.f | $(OBJPATH)
-#	$(FC) -c $< -o $@ $(FFLAGS)
-
-#$(OBJPATH)/krylov_expv.o : krylov_expv.c | $(OBJPATH)
-#	$(CC) -c $< -I./include/math -o $@ $(FFLAGS)
-
