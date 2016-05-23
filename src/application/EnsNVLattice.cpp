@@ -8,35 +8,11 @@ namespace po = boost::program_options;
 po::variables_map ParseCommandLineOptions(int argc, char* argv[]);
 void set_parameters(const string& xml_file_name);
 NVCenter create_defect_center(const po::variables_map& para);
-cSpinSourceUniformRandom create_spin_source(const po::variables_map& para);
-cDepthFirstPathTracing create_spin_cluster_algrithm(const po::variables_map& para, const cSpinCollection& bath_spins);
+cSpinSourceFromLattice create_spin_source(const po::variables_map& para);
+cUniformBathOnLattice create_spin_cluster_algrithm(const po::variables_map& para, const cSpinCollection& bath_spins);
 
 int  main(int argc, char* argv[])
 {
-    double lattice_const = 3.57, cut_off = 4.0;
-    int range_i = 20, root_range_i = 8, maxOrder = 6;
-    string isotope = "13C";
-
-    TwoDimFaceCenterLattice latt(lattice_const, isotope);
-    latt.setRange(range_i);
-
-    cSpinSourceFromLattice spin_on_lattice(latt);
-    cSpinCollection _bath_spins(&spin_on_lattice);
-    _bath_spins.make();
-
-    sp_mat c=_bath_spins.getConnectionMatrix(cut_off);
-    cUniformBathOnLattice bath_on_lattice(c, maxOrder, _bath_spins, latt, root_range_i);
-    cSpinCluster _spin_clusters(_bath_spins, &bath_on_lattice);
-    _spin_clusters.make();
-
-    _spin_clusters.enable_sub_cluster_position();
-    cout << _spin_clusters << endl;
-
-    _spin_clusters.MPI_partition(200);
-    vector<umat> m = _spin_clusters.getMPI_Cluster(0);
-    cout << m[1] << endl;
-
-    return 0;
     po::variables_map para = ParseCommandLineOptions(argc, argv);
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -68,14 +44,14 @@ int  main(int argc, char* argv[])
     sol.set_defect_center(&nv);
 
     // Step 2: make bath spins 
-    cSpinSourceUniformRandom spinUR = create_spin_source(para);
-    sol.set_bath_spin(&spinUR);
+    cSpinSourceFromLattice spin_from_latt = create_spin_source(para);
+    sol.set_bath_spin(&spin_from_latt);
     
     
     // Step 3: make clusters
     cSpinCollection bath_spins = sol.getSpinCollecion();
-    cDepthFirstPathTracing   dfpt = create_spin_cluster_algrithm(para, bath_spins);
-    sol.set_bath_cluster(&dfpt);
+    cUniformBathOnLattice bath_on_lattice = create_spin_cluster_algrithm(para, bath_spins);
+    sol.set_bath_cluster(&bath_on_lattice);
 
     // Step 4: run_each_cluster 
     sol.run_each_clusters();
@@ -99,7 +75,7 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
 
     ////////////////////////////////////////////////////////////////////////////////
     //{{{ record command line options
-    string output_filename("EnsNVeBath");
+    string output_filename("EnsNVLattice2D");
     string command_opt("");
     for(int i=1; i<argc; ++i)
         command_opt += argv[i];
@@ -144,27 +120,24 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
         ("output,o",         po::value<string>()->default_value(output_filename),        "Output .mat file of results")
         ("logfile,l",        po::value<string>()->default_value("EnsembleCCE.conf"),     "Config. file of logging")
         
-        ("position,P",       po::value<string>()->default_value("0.0 0.0 0.0"),          "Central spin position")
+        ("position,P",       po::value<string>()->default_value("0.0 0.0 -20.0"),          "Central spin position")
         ("state0,a",         po::value<int>()->default_value(0),                         "Central spin state index - a")
         ("state1,b",         po::value<int>()->default_value(1),                         "Central spin state index - b")
 
-        ("cce,c",            po::value<int>()->default_value(3),                         "CCE order")
-        ("cutoff,d",         po::value<double>()->default_value(300.0),                  "Cut-off distance of bath spins")
+        ("cce,c",            po::value<int>()->default_value(6),                         "CCE order")
+        ("cutoff,d",         po::value<double>()->default_value(4.0),                    "Cut-off distance of bath spins")
         ("polarization,z",   po::value<string>()->default_value("0.0 0.0 0.0"),          "bath spin polarization")
         ("dephasing_rate,r", po::value<double>()->default_value(10000.0),                "dephasing rate of bath spins")
         ("dephasing_axis,x", po::value<string>()->default_value("1.0 1.0 1.0"),          "dephasing axis of bath spins")
 
-        ("length,L",         po::value<double>()->default_value(3.57),                   "size of unit cell in angstrom (default diamond)")
-        ("num_cell,u",       po::value<int>()->default_value(8),                         "atom num in unit cell (default diamond)")
-        ("concentration,C",  po::value<double>()->default_value(1.0),                    "bath concentration in ppm")
-        ("max_number,M",     po::value<int>()->default_value(2000),                      "Max bath spin number")
-        ("number,N",         po::value<int>()->default_value(100),                       "bath spin number")
-        ("seed,D",           po::value<int>()->default_value(1),                         "bath seed")
-        ("isotope",          po::value<string>()->default_value("E"),                    "bath spin isotope")
+        ("latt_const,L",     po::value<double>()->default_value(3.57),                   "lattice constant (default diamond)")
+        ("isotope",          po::value<string>()->default_value("13C"),                  "bath spin isotope")
+        ("range",            po::value<int>()->default_value(20),                        "full range of bath spins")
+        ("root_range",       po::value<int>()->default_value(8),                         "root range of bath spins")
 
         ("nTime,n",          po::value<int>()->default_value(101),                       "Number of time points")
         ("start,s",          po::value<double>()->default_value(0.0),                    "Start time (in unit of sec.)")
-        ("finish,f",         po::value<double>()->default_value(0.0002),                  "Finish time (in unit of sec.)")
+        ("finish,f",         po::value<double>()->default_value(0.005),                  "Finish time (in unit of sec.)")
         ("magnetic_field,B", po::value<string>()->default_value("0.1 0.1 0.1"),          "magnetic field vector in Tesla")
         ("pulse,p",          po::value<string>()->default_value("CPMG"),                 "Pulse name")
         ("pulse_num,m",      po::value<int>()->default_value(1),                         "Pulse number")
@@ -201,26 +174,33 @@ NVCenter create_defect_center(const po::variables_map& para)
     return nv;
 }/*}}}*/
 
-cSpinSourceUniformRandom create_spin_source(const po::variables_map& para)
+cSpinSourceFromLattice create_spin_source(const po::variables_map& para)
 {/*{{{*/
-    double l0 = para["length"].as<double>();
-    int num_in_cell = para["num_cell"].as<int>();
-    double concentration = para["concentration"].as<double>();
-    int    max_num = para["max_number"].as<int>();
-    int        num = para["number"].as<int>();
-    int       seed = para["seed"].as<int>();
+    double lattice_const = para["latt_const"].as<double>();
+    double cut_off= para["cutoff"].as<double>();
     string isotope = para["isotope"].as<string>();
+    int range_i = para["range"].as<int>();
 
-    double range = 0.5e2 * l0 * pow(max_num/concentration/num_in_cell, 1.0/3.0);
-    cSpinSourceUniformRandom spinUR(range, max_num, num, isotope, seed);
-    return spinUR;
+    TwoDimFaceCenterLattice latt(lattice_const, isotope);
+    latt.setRange(range_i);
+
+    cSpinSourceFromLattice spin_on_lattice(latt);
+    return spin_on_lattice;
 }/*}}}*/
 
-cDepthFirstPathTracing create_spin_cluster_algrithm(const po::variables_map& para, const cSpinCollection& bath_spins)
+cUniformBathOnLattice create_spin_cluster_algrithm(const po::variables_map& para, const cSpinCollection& bath_spins)
 {/*{{{*/
-    double cut_off_dist = para["cutoff"].as<double>();
-    int    max_order    = para["cce"].as<int>();
-    sp_mat c = bath_spins.getConnectionMatrix(cut_off_dist);
-    cDepthFirstPathTracing dfpt(c, max_order);
-    return dfpt;
+    double lattice_const = para["latt_const"].as<double>();
+    double cut_off       = para["cutoff"].as<double>();
+    string isotope       = para["isotope"].as<string>();
+    int    maxOrder      = para["cce"].as<int>();
+    int    range_i       = para["range"].as<int>();
+    int    root_range_i  = para["root_range"].as<int>();
+
+    TwoDimFaceCenterLattice latt(lattice_const, isotope);
+    latt.setRange(range_i);
+    
+    sp_mat c=bath_spins.getConnectionMatrix(cut_off);
+    cUniformBathOnLattice bath_on_lattice(c, maxOrder, bath_spins, latt, root_range_i);
+    return  bath_on_lattice;
 }/*}}}*/
