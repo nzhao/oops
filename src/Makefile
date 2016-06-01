@@ -20,6 +20,12 @@ PS = cpp
 CC = mpic++ -g
 CPPFLAGS = $(addprefix -I,$(INCLUDES))
 
+ifeq ($(USE_11), true)
+	CPP11FLAG := -std=gnu++11
+else
+	CPP11FLAG := 
+endif
+
 ifeq ($(USE_MKL), true)
 	LIBS := 
 	CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm -ldl
@@ -75,7 +81,7 @@ doc :
 	/Applications/Doxygen.app/Contents/Resources/doxygen ../doc/DocGen 
 
 $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
-	@g++ -MM -std=gnu++11 $< $(addprefix -I, $(INCLUDES))> $@
+	@g++ -MM $(CPP11FLAG) $< $(addprefix -I, $(INCLUDES))> $@
 	@sed -i="" '1s/^/..\/obj\//g' $@
 	@rm $@=
 
