@@ -17,7 +17,7 @@ INCLUDES := .  $(ARMA_INC_PATH)
 RM := rm -f
 PS = cpp
 
-CC = mpic++
+CC = mpic++ -g
 CPPFLAGS = $(addprefix -I,$(INCLUDES))
 
 ifeq ($(USE_MKL), true)
@@ -34,7 +34,7 @@ endif
 ifeq ($(HAS_MATLAB), true)
 	LIBS += mx mat eng
 	CPPFLAGS += -DHAS_MATLAB
-	LIBPATH := $(MATLAB_LIB_PATH)
+	LIBPATH := $(MATLAB_LIB_PATH) -Wl,-rpath=$(MATLAB_LIB_PATH)
 	INCLUDES += $(MATLAB_INC_PATH)
 endif
 
@@ -59,6 +59,7 @@ NCC         := nvcc
 NCFLAGS     := -arch=sm_30 -O3 -DCUBLAS_GFORTRAN -ccbin g++ -Xcompiler "$(CPPFLAGS)"
 NCLINKER    := -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse -lboost_program_options -L/usr/local/lib #-lboost_system
 CXXLINKS    += $(NCLINKER)
+FLINKS      += $(NCLINKER)
 
 .PHONY : all clean
 
@@ -74,20 +75,24 @@ doc :
 	/Applications/Doxygen.app/Contents/Resources/doxygen ../doc/DocGen 
 
 $(addprefix $(OBJPATH)/, $(DEPS)) : $(OBJPATH)/%.d : %.cpp | $(OBJPATH)
-	@g++ -MM $< $(addprefix -I, $(INCLUDES))> $@
+	@g++ -MM -std=gnu++11 $< $(addprefix -I, $(INCLUDES))> $@
 	@sed -i="" '1s/^/..\/obj\//g' $@
 	@rm $@=
 
 -include $(addprefix $(OBJPATH)/, $(DEPS))
 
-EXPV_LIB      :=  libexpv.so
+EXPV_LIB      :=  expv
+EXPV_DIR      :=  $(ROOT_DIR)/$(OBJPATH)
+EXPV_LINKS    :=  -L$(ROOT_DIR)/$(OBJPATH) -Wl,-rpath,$(EXPV_DIR) -l$(EXPV_LIB)
+FLINKS        +=  $(EXPV_LINKS)
+CXXLINKS      +=  $(EXPV_LINKS)
 
 ifeq ($(MPI_INTEL), true)
 $(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(OBJPATH)/$(EXPV_LIB) | $(BINPATH)
-	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
+	$(FC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(FLINKS)
 else
 $(DESTINATION) : $(addprefix $(OBJPATH)/, $(OBJS)) $(OBJPATH)/$(EXPV_LIB) | $(BINPATH)
-	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(ROOT_DIR)/$(OBJPATH) -l:$(EXPV_LIB) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
+	$(CC) -o $@ $(OBJPATH)/$(notdir $@).o $(filter-out $(APP_OBJ), $(addprefix $(OBJPATH)/, $(OBJS))) -L$(LIBPATH) $(addprefix -l,$(LIBS)) $(CXXLINKS)
 endif
 
 $(addprefix $(OBJPATH)/, %.o) : %.cpp | $(OBJPATH)
