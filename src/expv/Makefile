@@ -29,7 +29,7 @@ ZKMV_MKL_F_SRC:=  hamvec_zgexpv_w_mkl_profile.f main_mkl.f
 ZKMV_MKL_C_SRC:=  hamvec_func3.cpp
 ZKMV_GPU_F_SRC:=  zgexpv_cache.f main_cache.f
 ZKMV_GPU_C_SRC:=  hamvec_cuda3.cu get_grid.cu
-CUDAAPI_DIR   :=  /usr/local/cuda-6.0/src
+CUDAAPI_DIR   :=  /usr/local/cuda/src
 CUDAAPI_SRC   :=  fortran.c cusparse_fortran.c
 
 vpath %.f   source source/expokit
@@ -77,4 +77,7 @@ $(ZKMV_GPU_C_OBJ):$(OBJPATH)/%.o:%.cu | $(OBJPATH)
 
 $(CUDAAPI_OBJ):$(OBJPATH)/%.o:%.c | $(OBJPATH)
 	$(NCC) -c $< -o $@ $(NCFLAGS)
+
+$(OBJPATH) :
+	@mkdir -p $(OBJPATH)
 
