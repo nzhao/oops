@@ -111,6 +111,8 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "Print help message")
+        ("initialize,I", "Initialize a dat folder")
+
         ("input,i",          po::value<string>()->default_value("C13Bath/RoyCoord.xyz"), "Input file name")
         ("output,o",         po::value<string>()->default_value(output_filename),        "Output .mat file of results")
         ("logfile,l",        po::value<string>()->default_value("EnsembleCCE.conf"),     "Config. file of logging")
@@ -149,6 +151,14 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
 
     if (para.count("help")) {
         cout << desc;
+        exit(0);
+    }
+    if (para.count("initialize")) {
+        string path = getenv("OOPS_PATH");
+        string cmd = "cp -r " + path + "/src/dat_example dat" ;
+        cout << cmd << endl;
+        system( cmd.c_str() );
+        cout << "default dat folder initialized." << endl;
         exit(0);
     }
     //}}}

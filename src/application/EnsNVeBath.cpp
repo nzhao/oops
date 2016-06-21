@@ -46,6 +46,8 @@ int  main(int argc, char* argv[])
     // Step 2: make bath spins 
     cSpinSourceUniformRandom spinUR = create_spin_source(para);
     sol.set_bath_spin(&spinUR);
+    spinUR.export_coordinates( OUTPUT_PATH + para["coord_file"].as<string>() );
+
     
     
     // Step 3: make clusters
@@ -116,6 +118,8 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "Print help message")
+        ("initialize,I", "Initialize a dat folder")
+
         ("input,i",          po::value<string>()->default_value("None"),                 "Input file name (not used)")
         ("output,o",         po::value<string>()->default_value(output_filename),        "Output .mat file of results")
         ("logfile,l",        po::value<string>()->default_value("EnsembleCCE.conf"),     "Config. file of logging")
@@ -137,6 +141,7 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
         ("number,N",         po::value<int>()->default_value(100),                       "bath spin number")
         ("seed,D",           po::value<int>()->default_value(1),                         "bath seed")
         ("isotope",          po::value<string>()->default_value("E"),                    "bath spin isotope")
+        ("coord_file,F",     po::value<string>()->default_value("coord.xyz"),            "export coordinates to file")
 
         ("nTime,n",          po::value<int>()->default_value(101),                       "Number of time points")
         ("start,s",          po::value<double>()->default_value(0.0),                    "Start time (in unit of sec.)")
@@ -158,6 +163,14 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
 
     if (para.count("help")) {
         cout << desc;
+        exit(0);
+    }
+    if (para.count("initialize")) {
+        string path = getenv("OOPS_PATH");
+        string cmd = "cp -r " + path + "/src/dat_example dat" ;
+        cout << cmd << endl;
+        system( cmd.c_str() );
+        cout << "default dat folder initialized." << endl;
         exit(0);
     }
     //}}}
