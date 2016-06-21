@@ -21,6 +21,7 @@ public:
     virtual vector<cSPIN>& generate()=0;
 
     vector<cSPIN>& get_spin_list() {return spin_list;};
+    void export_coordinates(const string& filename);
 protected:
     vector<cSPIN> spin_list;
 private:
@@ -84,5 +85,7 @@ private:
     string _isotope;
     int _seed;
 };
+///}}} 
+////////////////////////////////////////////////////////////////////////////////
 /// @}
 #endif

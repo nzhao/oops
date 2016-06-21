@@ -17,6 +17,26 @@ cSpinSource::cSpinSource()
 cSpinSource::~cSpinSource()
 { //LOG(INFO) << "Default destructor: cSpinSource.";
 }
+void cSpinSource::export_coordinates(const string& filename)
+{
+    ofstream coord_file(filename.c_str());
+    if(!coord_file)
+    {
+        cout << filename << " path not found." << endl;
+        assert(0);
+    }
+    coord_file << spin_list.size() << endl;
+    for(int i=0; i<spin_list.size(); ++i)
+    {
+        vec coord = spin_list[i].get_coordinate();
+        coord_file << spin_list[i].get_isotope() << "\t";
+        coord_file << coord[0] << "\t";
+        coord_file << coord[1] << "\t";
+        coord_file << coord[2] << endl;
+    }
+    coord_file.close();
+    cout << filename << " exported." << endl;
+}
 //}}}
 ////////////////////////////////////////////////////////////////////////////////
 
