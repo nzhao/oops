@@ -3,7 +3,6 @@
 #include "main_cache.h"
 #include "main_mkl.h"
 #include <mpi.h>
-#include "mpi_zkexpv.h" 
 #include "ham.h"
 //#include "mpi_zcsrkhmv.h"
 #include "mpi_zcsrkexpv.h"
