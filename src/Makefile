@@ -8,7 +8,7 @@ ROOT_DIR  :=  $(shell pwd)
 BINPATH := ../bin
 OBJPATH := ../obj
 
-APP := EnsNVeBath EnsNVnBath EnsNVLattice SingleSampleCCE_NV_C13 MatExpTest test 
+APP := EnsNVeBath EnsNVnBath EnsNVLattice SingleSampleCCE_NV_C13 MatExpTest test magR_new
 
 DESTINATION := $(addprefix $(BINPATH)/, $(APP))
 LIBPATH := .  
@@ -18,7 +18,7 @@ RM := rm -f
 PS = cpp
 
 CC = mpic++ -g
-CPPFLAGS = $(addprefix -I,$(INCLUDES))
+CPPFLAGS = $(addprefix -I,$(INCLUDES)) -qopenmp
 
 ifeq ($(USE_11), true)
 	CPP11FLAG := -std=gnu++11
@@ -28,7 +28,7 @@ endif
 
 ifeq ($(USE_MKL), true)
 	LIBS := 
-	CXXLINKS  :=  -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm -ldl
+	CXXLINKS  := -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_ilp64 -lpthread -lm -ldl
 	CPPFLAGS  +=  -DARMA_BLAS_LONG -DMKL_ILP64 -m64 -I${MKLROOT}/include -DARMA_DONT_USE_WRAPPER -DUSE_MKL
 else
 	LIBS :=  $(ARMA_LIB) 
@@ -44,7 +44,7 @@ ifeq ($(HAS_MATLAB), true)
 	INCLUDES += $(MATLAB_INC_PATH)
 endif
 
-SOURCE := $(wildcard application/*.$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
+SOURCE := $(wildcard application/$(APP).$(PS)) $(wildcard source/*/*.$(PS)) $(wildcard source/*/*/*.$(PS))
 OBJS := $(patsubst %.$(PS),%.o,$(notdir $(SOURCE)))
 DEPS := $(patsubst %.o,%.d,$(OBJS))
 APP_OBJ := $(addsuffix .o, $(addprefix $(OBJPATH)/, $(APP)) )
@@ -53,12 +53,12 @@ vpath %.cpp $(sort $(dir $(SOURCE)))
 
 FC          := mpif77
 ifeq ($(MPI_INTEL), true)
-  FFLAGS      := -I${MKLROOT}/include
-  FLINKS      := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -nofor-main -cxxlib
+  FFLAGS      := -i8 -I${MKLROOT}/include
+  FLINKS      := -nofor-main -cxxlib -parallel -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm -ldl
 else
-  FFLAGS      := -m64 
+  FFLAGS      := -fdefault-integer-8 -m64 -I${MKLROOT}/include
 #  CXXLINKS    :=  -L${GFORTRAN_PATH} -lpthread -lm -ldl -lgfortran
-  CXXLINKS    := -L${MKLROOT}/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl -lgfortran
+  CXXLINKS    := -lgfortran -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_gf_ilp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm -ldl
 endif
 
 NCC         := nvcc
