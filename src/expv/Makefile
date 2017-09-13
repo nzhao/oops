@@ -22,8 +22,8 @@ NCC         :=  nvcc
 NCFLAGS     :=  -arch=sm_30 -O3 -DCUBLAS_GFORTRAN -ccbin g++ -Xcompiler "$(CFLAGS)" --compiler-options '-fPIC'
 NCLINKER    :=  -L/usr/local/cuda/lib64 -lcudart -lcublas -lcusparse -lboost_program_options -L/usr/local/lib -lboost_system
 
-MPI_ZKEXPV_SRC:=  mpi_zkexpv.f mpi_zcsrkexpv.f mpi_hzcsrkexpv.f
-MPI_HAMVEC_SRC:=  mpi_hamvec.c mpi_zcsrkhmv.c ham.c
+MPI_ZKEXPV_SRC:=  mpi_zcsrkexpv.f mpi_hzcsrkexpv.f
+MPI_HAMVEC_SRC:=  mpi_zcsrkhmv.c ham.c
 EXPOKIT_SRC   :=  expokit.f mataid.f DLARAN.f
 KRYLOV_F_SRC  :=  krylov_expv_f.f
 KRYLOV_C_SRC  :=  krylov_expv.c
