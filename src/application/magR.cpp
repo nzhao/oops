@@ -11,7 +11,7 @@ _INITIALIZE_EASYLOGGINGPP
 namespace po = boost::program_options;
 
 int NSPIN;
-vec COEFF;
+vector<vec> COEFF;
 cx_vec INI;
 vector<uvec> OPLST;
 cx_vec FIN;
@@ -86,7 +86,9 @@ int  main(int argc, char* argv[])
     //cout << TIME_LIST << endl;
     //cout << PREFACTOR << endl;
     ///*}}}*/
-    
+    COEFF[0] = zeros<vec>(3*2*NSPIN + 2*NSPIN*(2*NSPIN-1)*9/2);
+    COEFF[1] = zeros<vec>(3*2*NSPIN + 2*NSPIN*(2*NSPIN-1)*9/2);
+    COEFF[2] = zeros<vec>(1);
     // Step 5: Evolution
     MatExpVector expM(2*NSPIN,COEFF,INI,OPLST,FIN,PREFACTOR,TIME_LIST,MatExpVector::LargeVecExpv);
     expM.run();
@@ -253,14 +255,14 @@ void prepare_coeff(const po::variables_map& para)
     double T1;
     double T2;
     //coeff[] = ;
-    COEFF = liou_coeff_list(NSPIN,coeff,coeff);
+    //COEFF = liou_coeff_list(NSPIN,coeff,coeff);
     
     for(int i = 0; i < coeff.size(); i++)
         printf("[debug] coeff[%d] = %e\n",i,coeff[i]);
     
     //add Lindblad
     //COEFF[] = ;
-}/*}}}*
+}/*}}}*/
 
 void prepare_ini()
 {/*{{{*/
