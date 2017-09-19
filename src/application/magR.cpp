@@ -2,6 +2,7 @@
 #include "include/math/MatExp.h"
 #include "expv/include/expv.h"
 #include <complex>
+#include <algorithm>
 #include <math.h>
 #include <mpi.h>
 #include <omp.h>
@@ -11,7 +12,7 @@ _INITIALIZE_EASYLOGGINGPP
 namespace po = boost::program_options;
 
 int NSPIN;
-vector<vec> COEFF;
+vec COEFF;
 cx_vec INI;
 vector<uvec> OPLST;
 cx_vec FIN;
@@ -23,7 +24,7 @@ void  prepare_coeff(const po::variables_map& para);
 void prepare_ini();
 vec liou_coeff_list(const int nspin, const vec coeff_list_l, const vec coeff_list_r);
 cx_vec gene_mixvec(const int nspin, const vector< pair<int,cx_mat> > p_lst);
-void save_matrix(const cx_mat result, const string filename);
+void save_Matrix(const cx_mat result, const string filename);
 
 int  main(int argc, char* argv[])
 {
@@ -53,7 +54,7 @@ int  main(int argc, char* argv[])
 
     // Step 1: generate coeffiien
     prepare_coeff(para);
-
+    
     // Step 2: generate initial state
     prepare_ini();
 
@@ -73,32 +74,39 @@ int  main(int argc, char* argv[])
     FIN = gene_mixvec(NSPIN,polarize_list_E);
     FIN *= pow(2,NSPIN);
     
-    ///*{{{*/ Stop 5.0: check input
-    //printf("[debug] NSPIN = %d\n",NSPIN);
+    // Step 5: Set Evolution time
+    double tmin = para["start"].as<double>();
+    double tmax = para["finish"].as<double>();
+    int tn = para["nTime"].as<int>();
+    TIME_LIST = linspace(tmin,tmax,tn);
+
+    /////*{{{*/ Stop  5.0: check input
+    //printf("[debug] APP,NSPIN = %d\n",NSPIN);
     //for(int i = 0; i < FIN.size(); i++){
     //    if( abs(FIN[i]) > 0.0 ){
-    //        printf("[debug] FIN(%d) = %e\n",i,abs(FIN(i)));}}
+    //        printf("[debug] APP,FIN(%d) = %e\n",i,abs(FIN[i]));}}
     //for(int i = 0; i < INI.size(); i++){
     //    if( abs(INI[i]) > 0.0 ){
-    //        printf("[debug] INI(%d) = %e\n",i,abs(INI(i)));}}
-    //for(int i = 0; i < OPLST.size(); i++){
-    //    cout << OPLST[i] << endl;}
-    //cout << TIME_LIST << endl;
+    //        printf("[debug] APP,INI(%d) = %e\n",i,abs(INI[i]));}}
+    //cout << TIME_LIST.size() << endl;
     //cout << PREFACTOR << endl;
+    printf("[debug] APP,size of COEFF:%d\n",COEFF.size());
     ///*}}}*/
-    COEFF[0] = zeros<vec>(3*2*NSPIN + 2*NSPIN*(2*NSPIN-1)*9/2);
-    COEFF[1] = zeros<vec>(3*2*NSPIN + 2*NSPIN*(2*NSPIN-1)*9/2);
-    COEFF[2] = zeros<vec>(1);
-    // Step 5: Evolution
+
+    // Step 6: Evolution
+    double scale = max(COEFF);
+    COEFF = COEFF / (2 * M_PI * scale);TIME_LIST = TIME_LIST * scale;//MHZ,microsecond
     MatExpVector expM(2*NSPIN,COEFF,INI,OPLST,FIN,PREFACTOR,TIME_LIST,MatExpVector::LargeVecExpv);
     expM.run();
     cx_mat result = expM.getResult();
-    cx_mat time = conv_to<cx_mat>::from(TIME_LIST);
+    cx_mat time = conv_to<cx_mat>::from(TIME_LIST / scale);
     result = join_horiz(time,result);
-
-    // Step 6: Save data
-    string filename = OUTPUT_PATH + para["output"].as<string>();
-    //save_Matrix(result,filename);
+    
+    // Step 7: Save data
+    string filename = para["output"].as<string>();
+    char str[] = "-";
+    filename.erase (std::remove(filename.begin(), filename.end(), str[0]), filename.end());
+    save_Matrix(result,filename);
 
     LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
@@ -111,7 +119,7 @@ int  main(int argc, char* argv[])
 }
 
 po::variables_map ParseCommandLineOptions(int argc, char* argv[])
-{/*{{{*/
+{/*{{{*/ 
     ////////////////////////////////////////////////////////////////////////////////
     //{{{ record command line options
     string output_filename("magR");
@@ -147,9 +155,9 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
     DEBUG_PATH  = PROJECT_PATH + "/dat/debug/";
     //}}}
     ////////////////////////////////////////////////////////////////////////////////
-
+    
     ////////////////////////////////////////////////////////////////////////////////
-     //{{{ Parse options
+     // {{{ Parse options
     po::variables_map para;
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -160,23 +168,21 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
         ("output,o",         po::value<string>()->default_value(output_filename), "Output .mat file of results")
         ("logfile,l",        po::value<string>()->default_value("magR.conf"), "Config. file of logging")
 
-        ("pair1,P1",         po::value<string>()->default_value("20.0 12.8  0.0"), "RadicalPair spin1 position(in unit Angstrom.)")
-        ("isotope1,E1",       po::value<string>()->default_value("E"), "RadicalPair spin1 tye")
-        ("pair2,P2",         po::value<string>()->default_value("20.0 -12.8 0.0"), "RadicalPair spin2 position(in unit Angstrom.)")
-        ("isotope2,E2",       po::value<string>()->default_value("E"), "RadicalPair spin2 tye")
-        ("Gaps0,Es0",        po::value<double>()->default_value(0.0e6), "Radical pair enregy gap between |s> and |0>(in unit Hz.)")
-        ("Gapsp,Esp",        po::value<double>()->default_value(10.0e6), "Radical pair energy gap between |s> and |+>(in unit Hz.)")
-        ("Gapsn,Esn",        po::value<double>()->default_value(10.0e6), "Radical pair energy gap between |s> and |->(in unit Hz.)")
+        ("pair1,S",          po::value<string>()->default_value("48.31 59.97 80.14"), "RadicalPair spin1 position(in unit Angstrom.)")
+        ("isotope1,E",       po::value<string>()->default_value("E"), "RadicalPair spin1 tye")
+        ("pair2,s",          po::value<string>()->default_value("48.31 35.97 80.14"), "RadicalPair spin2 position(in unit Angstrom.)")
+        ("isotope2,e",       po::value<string>()->default_value("E"), "RadicalPair spin2 tye")
+        ("Gapsz,z",          po::value<double>()->default_value(0.0e6), "Radical pair enregy gap between |s> and |0>(in unit Hz.)")
+        ("Gapsp,p",          po::value<double>()->default_value(10.0e6), "Radical pair energy gap between |s> and |+>(in unit Hz.)")
+        ("Gapsn,n",          po::value<double>()->default_value(-10.0e6), "Radical pair energy gap between |s> and |->(in unit Hz.)")
         ("bath_numer,m",     po::value<int>()->default_value(4), "Bath spins number")
 
-        ("B_stren,B", po::value<double>()->default_value(0.3e-4), "Magnetic field strength(in unit Tesla.)")
-        ("B_theta,theta",    po::value<double>()->default_value(0), "Magnetic field direction(in unit degree.)")
-        ("B_phi,phi",        po::value<double>()->default_value(0), "Magnetic field direction(in unit degree.)")
-        ("dephasing_rate,r", po::value<double>()->default_value(0.0), "Dephasing rate of bath spins(in unit of Hz.)")
-        ("dephasing_axis,x", po::value<string>()->default_value("1.0 1.0 1.0"), "Dephasing axis of bath spins")
+        ("B_stren,B",        po::value<double>()->default_value(3.0e-5), "Magnetic field strength(in unit Tesla.)")
+        ("B_theta,t",        po::value<double>()->default_value(0), "Magnetic field direction(in unit degree.)")
+        ("B_phi,F",          po::value<double>()->default_value(0), "Magnetic field direction(in unit degree.)")
 
-        ("nTime,n",          po::value<int>()->default_value(101), "Number of time points")
-        ("start,s",          po::value<double>()->default_value(0.0), "Start time (in unit of sec.)")
+        ("nTime,N",          po::value<int>()->default_value(101), "Number of time points")
+        ("start,k",          po::value<double>()->default_value(0.0), "Start time (in unit of sec.)")
         ("finish,f",         po::value<double>()->default_value(1.0e-5), "Finish time (in unit of sec.)")
         ;
 
@@ -232,36 +238,61 @@ void prepare_coeff(const po::variables_map& para)
 
     double normB = para["B_stren"].as<double>();
     double thetaB = para["B_theta"].as<double>();
-    thetaB = thetaB * M_PI / 180;
+    thetaB = thetaB * M_PI / 180.0;
     double phiB = para["B_phi"].as<double>();
-    phiB = phiB * M_PI / 180;
-    vec magB;
-    magB <<  sin(thetaB) * cos(phiB) << sin(thetaB) * sin(phiB) << cos(thetaB);
-    magB = normB * magB;
-
+    phiB = phiB * M_PI / 180.0;
+    vec nB;
+    nB <<  sin(thetaB) * cos(phiB) << sin(thetaB) * sin(phiB) << cos(thetaB);
+    vec magB = normB * nB;
+    
     vec coeff;
-    for(int i = 0; i < NSPIN; i++)
+    //in unit of rad/s
+    for(int i = 0; i < NSPIN - 1; i++)
         for(int j = i + 1; j < NSPIN; j++)
             coeff = join_vert( coeff, dipole( sl_tot[i], sl_tot[j] ) );
+    //in unit of rad/s
     for(int i = 0; i < NSPIN; i++){
         vec temp = zeeman( sl_tot[i], magB );
         vec temp1;
         temp1 << temp(0) << temp(1) << temp(2);
         coeff = join_vert( coeff, temp1 );
     }
-    double Es0 = para["Gaps0"].as<double>();
+
+    //Center spin as given four energy levels
+    double Es0 = para["Gapsz"].as<double>();
+    Es0 = Es0 * 2 * M_PI;//transform unit from Hz to rad/s
     double Esp = para["Gapsp"].as<double>();
+    Esp = Esp * 2 * M_PI;//transform unit from Hz to rad/s
     double Esn = para["Gapsn"].as<double>();
-    double T1;
-    double T2;
-    //coeff[] = ;
-    //COEFF = liou_coeff_list(NSPIN,coeff,coeff);
-    
-    for(int i = 0; i < coeff.size(); i++)
-        printf("[debug] coeff[%d] = %e\n",i,coeff[i]);
-    
-    //add Lindblad
-    //COEFF[] = ;
+    Esn = Esn * 2 * M_PI;//transform unit from Hz to rad/s
+    coeff[0] = Es0 + (Esp + Esn - 2 * Es0) * nB[0] * nB[0];
+    coeff[1] = (Esp + Esn - 2 * Es0) * nB[0] * nB[1];
+    coeff[2] = (Esp + Esn - 2 * Es0) * nB[0] * nB[2];
+    coeff[3] = (Esp + Esn - 2 * Es0) * nB[1] * nB[0];
+    coeff[4] = Es0 + (Esp + Esn - 2 * Es0) * nB[1] * nB[1];
+    coeff[5] = (Esp + Esn - 2 * Es0) * nB[1] * nB[2];
+    coeff[6] = (Esp + Esn - 2 * Es0) * nB[2] * nB[0];
+    coeff[7] = (Esp + Esn - 2 * Es0) * nB[2] * nB[1];
+    coeff[8] = Es0 + (Esp + Esn - 2 * Es0) * nB[2] * nB[2];
+    int p = NSPIN * (NSPIN - 1) * 9 /2;
+    coeff[p]   = (Esp - Esn) * nB[0] / 2;
+    coeff[p+1] = (Esp - Esn) * nB[1] / 2;
+    coeff[p+2] = (Esp - Esn) * nB[2] / 2;
+    coeff[p+3] = (Esp - Esn) * nB[0] / 2;
+    coeff[p+4] = (Esp - Esn) * nB[1] / 2;
+    coeff[p+5] = (Esp - Esn) * nB[2] / 2;
+
+    COEFF = liou_coeff_list(NSPIN,coeff,coeff);
+    ////{{{
+    //int coeff_size = coeff.size();
+    //printf("[debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
+    //        coeff_size-1,coeff[coeff_size-1],coeff_size-2,\
+    //        coeff[coeff_size-2],coeff_size-3,coeff[coeff_size-3]);
+    //printf("[debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
+    //        p,coeff[p],p+1,coeff[p+1],p+2,coeff[p+2]);
+    //printf("[debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
+    //        0,coeff[0],1,coeff[1],2,coeff[2]);
+    ////}}}
 }/*}}}*/
 
 void prepare_ini()
@@ -410,18 +441,18 @@ void save_Matrix(const cx_mat result, const string name)
     mat m_i = imag(result);
     int n_rows = result.n_rows;
     int n_cols = result.n_cols;
-
+    
+    string dbg_filename = OUTPUT_PATH + name + ".mat";
+    MATFile *mFile = matOpen(dbg_filename.c_str(), "w");
     mxArray *pArray = mxCreateDoubleMatrix(n_rows, n_cols, mxCOMPLEX);
 
     int dim = n_rows * n_cols;
     memcpy((void *)(mxGetPr(pArray)), (void *) m_r.memptr(), dim*sizeof(double));
     memcpy((void *)(mxGetPi(pArray)), (void *) m_i.memptr(), dim*sizeof(double));
-
-    string dbg_filename = DEBUG_PATH + name + ".mat";
-    MATFile *mFile = matOpen(dbg_filename.c_str(), "w");
+    
     matPutVariableAsGlobal(mFile, name.c_str(), pArray);
     matClose(mFile);
-    printf("[output] matrix export success!\n");
+    printf("[output] APP,matrix export success!\n");
 
     mxDestroyArray(pArray);
 
