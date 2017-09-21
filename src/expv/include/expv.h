@@ -2,3 +2,8 @@
 #include "krylov_expv.h"
 #include "main_cache.h"
 #include "main_mkl.h"
+#include <mpi.h>
+#include "ham.h"
+//#include "mpi_zcsrkhmv.h"
+#include "mpi_zcsrkexpv.h"
+#include "mpi_hzcsrkexpv.h"
