@@ -70,7 +70,7 @@ public:
     MatExpVector(const SumKronProd& skp, const cx_vec& v, const vec& time_list, MatExpVectorMethod method);
     MatExpVector(const cx_mat& m, const cx_vec& v, const cx_double prefactor, const vec& time_list);
     MatExpVector(const sp_cx_mat& m, const cx_vec& v, const cx_double prefactor, const vec& time_list);
-    MatExpVector(const int nspin, const vec coeff_list, const cx_vec local_phi0,const vector<uvec> op_list,\
+    MatExpVector(const int nspin, const vector<vec> coeff_list, const cx_vec local_phi0,const vector<uvec> op_list,\
            const cx_vec final_vec, const cx_double PREFACTOR,const vec TIME_LIST, MatExpVectorMethod method);
     ~MatExpVector() {};
 
@@ -108,7 +108,7 @@ private:
     bool _is_print_skp;
     
     //external variable in LargeMatExpv
-    vec _coeff_list;
+    vector<vec> _coeff_list;
     vector<uvec> _op_list;
     int _nspin;
     cx_vec _v;

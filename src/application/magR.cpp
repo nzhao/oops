@@ -12,7 +12,7 @@ _INITIALIZE_EASYLOGGINGPP
 namespace po = boost::program_options;
 
 int NSPIN;
-vec COEFF;
+vector<vec> COEFF;
 cx_vec INI;
 vector<uvec> OPLST;
 cx_vec FIN;
@@ -81,21 +81,24 @@ int  main(int argc, char* argv[])
     TIME_LIST = linspace(tmin,tmax,tn);
 
     /////*{{{*/ Stop  5.0: check input
-    //printf("[debug] APP,NSPIN = %d\n",NSPIN);
+    //printf("[Debug] APP,NSPIN = %d\n",NSPIN);
     //for(int i = 0; i < FIN.size(); i++){
     //    if( abs(FIN[i]) > 0.0 ){
-    //        printf("[debug] APP,FIN(%d) = %e\n",i,abs(FIN[i]));}}
+    //        printf("[Debug] APP,FIN(%d) = %e\n",i,abs(FIN[i]));}}
     //for(int i = 0; i < INI.size(); i++){
     //    if( abs(INI[i]) > 0.0 ){
-    //        printf("[debug] APP,INI(%d) = %e\n",i,abs(INI[i]));}}
+    //        printf("[Debug] APP,INI(%d) = %e\n",i,abs(INI[i]));}}
     //cout << TIME_LIST.size() << endl;
     //cout << PREFACTOR << endl;
-    printf("[debug] APP,size of COEFF:%d\n",COEFF.size());
+    //printf("[Debug] APP,size of COEFF:%d\n",COEFF.size());
     ///*}}}*/
 
     // Step 6: Evolution
-    double scale = max(COEFF);
-    COEFF = COEFF / (2 * M_PI * scale);TIME_LIST = TIME_LIST * scale;//MHZ,microsecond
+    double scale = max(COEFF[0]);
+    COEFF[0] = COEFF[0] / (2 * M_PI * scale );
+    COEFF[1] = COEFF[1] / (2 * M_PI * scale );
+    COEFF[2] = COEFF[2] / (2 * M_PI * scale );
+    TIME_LIST = TIME_LIST * scale;//Hz,second
     MatExpVector expM(2*NSPIN,COEFF,INI,OPLST,FIN,PREFACTOR,TIME_LIST,MatExpVector::LargeVecExpv);
     expM.run();
     cx_mat result = expM.getResult();
@@ -111,7 +114,7 @@ int  main(int argc, char* argv[])
     LOG(INFO) << "my_rank = " << my_rank << "  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Program ends ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
     ////////////////////////////////////////////////////////////////////////////////
-    //{{{ MPI Finializing
+    //{{{ MPI  Finializing
     mpi_status = MPI_Finalize();
     assert (mpi_status == MPI_SUCCESS);
     //}}}
@@ -119,9 +122,9 @@ int  main(int argc, char* argv[])
 }
 
 po::variables_map ParseCommandLineOptions(int argc, char* argv[])
-{/*{{{*/ 
+{/*{{{*/   
     ////////////////////////////////////////////////////////////////////////////////
-    //{{{ record command line options
+    //{{{  record command line options
     string output_filename("magR");
     string command_opt("");
     for(int i=1; i<argc; ++i)
@@ -180,6 +183,9 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
         ("B_stren,B",        po::value<double>()->default_value(3.0e-5), "Magnetic field strength(in unit Tesla.)")
         ("B_theta,t",        po::value<double>()->default_value(0), "Magnetic field direction(in unit degree.)")
         ("B_phi,F",          po::value<double>()->default_value(0), "Magnetic field direction(in unit degree.)")
+        ("T1,a",             po::value<double>()->default_value(0.0), "T1 of bath spin(in unit Hz.)")
+        ("T2,b",             po::value<double>()->default_value(0.0), "T2 of bath spin(in unit Hz.)")
+        ("dephasing_axis,c", po::value<string>()->default_value("0.0 0.0 1.0"), "Dephasing axis of bath spin")
 
         ("nTime,N",          po::value<int>()->default_value(101), "Number of time points")
         ("start,k",          po::value<double>()->default_value(0.0), "Start time (in unit of sec.)")
@@ -214,7 +220,7 @@ po::variables_map ParseCommandLineOptions(int argc, char* argv[])
 }/*}}}*/
 
 void prepare_coeff(const po::variables_map& para)
-{/*{{{*/
+{/*{{{*/ 
     string filename = INPUT_PATH + para["input"].as<string>();
     cSpinSourceFromFile spin_file(filename);
     cSpinCollection spins(&spin_file);
@@ -274,23 +280,55 @@ void prepare_coeff(const po::variables_map& para)
     coeff[6] = (Esp + Esn - 2 * Es0) * nB[2] * nB[0];
     coeff[7] = (Esp + Esn - 2 * Es0) * nB[2] * nB[1];
     coeff[8] = Es0 + (Esp + Esn - 2 * Es0) * nB[2] * nB[2];
-    int p = NSPIN * (NSPIN - 1) * 9 /2;
+    int p = NSPIN * (NSPIN - 1) * 9 / 2;
     coeff[p]   = (Esp - Esn) * nB[0] / 2;
     coeff[p+1] = (Esp - Esn) * nB[1] / 2;
     coeff[p+2] = (Esp - Esn) * nB[2] / 2;
     coeff[p+3] = (Esp - Esn) * nB[0] / 2;
     coeff[p+4] = (Esp - Esn) * nB[1] / 2;
     coeff[p+5] = (Esp - Esn) * nB[2] / 2;
-
-    COEFF = liou_coeff_list(NSPIN,coeff,coeff);
-    ////{{{
+    vec coeff1 = liou_coeff_list(NSPIN,coeff,coeff);
+    
+    //add Lindblad to bath spin
+    double T1 = para["T1"].as<double>(); T1 = T1 * 2 * M_PI;//Unit rad/s
+    double T2 = para["T2"].as<double>(); T2 = T2 * 2 * M_PI;//Unit rad/s
+    vec r( para["dephasing_axis"].as<string>() ); 
+    r = normalise(r);r = nB;//set dephasing axis as magnetic field direction
+    double r_theta = acos(r[2]);
+    double r_phi = atan2(r[1],r[0]);
+    r << sin(r_theta) * cos(r_phi) << sin(r_theta) * sin(r_phi) << cos(r_theta);
+    vec n1;   
+    n1 <<  cos(r_theta) * cos(r_phi) << cos(r_theta) * sin(r_phi) << -sin(r_theta);
+    vec n2;
+    n2 << -sin(r_phi) << cos(r_phi) << 0;
+    //{r,n1,n2} compose an coordinates
+    vec coeff2 = zeros<vec>(coeff1.size());
+    int flag = 3 * nbath + 4;
+    for (int i = 0; i < nbath; i++){
+        flag = flag + 2 * nbath + 2 - i;
+        coeff2[9 * flag + 0] = (4 * T2 * r[0] * r[0]) + (2 * T1 * (n1[0] * n1[0] + n2[0] * n2[0]));
+        coeff2[9 * flag + 1] = (4 * T2 * r[0] * r[1]) + (2 * T1 * (n1[0] * n1[1] + n2[0] * n2[1]));
+        coeff2[9 * flag + 2] = (4 * T2 * r[0] * r[2]) + (2 * T1 * (n1[0] * n1[2] + n2[0] * n2[2]));
+        coeff2[9 * flag + 3] = (-4 * T2 * r[1] * r[0]) + (-2 * T1 * (n1[1] * n1[0] + n2[1] * n2[0]));
+        coeff2[9 * flag + 4] = (-4 * T2 * r[1] * r[1]) + (-2 * T1 * (n1[1] * n1[1] + n2[1] * n2[1]));
+        coeff2[9 * flag + 5] = (-4 * T2 * r[1] * r[2]) + (-2 * T1 * (n1[1] * n1[2] + n2[1] * n2[2]));
+        coeff2[9 * flag + 6] = (4 * T2 * r[2] * r[0]) + (2 * T1 * (n1[2] * n1[0] + n2[2] * n2[0]));
+        coeff2[9 * flag + 7] = (4 * T2 * r[2] * r[1]) + (2 * T1 * (n1[2] * n1[1] + n2[2] * n2[1]));
+        coeff2[9 * flag + 8] = (4 * T2 * r[2] * r[2]) + (2 * T1 * (n1[2] * n1[2] + n2[2] * n2[2]));
+    }
+    vec coeff3 = zeros<vec>(1);
+    coeff3[0] = nbath * (T2 + T1);
+    
+    COEFF.push_back(coeff1);COEFF.push_back(coeff2);
+    COEFF.push_back(coeff3);
+    ////{{{ 
     //int coeff_size = coeff.size();
-    //printf("[debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
+    //printf("[Debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
     //        coeff_size-1,coeff[coeff_size-1],coeff_size-2,\
     //        coeff[coeff_size-2],coeff_size-3,coeff[coeff_size-3]);
-    //printf("[debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
+    //printf("[Debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
     //        p,coeff[p],p+1,coeff[p+1],p+2,coeff[p+2]);
-    //printf("[debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
+    //printf("[Debug] APP,Unit: coeff[%d] = %e, coeff[%d] = %e, coeff[%d] = %e\n",\
     //        0,coeff[0],1,coeff[1],2,coeff[2]);
     ////}}}
 }/*}}}*/
@@ -331,7 +369,7 @@ void prepare_ini()
 }/*}}}*/
 
 vec liou_coeff_list(const int nspin, const vec coeff_list_l, const vec coeff_list_r)
-{/*{{{*/
+{/* {{{*/
     // -1.0 * transpose(H) [*] E;
     // transpose(a [*] b) = transpose(a) [*] transpose(b)
     int single_term = 3 * 2 * nspin;
@@ -343,7 +381,7 @@ vec liou_coeff_list(const int nspin, const vec coeff_list_l, const vec coeff_lis
     for (int i = 0; i < (2 * nspin); i++){
         for(int j = i+1; j< (2 * nspin) ; j++){
             for(int k = 0; k < 9; k++){
-                //printf("i = %4d, j = %4d, k = %4d, idx = %4d, idx1 = %4d\n",i,j,k,idx,idx1);//for debug
+                //printf("[Debug] APP, i = %4d, j = %4d, k = %4d, idx = %4d, idx1 = %4d\n",i,j,k,idx,idx1);
                 if( i < nspin && j < nspin){
                     if( k % 2 == 1)
                         coeff_list[idx1] = coeff_list_l[idx];
@@ -355,7 +393,7 @@ vec liou_coeff_list(const int nspin, const vec coeff_list_l, const vec coeff_lis
     }
 
     for ( int i = 0; i < single_term; i++){
-        //printf("i = %4d, idx = %4d, idx1 = %4d\n",i,idx,idx1);//for debug
+        //printf("[Debug] APP, i = %4d, idx = %4d, idx1 = %4d\n",i,idx,idx1);
         if( i < 3 * nspin ){
             if( i % 3 == 1 )
                 coeff_list[idx1] = coeff_list_l[idx];
@@ -371,7 +409,7 @@ vec liou_coeff_list(const int nspin, const vec coeff_list_l, const vec coeff_lis
     for (int i = 0; i < (2 * nspin); i++){
         for(int j = i + 1; j< (2 * nspin) ; j++){
             for(int k = 0; k < 9; k++){
-                //printf("i = %4d, j = %4d, k = %4d, idx = %4d, idx1 = %4d\n",i,j,k,idx,idx1);//for debug
+                //printf("[Debug] APP, i = %4d, j = %4d, k = %4d, idx = %4d, idx1 = %4d\n",i,j,k,idx,idx1);
                 if( ( i > (nspin - 1) ) && ( j > (nspin - 1) ) ){
                         coeff_list[idx1] += coeff_list_r[idx];
                     idx++;}
@@ -380,7 +418,7 @@ vec liou_coeff_list(const int nspin, const vec coeff_list_l, const vec coeff_lis
     }
 
     for ( int i = 0; i < single_term; i++){
-        //printf("i = %4d, idx = %4d, idx1 = %4d\n",i,idx,idx1);//for debug
+        //printf("[Debug] APP, i = %4d, idx = %4d, idx1 = %4d\n",i,idx,idx1);
         if( i > (3 * nspin - 1) ){
             coeff_list[idx1] += coeff_list_r[idx];
             idx++;}
@@ -390,7 +428,7 @@ vec liou_coeff_list(const int nspin, const vec coeff_list_l, const vec coeff_lis
 }/*}}}*/
 
 cx_vec gene_mixvec(const int nspin, const vector< pair<int,cx_mat> > p_lst)
-{/*{{{*/
+{/*{{{*/ 
     //reverse spin sequence
     vector< pair<int,cx_mat> > polarize_list(p_lst.size());
     for(int i=0; i < polarize_list.size(); i++){
@@ -436,7 +474,7 @@ cx_vec gene_mixvec(const int nspin, const vector< pair<int,cx_mat> > p_lst)
 }/*}}}*/
 
 void save_Matrix(const cx_mat result, const string name)
-{/*{{{*/
+{/*{{{*/ 
     mat m_r = real(result);
     mat m_i = imag(result);
     int n_rows = result.n_rows;
@@ -452,7 +490,7 @@ void save_Matrix(const cx_mat result, const string name)
     
     matPutVariableAsGlobal(mFile, name.c_str(), pArray);
     matClose(mFile);
-    printf("[output] APP,matrix export success!\n");
+    printf("[Output] APP,matrix export to %s success!\n",dbg_filename.c_str());
 
     mxDestroyArray(pArray);
 

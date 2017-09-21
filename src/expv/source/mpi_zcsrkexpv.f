@@ -3,8 +3,8 @@
 !     .                   wsp,lwsp, iwsp,liwsp, matvec, itrace,iflag )
 
       SUBROUTINE MPI_ZCSRKEXPV(n, m, v, f, w, tol, anorm, 
-     .  wsp, lwsp, iwsp, liwsp, itrace, iflag, 
-     .  nspin, h, prefactor, nterm, tlst, tn, alst, n_op, oplst, 
+     .  wsp, lwsp, iwsp, liwsp, itrace, iflag, nspin, h1, 
+     .  h2, h3, prefactor, nterm, tlst, tn, alst, n_op, oplst, 
      .  reqs, status, cache, nchunk)
       implicit none
       
@@ -21,13 +21,14 @@
       DOUBLE PRECISION  cr
       COMPLEX*16        ONEIM
       PARAMETER( ONEIM=(0.0d0,-1.0d0) )
-      INTEGER*8         h
+      INTEGER*8         h1,h2
+      DOUBLE PRECISION  h3
       INTEGER*8         alst(n_op * 20)
       COMPLEX*16        prefactor
       
       integer          n, m, lwsp, liwsp, itrace, iflag, iwsp(liwsp)
       double precision t, tol, anorm
-      complex*16       v(n), w(n), wsp(lwsp),f(n)
+      complex*16       v(n), w(n), wsp(lwsp),f(n),res(n)
 !      external         matvec
 
 *-----Purpose----------------------------------------------------------|
@@ -154,7 +155,7 @@
       parameter( ZERO=(0.0d0,0.0d0), ONE=(1.0d0,0.0d0) )
       integer i, j, k1, mh, mx, iv, ih, j1v, ns, ifree, lfree, iexph,
      .        ireject,ibrkflag,mbrkdwn, nmult, nreject, nexph, nscale,
-     .        nstep
+     .        nstep,flag
       double precision sgn, t_out, tbrkdwn, step_min,step_max, err_loc,
      .                 s_error, x_error, t_now, t_new, t_step, t_old,
      .                 xm, beta, break_tol, p1, p2, p3, eps, rndoff,
@@ -263,8 +264,19 @@
 !         CALL mpi_hamvec(nspin, coeff_lst, wsp(j1v-n), wsp(j1v), reqs, 
 !     .     status, cache, nchunk)
 !         CALL ZSCAL(n, ONEIM, wsp(j1v), 1)! -i * h;
-         CALL mpi_zcsrkhmv(nspin, h, prefactor, wsp(j1v-n), wsp(j1v), 
+!         CALL mpi_zcsrkhmv(nspin, h, prefactor, wsp(j1v-n), wsp(j1v), 
+!     .     nchunk, reqs, status, cache)
+         do flag = 1,n
+           res(flag) = ZERO;    
+         end do
+         CALL mpi_zcsrkhmv(nspin, h1, prefactor, wsp(j1v-n), wsp(j1v), 
      .     nchunk, reqs, status, cache)
+         CALL mpi_zcsrkhmv(nspin, h2, ONE, wsp(j1v-n), res, 
+     .     nchunk, reqs, status, cache)
+         do flag = j1v,j1v + n - 1
+            wsp(flag) = wsp(flag) - h3 * wsp(flag - n) 
+     .                  + res(flag - j1v + 1);
+         end do
          do i = 1,j
             hij = ZDOTC( n, wsp(iv+(i-1)*n),1, wsp(j1v),1 )
             CALL MPI_ALLREDUCE(hij, cz, 2, MPI_DOUBLE_PRECISION, 
@@ -296,8 +308,19 @@
 !      CALL mpi_hamvec(nspin, coeff_lst, wsp(j1v-n), wsp(j1v), reqs, 
 !     .  status, cache, nchunk)
 !      CALL ZSCAL(n, ONEIM, wsp(j1v), 1)! -i * h;
-      CALL mpi_zcsrkhmv(nspin, h, prefactor, wsp(j1v-n), wsp(j1v), 
+!         CALL mpi_zcsrkhmv(nspin, h, prefactor, wsp(j1v-n), wsp(j1v), 
+!     .     nchunk, reqs, status, cache)
+      do flag = 1,n
+        res(flag) = ZERO;    
+      end do
+      CALL mpi_zcsrkhmv(nspin, h1, prefactor, wsp(j1v-n), wsp(j1v), 
      .  nchunk, reqs, status, cache)
+      CALL mpi_zcsrkhmv(nspin, h2, ONE, wsp(j1v-n), res, 
+     .  nchunk, reqs, status, cache)
+      do flag = j1v,j1v + n - 1
+         wsp(flag) = wsp(flag) - h3 * wsp(flag - n) 
+     .               + res(flag - j1v + 1);
+      end do
       avnorm = DZNRM2( n, wsp(j1v),1 )
       CALL MPI_ALLREDUCE(avnorm, cr, 1, MPI_DOUBLE_PRECISION, MPI_SUM, 
      .  MPI_COMM_WORLD, ierr)

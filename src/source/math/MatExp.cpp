@@ -329,7 +329,7 @@ MatExpVector::MatExpVector(const sp_cx_mat& m, const cx_vec& v, const cx_double 
     _is_print_skp = false;
 }
 
-MatExpVector::MatExpVector(const int nspin, const vec coeff_list, const cx_vec local_phi0,const vector<uvec> op_list,\
+MatExpVector::MatExpVector(const int nspin, const vector<vec> coeff_list, const cx_vec local_phi0,const vector<uvec> op_list,\
                            const cx_vec final_vec, const cx_double PREFACTOR, const vec TIME_LIST, MatExpVectorMethod method)
 {
     _nspin = nspin;//Liouville space
@@ -745,7 +745,7 @@ cx_mat MatExpVector::runLargeVecExpv()
     long            itrace;
     long            iflag;
     long            lnspin;
-    double          *coeff_lst;
+    double          *coeff_lst1, *coeff_lst2;
     double          *op_coeff_lst;
     long            nterm;
     double          *tlst;
@@ -757,7 +757,8 @@ cx_mat MatExpVector::runLargeVecExpv()
     long            nchunk;
     long			chunkmax;
     double _Complex *cache;
-    ham             h, **hlst, *alst;
+    ham             h1, h2, *alst;
+    double          h3;
     double _Complex prefactor;
     int             rank,nprocess;
     
@@ -789,7 +790,8 @@ cx_mat MatExpVector::runLargeVecExpv()
     cache = (double _Complex*)malloc(sizeof(double _Complex) * n * 2);
     wsp = (double _Complex*)malloc(sizeof(double _Complex) * lwsp);
     iwsp = (long*)malloc(sizeof(long) * liwsp);
-    coeff_lst = (double*)malloc(sizeof(double) * nterm);
+    coeff_lst1 = (double*)malloc(sizeof(double) * nterm);
+    coeff_lst2 = (double*)malloc(sizeof(double) * nterm);
     reqs = (MPI_Request*)malloc(sizeof(MPI_Request) * nchunk * 2);
     status = (MPI_Status*)malloc(sizeof(MPI_Status) * nchunk * 2);
     op_coeff_lst = (double*)malloc(sizeof(double) * nterm * n_op);
@@ -800,7 +802,8 @@ cx_mat MatExpVector::runLargeVecExpv()
       for (int j = i + 1; j < lnspin; j++){
         for (int a = 0; a < 3; a++){
           for (int b = 0; b < 3; b++){
-            coeff_lst[getPairIdx(lnspin, i, a, j, b)] =  _coeff_list[idx] / 4;
+            coeff_lst1[getPairIdx(lnspin, i, a, j, b)] =  _coeff_list[0][idx] / 4;
+            coeff_lst2[getPairIdx(lnspin, i, a, j, b)] =  _coeff_list[1][idx] / 4;
             idx++;
           }
         }
@@ -808,7 +811,8 @@ cx_mat MatExpVector::runLargeVecExpv()
     }
     for (int i = 0; i < lnspin; i++){
       for (int a = 0; a < 3; a++){
-       coeff_lst[getSingleIdx(lnspin, i, a)] =  _coeff_list[idx] / 2;
+       coeff_lst1[getSingleIdx(lnspin, i, a)] =  _coeff_list[0][idx] / 2;
+       coeff_lst2[getSingleIdx(lnspin, i, a)] =  _coeff_list[1][idx] / 2;
        idx++;
       }
     }
@@ -819,7 +823,7 @@ cx_mat MatExpVector::runLargeVecExpv()
 
     anorm = 0.0;
     for (int i = 0; i < nterm; i++)
-      anorm += fabs(coeff_lst[i]);
+      anorm += fabs(coeff_lst1[i]);
     
     if( rank == 0)
         printf("[Data] MatExp,anorm = %e, typical_time = %e\n",anorm,1.0 / anorm);
@@ -848,11 +852,13 @@ cx_mat MatExpVector::runLargeVecExpv()
         else if( _op_list[i][0] == 2){
             op_coeff_lst[ i * nterm + getPairIdx(lnspin,_op_list[i][1],_op_list[i][2], _op_list[i][3], _op_list[i][4])] = 1.0 / 4;}
         else{
-            printf("wrong input!!!");
+            printf("[Debug] MatExp,wrong input!!!");
             exit(0);}
     } 
     
-    h = hamGen(lnspin, coeff_lst);
+    h1 = hamGen(lnspin, coeff_lst1);
+    h2 = hamGen(lnspin, coeff_lst2);
+    h3 = _coeff_list[2][0];
     
     double  *op_temp;
     op_temp = (double*)malloc(sizeof(double) * nterm);
@@ -866,19 +872,19 @@ cx_mat MatExpVector::runLargeVecExpv()
     double  tic, tac;
     tic = omp_get_wtime();
     
-    //{{{
-    printf("[debug] MatExp,n = %d, m = %d, tol = %e, anorm = %e\n",n,m,tol,anorm);   
-    printf("[debug] MatExp,lwsp = %d, liwsp = %d, itrace = %d, iflag = %d\n",lwsp,liwsp,itrace,iflag);
-    printf("[debug] MatExp,lnspin = %d, nterm = %d, tn = %d, n_op = %d\n",lnspin,nterm,tn,n_op);
+    //{{{ 
+    //printf("[Debug] MatExp,n = %d, m = %d, tol = %e, anorm = %e\n",n,m,tol,anorm);   
+    //printf("[Debug] MatExp,lwsp = %d, liwsp = %d, itrace = %d, iflag = %d\n",lwsp,liwsp,itrace,iflag);
+    //printf("[Debug] MatExp,lnspin = %d, nterm = %d, tn = %d, n_op = %d\n",lnspin,nterm,tn,n_op);
     //}}}
-
+    printf("[Hint] MatExp,Working ...\n");
     mpi_zcsrkexpv_(&n, &m, v, f, w, &tol, &anorm, wsp, &lwsp, iwsp, &liwsp, &itrace,\
-                  &iflag, &lnspin, &h, &prefactor, &nterm, tlst, &tn, alst, &n_op, \
-                  oplst, reqs, status, cache, &nchunk);
+                  &iflag, &lnspin, &h1, &h2, &h3, &prefactor, &nterm, tlst, &tn, \
+                  alst, &n_op, oplst, reqs, status, cache, &nchunk);
                 
     tac = omp_get_wtime();
     
-    printf("[debug] MatExp,rank %4d: mpi_zcsrkexpv works %f second!\n",rank, tac-tic);// for debug;
+    printf("[Debug] MatExp,rank %4d: mpi_zcsrkexpv works %f second!\n",rank, tac-tic);// for debug;
     
     _resVectorList = zeros<cx_mat>(tn,n_op);
     for (int j =0; j < n_op; j++){
@@ -890,14 +896,16 @@ cx_mat MatExpVector::runLargeVecExpv()
     }
 
     for (int i = 0; i < n_op; i++) hamFree(alst[i]);
-    hamFree(h);
+    hamFree(h1);
+    hamFree(h2);
     
     free(op_temp);
     free(op_coeff_lst);
     free(oplst);
     free(status);
     free(reqs);
-    free(coeff_lst);
+    free(coeff_lst1);
+    free(coeff_lst2);
     free(iwsp);
     free(wsp);
     free(cache);
