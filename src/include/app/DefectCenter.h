@@ -30,18 +30,32 @@ private:
 };
 
 class NVCenter:public DefectCenter
-{
+{/*{{{*/
 public:
     enum NVNuclearSpin { N14, N15 };
-    
+
     NVCenter(NVNuclearSpin nuc);
     NVCenter(NVNuclearSpin nuc, vec coord);
     ~NVCenter() {};
-    
+
     void  make_espin_hamiltonian();
 
 protected:
 private:
         void  add_spin_member(NVNuclearSpin nuc, vec coord);
-};
+};/*}}}*/
+
+class ECenter:public DefectCenter
+{/*{{{*/
+public:
+    ECenter();
+    ECenter(vec coord);
+    ~ECenter() {};
+
+    void  make_espin_hamiltonian();
+
+protected:
+private:
+        void  add_spin_member(vec coord);
+};/*}}}*/
 #endif

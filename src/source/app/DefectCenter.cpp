@@ -1,5 +1,7 @@
 #include "include/app/DefectCenter.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//{{{  EnsembleCCE
 NVCenter::NVCenter(NVNuclearSpin nuc)
 {
     vec coord; coord << 0.0 << 0.0 << 0.0;
@@ -43,3 +45,39 @@ void NVCenter::make_espin_hamiltonian()
 
     eig_sym(_eigen_vals, _eigen_vectors, _espin_hamiltonian);
 }
+//}}}
+////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+//{{{  EnsembleCCE
+ECenter::ECenter()
+{
+    vec coord; coord << 0.0 << 0.0 << 0.0;
+    add_spin_member(coord);
+}
+
+ECenter::ECenter(vec coord)
+{
+    add_spin_member(coord);
+}
+
+void ECenter::add_spin_member(vec coord)
+{
+    _electron_spin = cSPIN(coord, "E");
+}
+
+void ECenter::make_espin_hamiltonian()
+{
+    cx_mat sx=_electron_spin.sx();
+    cx_mat sy=_electron_spin.sy();
+    cx_mat sz=_electron_spin.sz();
+    double omegaQ = _electron_spin.get_omegaQ() * 2.0 * datum::pi * 1e6;
+    double gamma = _electron_spin.get_gamma();
+
+    _espin_hamiltonian = gamma * (_magB(0)*sx + _magB(1)*sy + _magB(2)*sz );
+
+    eig_sym(_eigen_vals, _eigen_vectors, _espin_hamiltonian);
+}
+//}}}
+////////////////////////////////////////////////////////////////////////////////
